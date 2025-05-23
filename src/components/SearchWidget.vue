@@ -100,7 +100,7 @@
     </div>
 
     <!-- Search Results -->
-    <div v-else-if="currentResult" class="space-y-6">
+    <div v-else-if="currentResult" class="space-y-6 max-h-[400px] overflow-y-auto">
       <!-- AI Answer -->
       <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
         <div class="flex items-start gap-3">
