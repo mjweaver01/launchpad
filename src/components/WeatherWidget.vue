@@ -53,7 +53,7 @@
     <!-- Weather data -->
     <div v-else-if="weatherData" class="text-center">
       <div class="flex items-center justify-center mb-4">
-        <div class="text-9xl mr-3">{{ getWeatherEmoji(weatherData.icon) }}</div>
+        <div class="text-9xl mr-10">{{ getWeatherEmoji(weatherData.icon) }}</div>
         <div class="text-left">
           <div class="text-sm text-gray-600 capitalize">{{ weatherData.description }}</div>
           <div class="text-3xl font-bold text-gray-800">
@@ -68,7 +68,7 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-2 gap-4 text-sm">
+      <div class="grid grid-cols-2 gap-4 text-sm mt-8">
         <div class="bg-blue-50 rounded-lg p-3">
           <div class="text-blue-600 font-medium">Humidity</div>
           <div class="text-gray-800">{{ weatherData.humidity }}%</div>
