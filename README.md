@@ -10,19 +10,22 @@ Your personal assistant with weather, news, and task management.
    OPENAI_API_KEY=your_openai_api_key_here
    OPENAI_MODEL=gpt-4o-mini
    VISUAL_CROSSING_API_KEY=your_visual_crossing_api_key_here
+   NEWS_API_KEY=your_news_api_key_here
    ```
 
 2. Replace `your_openai_api_key_here` with your actual OpenAI API key.
 
 3. Replace `your_visual_crossing_api_key_here` with your actual Visual Crossing API key. You can get a free API key at [https://www.visualcrossing.com/weather-api](https://www.visualcrossing.com/weather-api).
 
-4. Install dependencies:
+4. Replace `your_news_api_key_here` with your actual NewsAPI key. You can get a free API key at [https://newsapi.org](https://newsapi.org).
+
+5. Install dependencies:
 
    ```
    npm install
    ```
 
-5. Run the development server with Netlify CLI:
+6. Run the development server with Netlify CLI:
    ```
    npm run dev
    ```
@@ -59,6 +62,7 @@ This project is set up to be deployed on Netlify:
    - OPENAI_API_KEY
    - OPENAI_MODEL
    - VISUAL_CROSSING_API_KEY
+   - NEWS_API_KEY
 
 ## Usage
 
@@ -97,6 +101,16 @@ Send a GET request to `/.netlify/functions/weather` with latitude and longitude 
 ```
 
 The service will return current weather data including temperature, description, humidity, and wind speed using the Visual Crossing Weather API.
+
+#### News API
+
+Send a GET request to `/.netlify/functions/news` with optional country and category query parameters:
+
+```
+/.netlify/functions/news?country=us&category=technology
+```
+
+The service will return the latest news articles from NewsAPI including title, description, URL, and publication details.
 
 ## Project Structure
 

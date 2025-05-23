@@ -4,7 +4,9 @@
       <WeatherWidget />
     </div>
 
-    <!-- @TODO create news component - use newsapi.org api -->
+    <div class="mb-8">
+      <NewsWidget />
+    </div>
 
     <!-- @TODO create task list component (todo app using local storage) -->
 
@@ -15,11 +17,13 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import WeatherWidget from '../components/WeatherWidget.vue';
+import NewsWidget from '../components/NewsWidget.vue';
 
 export default defineComponent({
   name: 'Home',
   components: {
     WeatherWidget,
+    NewsWidget,
   },
   setup() {
     return {};

@@ -1,5 +1,5 @@
 import { Handler } from '@netlify/functions';
-import { news } from '../server/news';
+import { getTopNews } from '../server/news';
 
 const handler: Handler = async (event, context) => {
   // CORS headers
@@ -19,12 +19,20 @@ const handler: Handler = async (event, context) => {
   }
 
   try {
-    const news = await news();
+    // Get query parameters
+    const { country, category, page, pageSize } = event.queryStringParameters || {};
+
+    const newsData = await getTopNews(
+      country || 'us',
+      category,
+      page ? parseInt(page) : 1,
+      pageSize ? parseInt(pageSize) : 20
+    );
 
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify(news),
+      body: JSON.stringify(newsData),
     };
   } catch (error) {
     console.error('Error:', error);
@@ -32,7 +40,10 @@ const handler: Handler = async (event, context) => {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: 'An error occurred while processing the request' }),
+      body: JSON.stringify({
+        error:
+          error instanceof Error ? error.message : 'An error occurred while processing the request',
+      }),
     };
   }
 };
