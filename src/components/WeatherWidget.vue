@@ -3,13 +3,13 @@
     <h2 class="text-xl font-semibold text-gray-800 mb-4 text-center">Current Weather</h2>
 
     <!-- Loading state -->
-    <div v-if="loading" class="text-center">
+    <div v-if="weatherStore.loading" class="text-center">
       <LoadingSpinner />
       <p class="text-gray-600 mt-2">Getting your location...</p>
     </div>
 
     <!-- Error state -->
-    <div v-else-if="error" class="text-center">
+    <div v-else-if="weatherStore.error" class="text-center">
       <div class="text-red-500 mb-2">
         <svg class="w-12 h-12 mx-auto" fill="currentColor" viewBox="0 0 20 20">
           <path
@@ -19,7 +19,7 @@
           />
         </svg>
       </div>
-      <p class="text-red-600 text-sm">{{ error }}</p>
+      <p class="text-red-600 text-sm">{{ weatherStore.error }}</p>
       <button
         @click="retryLocation"
         class="mt-3 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors text-sm"
@@ -29,22 +29,24 @@
     </div>
 
     <!-- Weather data -->
-    <div v-else-if="weather" class="text-center">
+    <div v-else-if="weatherData" class="text-center">
       <div class="flex items-center justify-center mb-4">
-        <div class="text-6xl mr-3">{{ getWeatherEmoji(weather.icon) }}</div>
+        <div class="text-6xl mr-3">{{ getWeatherEmoji(weatherData.icon) }}</div>
         <div class="text-left">
           <div class="text-3xl font-bold text-gray-800">
-            {{ celsiusToFahrenheit(weather.temperature) }}°F
-            <span class="text-lg text-gray-500 font-normal">({{ weather.temperature }}°C)</span>
+            {{ celsiusToFahrenheit(weatherData.temperature) }}°F
+            <span class="text-lg text-gray-500 font-normal">({{ weatherData.temperature }}°C)</span>
           </div>
-          <div class="text-sm text-gray-600 capitalize">{{ weather.description }}</div>
+          <div class="text-sm text-gray-600 capitalize">{{ weatherData.description }}</div>
         </div>
       </div>
 
       <div class="text-sm text-gray-700 mb-4">
-        <div class="font-medium">{{ weather.location }}</div>
+        <div class="font-medium">{{ weatherData.location }}</div>
         <div>
-          Feels like {{ celsiusToFahrenheit(weather.feelsLike) }}°F ({{ weather.feelsLike }}°C)
+          Feels like {{ celsiusToFahrenheit(weatherData.feelsLike) }}°F ({{
+            weatherData.feelsLike
+          }}°C)
         </div>
       </div>
 
@@ -52,7 +54,7 @@
       <div v-if="coordinates" class="mb-4">
         <img
           :src="getStaticMapUrl(coordinates.lat, coordinates.lon)"
-          :alt="`Map of ${weather.location}`"
+          :alt="`Map of ${weatherData.location}`"
           class="w-full h-32 object-cover rounded-lg border border-gray-200"
           @error="handleMapError"
         />
@@ -64,11 +66,11 @@
       <div class="grid grid-cols-2 gap-4 text-sm">
         <div class="bg-blue-50 rounded-lg p-3">
           <div class="text-blue-600 font-medium">Humidity</div>
-          <div class="text-gray-800">{{ weather.humidity }}%</div>
+          <div class="text-gray-800">{{ weatherData.humidity }}%</div>
         </div>
         <div class="bg-green-50 rounded-lg p-3">
           <div class="text-green-600 font-medium">Wind Speed</div>
-          <div class="text-gray-800">{{ weather.windSpeed }} m/s</div>
+          <div class="text-gray-800">{{ weatherData.windSpeed }} m/s</div>
         </div>
       </div>
     </div>
@@ -76,23 +78,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, Ref } from 'vue';
+import { defineComponent, ref, onMounted, computed } from 'vue';
 import LoadingSpinner from './LoadingSpinner.vue';
-
-interface WeatherData {
-  location: string;
-  temperature: number;
-  description: string;
-  icon: string;
-  humidity: number;
-  windSpeed: number;
-  feelsLike: number;
-}
-
-interface Coordinates {
-  lat: number;
-  lon: number;
-}
+import { useWeatherStore } from '../stores';
 
 export default defineComponent({
   name: 'WeatherWidget',
@@ -100,14 +88,16 @@ export default defineComponent({
     LoadingSpinner,
   },
   setup() {
-    const weather: Ref<WeatherData | null> = ref(null);
-    const coordinates: Ref<Coordinates | null> = ref(null);
-    const loading = ref(false);
-    const error = ref('');
+    const weatherStore = useWeatherStore();
+    const weatherData = ref(null);
 
     // You'll need to add your Google Maps API key here
     const GOOGLE_MAPS_API_KEY =
       import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'YOUR_GOOGLE_MAPS_API_KEY';
+
+    const coordinates = computed(() => {
+      return weatherStore.coordinatesCache?.data || null;
+    });
 
     const celsiusToFahrenheit = (celsius: number): number => {
       return Math.round((celsius * 9) / 5 + 32);
@@ -159,73 +149,12 @@ export default defineComponent({
       return iconMap[icon] || '🌤️'; // Default to sun-behind-cloud emoji
     };
 
-    const getCurrentLocation = (): Promise<GeolocationPosition> => {
-      return new Promise((resolve, reject) => {
-        if (!navigator.geolocation) {
-          reject(new Error('Geolocation is not supported by this browser'));
-          return;
-        }
-
-        navigator.geolocation.getCurrentPosition(
-          resolve,
-          error => {
-            switch (error.code) {
-              case error.PERMISSION_DENIED:
-                reject(new Error('Location access denied. Please enable location permissions.'));
-                break;
-              case error.POSITION_UNAVAILABLE:
-                reject(new Error('Location information is unavailable.'));
-                break;
-              case error.TIMEOUT:
-                reject(new Error('Location request timed out.'));
-                break;
-              default:
-                reject(new Error('An unknown error occurred while retrieving location.'));
-                break;
-            }
-          },
-          {
-            timeout: 10000,
-            enableHighAccuracy: true,
-          }
-        );
-      });
-    };
-
-    const fetchWeather = async (lat: number, lon: number) => {
-      try {
-        const response = await fetch(`/.netlify/functions/weather?lat=${lat}&lon=${lon}`);
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-        }
-
-        const weatherData = await response.json();
-        weather.value = weatherData;
-      } catch (err) {
-        throw new Error(err instanceof Error ? err.message : 'Failed to fetch weather data');
-      }
-    };
-
     const loadWeather = async () => {
-      loading.value = true;
-      error.value = '';
-      weather.value = null;
-      coordinates.value = null;
-
       try {
-        const position = await getCurrentLocation();
-        const { latitude, longitude } = position.coords;
-
-        // Store coordinates for the map
-        coordinates.value = { lat: latitude, lon: longitude };
-
-        await fetchWeather(latitude, longitude);
-      } catch (err) {
-        error.value = err instanceof Error ? err.message : 'An unexpected error occurred';
-      } finally {
-        loading.value = false;
+        const data = await weatherStore.loadWeather();
+        weatherData.value = data;
+      } catch (error) {
+        console.error('Failed to load weather:', error);
       }
     };
 
@@ -238,10 +167,9 @@ export default defineComponent({
     });
 
     return {
-      weather,
+      weatherStore,
+      weatherData,
       coordinates,
-      loading,
-      error,
       retryLocation,
       getWeatherEmoji,
       celsiusToFahrenheit,

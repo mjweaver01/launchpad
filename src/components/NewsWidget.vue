@@ -20,22 +20,22 @@
         <button
           @click="loadNews"
           class="px-3 py-1 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors text-sm"
-          :disabled="loading"
+          :disabled="newsStore.loading"
         >
-          <span v-if="!loading">Refresh</span>
+          <span v-if="!newsStore.loading">Refresh</span>
           <span v-else>Loading...</span>
         </button>
       </div>
     </div>
 
     <!-- Loading state -->
-    <div v-if="loading" class="text-center py-8">
+    <div v-if="newsStore.loading" class="text-center py-8">
       <LoadingSpinner />
       <p class="text-gray-600 mt-2">Loading latest news...</p>
     </div>
 
     <!-- Error state -->
-    <div v-else-if="error" class="text-center py-8">
+    <div v-else-if="newsStore.error" class="text-center py-8">
       <div class="text-red-500 mb-2">
         <svg class="w-12 h-12 mx-auto" fill="currentColor" viewBox="0 0 20 20">
           <path
@@ -45,7 +45,7 @@
           />
         </svg>
       </div>
-      <p class="text-red-600 text-sm">{{ error }}</p>
+      <p class="text-red-600 text-sm">{{ newsStore.error }}</p>
       <button
         @click="loadNews"
         class="mt-3 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors text-sm"
@@ -200,25 +200,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, Ref } from 'vue';
+import { defineComponent, ref, onMounted, computed } from 'vue';
 import LoadingSpinner from './LoadingSpinner.vue';
-
-interface NewsArticle {
-  title: string;
-  description: string;
-  url: string;
-  urlToImage: string;
-  publishedAt: string;
-  source: {
-    name: string;
-  };
-  author: string;
-}
-
-interface NewsResponse {
-  articles: NewsArticle[];
-  totalResults: number;
-}
+import { useNewsStore } from '../stores';
 
 export default defineComponent({
   name: 'NewsWidget',
@@ -226,9 +210,8 @@ export default defineComponent({
     LoadingSpinner,
   },
   setup() {
-    const newsData: Ref<NewsResponse | null> = ref(null);
-    const loading = ref(false);
-    const error = ref('');
+    const newsStore = useNewsStore();
+    const newsData = ref(null);
     const selectedCategory = ref('');
     const currentPage = ref(1);
     const pageSize = ref(10);
@@ -259,55 +242,34 @@ export default defineComponent({
       img.style.display = 'none';
     };
 
-    const fetchNews = async () => {
-      try {
-        let url = `/.netlify/functions/news?country=us&page=${currentPage.value}&pageSize=${pageSize.value}`;
-        if (selectedCategory.value) {
-          url += `&category=${selectedCategory.value}`;
-        }
+    const calculatePagination = (data: any) => {
+      totalPages.value = Math.ceil(data.totalResults / pageSize.value);
 
-        const response = await fetch(url);
+      // Calculate visible pages (show max 5 pages around current page)
+      const maxVisiblePages = 5;
+      const halfRange = Math.floor(maxVisiblePages / 2);
+      let startPage = Math.max(1, currentPage.value - halfRange);
+      let endPage = Math.min(totalPages.value, startPage + maxVisiblePages - 1);
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        newsData.value = data;
-        totalPages.value = Math.ceil(data.totalResults / pageSize.value);
-
-        // Calculate visible pages (show max 5 pages around current page)
-        const maxVisiblePages = 5;
-        const halfRange = Math.floor(maxVisiblePages / 2);
-        let startPage = Math.max(1, currentPage.value - halfRange);
-        let endPage = Math.min(totalPages.value, startPage + maxVisiblePages - 1);
-
-        // Adjust start if we're near the end
-        if (endPage - startPage < maxVisiblePages - 1) {
-          startPage = Math.max(1, endPage - maxVisiblePages + 1);
-        }
-
-        visiblePages.value = Array.from(
-          { length: endPage - startPage + 1 },
-          (_, i) => startPage + i
-        );
-      } catch (err) {
-        throw new Error(err instanceof Error ? err.message : 'Failed to fetch news data');
+      // Adjust start if we're near the end
+      if (endPage - startPage < maxVisiblePages - 1) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
       }
+
+      visiblePages.value = Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
     };
 
     const loadNews = async () => {
-      loading.value = true;
-      error.value = '';
-      newsData.value = null;
-
       try {
-        await fetchNews();
-      } catch (err) {
-        error.value = err instanceof Error ? err.message : 'An unexpected error occurred';
-      } finally {
-        loading.value = false;
+        const data = await newsStore.loadNews(
+          selectedCategory.value,
+          currentPage.value,
+          pageSize.value
+        );
+        newsData.value = data;
+        calculatePagination(data);
+      } catch (error) {
+        console.error('Failed to load news:', error);
       }
     };
 
@@ -326,9 +288,8 @@ export default defineComponent({
     });
 
     return {
+      newsStore,
       newsData,
-      loading,
-      error,
       selectedCategory,
       loadNews,
       formatDate,
