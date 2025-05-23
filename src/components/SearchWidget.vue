@@ -118,7 +118,7 @@
           <div class="flex-1">
             <h3 class="font-semibold text-gray-900 mb-2">AI Answer</h3>
             <div
-              class="prose prose-sm max-w-none text-gray-700"
+              class="markdown-content max-w-none text-gray-700"
               v-html="formatAnswer(currentResult.answer)"
             ></div>
           </div>
@@ -201,6 +201,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed, watch } from 'vue';
+import { marked } from 'marked';
 import { useSearchStore } from '../stores/search';
 import type { SearchResult } from '../stores/types';
 import LoadingSpinner from './LoadingSpinner.vue';
@@ -261,14 +262,8 @@ export default defineComponent({
     };
 
     const formatAnswer = (answer: string) => {
-      // Basic formatting for the answer
-      return answer
-        .replace(/\n\n/g, '</p><p>')
-        .replace(/\n/g, '<br>')
-        .replace(/^/, '<p>')
-        .replace(/$/, '</p>')
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>');
+      // Use marked to parse markdown
+      return marked.parse(answer);
     };
 
     const formatDate = (timestamp: number) => {
