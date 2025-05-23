@@ -1,6 +1,12 @@
 # 🚀 Launchpad
 
-Your personal assistant with AI search, weather, news, and task management.
+A personal dashboard with the following widgets:
+
+- AI Search (web enabled)
+- Weather
+- News
+- Calendar (google)
+- Task Management
 
 ## Quickstart
 
