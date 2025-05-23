@@ -2,14 +2,16 @@
   <header class="bg-blue-800 text-white shadow-md">
     <div class="mx-auto px-4 sm:px-6 py-2.5">
       <div class="flex justify-between items-center">
-        <router-link to="/" class="uppercase tracking-[3px] text-2xl font-bold"
+        <router-link to="/" class="uppercase tracking-[2px] text-2xl font-bold"
           >🚀 Launchpad</router-link
         >
 
         <div class="flex items-center space-x-4">
           <nav class="flex space-x-4">
             <router-link
-              v-for="route in routes.filter(route => !route.path.includes('google'))"
+              v-for="route in routes.filter(
+                route => !route.path.includes('google') && route.path !== '/'
+              )"
               :key="route.path"
               :to="route.path"
               class="px-3 py-2 rounded hover:bg-blue-700 transition-colors"
