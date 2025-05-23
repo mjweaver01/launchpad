@@ -1,23 +1,28 @@
-# Player Probability
+# 🚀 Launchpad
 
-Forecast the probability of a player appearing in their next game.
+Your personal assistant with weather, news, and task management.
 
 ## Setup
 
 1. Create a `.env` file in the root directory with the following content:
+
    ```
    OPENAI_API_KEY=your_openai_api_key_here
    OPENAI_MODEL=gpt-4o-mini
+   VISUAL_CROSSING_API_KEY=your_visual_crossing_api_key_here
    ```
 
 2. Replace `your_openai_api_key_here` with your actual OpenAI API key.
 
-3. Install dependencies:
+3. Replace `your_visual_crossing_api_key_here` with your actual Visual Crossing API key. You can get a free API key at [https://www.visualcrossing.com/weather-api](https://www.visualcrossing.com/weather-api).
+
+4. Install dependencies:
+
    ```
    npm install
    ```
 
-4. Run the development server with Netlify CLI:
+5. Run the development server with Netlify CLI:
    ```
    npm run dev
    ```
@@ -27,21 +32,25 @@ Forecast the probability of a player appearing in their next game.
 This project is set up to be deployed on Netlify:
 
 1. Install Netlify CLI globally (if not already installed):
+
    ```
    npm install -g netlify-cli
    ```
 
 2. Log in to Netlify:
+
    ```
    netlify login
    ```
 
 3. Link your repository to a Netlify site:
+
    ```
    netlify init
    ```
 
 4. Deploy to Netlify:
+
    ```
    netlify deploy --prod
    ```
@@ -49,6 +58,7 @@ This project is set up to be deployed on Netlify:
 5. Set environment variables in the Netlify dashboard:
    - OPENAI_API_KEY
    - OPENAI_MODEL
+   - VISUAL_CROSSING_API_KEY
 
 ## Usage
 
@@ -77,6 +87,16 @@ Send a GET request to `/.netlify/functions/probability` with the playerName as a
 ```
 
 The service will return a forecast with the probability of the player appearing in their next game, confidence, and an explanation.
+
+#### Weather API
+
+Send a GET request to `/.netlify/functions/weather` with latitude and longitude as query parameters:
+
+```
+/.netlify/functions/weather?lat=40.7128&lon=-74.0060
+```
+
+The service will return current weather data including temperature, description, humidity, and wind speed using the Visual Crossing Weather API.
 
 ## Project Structure
 

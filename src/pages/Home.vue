@@ -1,11 +1,8 @@
 <template>
   <div>
-    <div class="text-center mb-10">
-      <h1 class="text-4xl font-bold text-indigo-800 mb-2">Launchpad</h1>
-      <p class="text-gray-600">Your personal assistant</p>
+    <div class="mb-8">
+      <WeatherWidget />
     </div>
-
-    <!-- @TODO create weather component - use current location from browser and fetch weather data from openweathermap api -->
 
     <!-- @TODO create news component - use newsapi.org api -->
 
@@ -14,14 +11,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, Ref } from 'vue';
+import { defineComponent } from 'vue';
+import WeatherWidget from '../components/WeatherWidget.vue';
 
 export default defineComponent({
   name: 'Home',
+  components: {
+    WeatherWidget,
+  },
   setup() {
-    return {
-      routes,
-    };
+    return {};
   },
 });
 </script>
