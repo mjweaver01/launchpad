@@ -16,9 +16,9 @@
       <SearchWidget />
     </div>
 
-    <!-- @TODO create "google" style web search using openai's web_search_preview tool -->
-
-    <!-- @TODO create a calendar component that pulls events from google calendar -->
+    <div class="mb-8">
+      <CalendarWidget />
+    </div>
   </div>
 </template>
 
@@ -28,6 +28,7 @@ import WeatherWidget from '../components/WeatherWidget.vue';
 import NewsWidget from '../components/NewsWidget.vue';
 import TodoWidget from '../components/TodoWidget.vue';
 import SearchWidget from '../components/SearchWidget.vue';
+import CalendarWidget from '../components/CalendarWidget.vue';
 
 export default defineComponent({
   name: 'Home',
@@ -36,6 +37,7 @@ export default defineComponent({
     NewsWidget,
     TodoWidget,
     SearchWidget,
+    CalendarWidget,
   },
   setup() {
     return {};
