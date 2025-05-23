@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-lg shadow-md p-6 w-full max-h-[500px] overflow-y-auto mx-auto">
+  <div class="bg-white rounded-lg shadow-md p-6 w-full mx-auto">
     <div class="flex items-center justify-between mb-6">
       <h2 class="text-2xl font-semibold text-gray-800">Latest News</h2>
       <div class="flex gap-2">
@@ -17,14 +17,14 @@
           <option value="sports">Sports</option>
           <option value="technology">Technology</option>
         </select>
-        <button
+        <!-- <button
           @click="loadNews"
           class="px-3 py-1 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors text-sm"
           :disabled="newsStore.loading"
         >
           <span v-if="!newsStore.loading">Refresh</span>
           <span v-else>Loading...</span>
-        </button>
+        </button> -->
       </div>
     </div>
 
@@ -55,7 +55,7 @@
     </div>
 
     <!-- News articles -->
-    <div v-else-if="newsData" class="space-y-6">
+    <div v-else-if="newsData" class="space-y-6 max-h-[500px] overflow-y-auto">
       <!-- Featured article -->
       <div v-if="newsData.articles.length > 0" class="border-b border-gray-200 pb-6">
         <article class="group">

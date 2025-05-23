@@ -1,13 +1,13 @@
 <template>
   <div class="bg-white rounded-lg shadow-md p-6 w-full mx-auto">
     <div class="flex items-center justify-between mb-4">
-      <h2 class="text-xl font-semibold text-gray-800">Calendar</h2>
+      <h2 class="text-2xl font-semibold text-gray-800">Calendar</h2>
       <div class="flex items-center space-x-2">
         <button
           v-if="calendarStore.isAuthenticated"
           @click="refreshCalendar"
           :disabled="calendarStore.loading"
-          class="p-2 text-gray-600 hover:text-indigo-600 transition-colors"
+          class="p-2 text-gray-600 hover:text-indigo-600 transition-colors flex items-center justify-center"
           title="Refresh Calendar"
         >
           <svg
@@ -21,7 +21,7 @@
               stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
-              d="M4 4v5h.582m15.356 2A8.955 8.955 0 0112 4.582M4.582 9A8.955 8.955 0 0112 19.418M15 5v2m0 0v2m0-2h2m-2 0h-2"
+              d="M4 12a8 8 0 0116 0M12 4v4m0 0l2-2m-2 2l-2-2"
             />
           </svg>
         </button>
@@ -137,7 +137,7 @@
     </div>
 
     <!-- Calendar data -->
-    <div v-else class="space-y-4">
+    <div v-else class="space-y-4 max-h-[500px] overflow-y-auto">
       <!-- User info -->
       <div
         v-if="calendarStore.authState.userInfo"
