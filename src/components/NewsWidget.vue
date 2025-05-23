@@ -17,14 +17,14 @@
           <option value="sports">Sports</option>
           <option value="technology">Technology</option>
         </select>
-        <!-- <button
+        <button
           @click="loadNews"
           class="px-3 py-1 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors text-sm"
           :disabled="newsStore.loading"
         >
           <span v-if="!newsStore.loading">Refresh</span>
           <span v-else>Loading...</span>
-        </button> -->
+        </button>
       </div>
     </div>
 

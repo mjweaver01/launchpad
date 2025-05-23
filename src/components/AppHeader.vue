@@ -1,6 +1,6 @@
 <template>
   <header class="bg-indigo-800 text-white shadow-md">
-    <div class="mx-auto px-4 py-3">
+    <div class="mx-auto px-4 sm:px-6 py-3">
       <div class="flex justify-between items-center">
         <router-link to="/" class="font-bold text-xl">🚀 Launchpad</router-link>
 
