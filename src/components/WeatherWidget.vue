@@ -75,7 +75,7 @@
       <!-- Google Maps Static Image -->
       <div v-if="coordinates" class="mb-4">
         <img
-          :src="getStaticMapUrl(coordinates.lat, coordinates.lon)"
+          :src="cachedMapImage || getStaticMapUrl(coordinates.lat, coordinates.lon)"
           :alt="`Map of ${weatherData.location}`"
           class="w-full h-32 object-cover rounded-lg border border-gray-200"
           @error="handleMapError"
@@ -100,7 +100,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed } from 'vue';
+import { defineComponent, ref, onMounted, computed, watch } from 'vue';
 import LoadingSpinner from './LoadingSpinner.vue';
 import { useWeatherStore } from '../stores';
 
@@ -112,6 +112,7 @@ export default defineComponent({
   setup() {
     const weatherStore = useWeatherStore();
     const weatherData = ref(null);
+    const cachedMapImage = ref<string | null>(null);
 
     // You'll need to add your Google Maps API key here
     const GOOGLE_MAPS_API_KEY =
@@ -123,6 +124,25 @@ export default defineComponent({
 
     const celsiusToFahrenheit = (celsius: number): number => {
       return Math.round((celsius * 9) / 5 + 32);
+    };
+
+    const getCacheKey = (lat: number, lon: number): string => {
+      return `weather-map-${lat.toFixed(4)}-${lon.toFixed(4)}`;
+    };
+
+    const cleanupOldCachedImages = () => {
+      try {
+        const keys = Object.keys(localStorage);
+        const mapCacheKeys = keys.filter(key => key.startsWith('weather-map-'));
+
+        // Keep only the 5 most recent cached map images
+        if (mapCacheKeys.length > 5) {
+          const keysToRemove = mapCacheKeys.slice(0, mapCacheKeys.length - 5);
+          keysToRemove.forEach(key => localStorage.removeItem(key));
+        }
+      } catch (error) {
+        console.warn('Failed to cleanup old cached images:', error);
+      }
     };
 
     const getStaticMapUrl = (lat: number, lon: number): string => {
@@ -140,10 +160,64 @@ export default defineComponent({
       return `${baseUrl}?${params.toString()}`;
     };
 
+    const fetchImageAsBase64 = async (url: string): Promise<string> => {
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const blob = await response.blob();
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      } catch (error) {
+        console.error('Failed to fetch image as base64:', error);
+        throw error;
+      }
+    };
+
+    const loadCachedMapImage = async (lat: number, lon: number) => {
+      const cacheKey = getCacheKey(lat, lon);
+
+      // Check if we have a cached version
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        cachedMapImage.value = cached;
+        return;
+      }
+
+      // If not cached, fetch and cache it
+      try {
+        const mapUrl = getStaticMapUrl(lat, lon);
+        const base64Image = await fetchImageAsBase64(mapUrl);
+
+        // Cleanup old cached images before storing new one
+        cleanupOldCachedImages();
+
+        // Store in localStorage
+        localStorage.setItem(cacheKey, base64Image);
+        cachedMapImage.value = base64Image;
+      } catch (error) {
+        console.error('Failed to load and cache map image:', error);
+        // Fallback to direct URL if caching fails
+        cachedMapImage.value = getStaticMapUrl(lat, lon);
+      }
+    };
+
     const handleMapError = (event: Event) => {
       console.warn('Failed to load Google Maps image. Please check your API key.');
       const img = event.target as HTMLImageElement;
       img.style.display = 'none';
+    };
+
+    // Watch for coordinate changes and update cached image
+    const updateMapImage = async () => {
+      if (coordinates.value) {
+        await loadCachedMapImage(coordinates.value.lat, coordinates.value.lon);
+      }
     };
 
     const getWeatherEmoji = (icon: string): string => {
@@ -175,6 +249,8 @@ export default defineComponent({
       try {
         const data = await weatherStore.loadWeather();
         weatherData.value = data;
+        // Load cached map image after weather data is loaded
+        await updateMapImage();
       } catch (error) {
         console.error('Failed to load weather:', error);
       }
@@ -183,6 +259,20 @@ export default defineComponent({
     const retryLocation = () => {
       loadWeather();
     };
+
+    // Watch for coordinate changes and update cached image
+    watch(
+      coordinates,
+      async (newCoords, oldCoords) => {
+        if (
+          newCoords &&
+          (!oldCoords || newCoords.lat !== oldCoords.lat || newCoords.lon !== oldCoords.lon)
+        ) {
+          await updateMapImage();
+        }
+      },
+      { immediate: false }
+    );
 
     onMounted(() => {
       loadWeather();
@@ -197,6 +287,8 @@ export default defineComponent({
       celsiusToFahrenheit,
       getStaticMapUrl,
       handleMapError,
+      cachedMapImage,
+      updateMapImage,
     };
   },
 });
