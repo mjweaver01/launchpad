@@ -48,6 +48,19 @@
         </div>
       </div>
 
+      <!-- Google Maps Static Image -->
+      <div v-if="coordinates" class="mb-4">
+        <img
+          :src="getStaticMapUrl(coordinates.lat, coordinates.lon)"
+          :alt="`Map of ${weather.location}`"
+          class="w-full h-32 object-cover rounded-lg border border-gray-200"
+          @error="handleMapError"
+        />
+        <p class="text-xs text-gray-500 mt-1">
+          Location: {{ coordinates.lat.toFixed(4) }}, {{ coordinates.lon.toFixed(4) }}
+        </p>
+      </div>
+
       <div class="grid grid-cols-2 gap-4 text-sm">
         <div class="bg-blue-50 rounded-lg p-3">
           <div class="text-blue-600 font-medium">Humidity</div>
@@ -76,6 +89,11 @@ interface WeatherData {
   feelsLike: number;
 }
 
+interface Coordinates {
+  lat: number;
+  lon: number;
+}
+
 export default defineComponent({
   name: 'WeatherWidget',
   components: {
@@ -83,11 +101,37 @@ export default defineComponent({
   },
   setup() {
     const weather: Ref<WeatherData | null> = ref(null);
+    const coordinates: Ref<Coordinates | null> = ref(null);
     const loading = ref(false);
     const error = ref('');
 
+    // You'll need to add your Google Maps API key here
+    const GOOGLE_MAPS_API_KEY =
+      import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'YOUR_GOOGLE_MAPS_API_KEY';
+
     const celsiusToFahrenheit = (celsius: number): number => {
       return Math.round((celsius * 9) / 5 + 32);
+    };
+
+    const getStaticMapUrl = (lat: number, lon: number): string => {
+      const baseUrl = 'https://maps.googleapis.com/maps/api/staticmap';
+      const params = new URLSearchParams({
+        center: `${lat},${lon}`,
+        zoom: '12',
+        size: '400x150',
+        maptype: 'roadmap',
+        markers: `color:red|${lat},${lon}`,
+        key: GOOGLE_MAPS_API_KEY,
+        style: 'feature:poi|visibility:off', // Hide points of interest for cleaner look
+      });
+
+      return `${baseUrl}?${params.toString()}`;
+    };
+
+    const handleMapError = (event: Event) => {
+      console.warn('Failed to load Google Maps image. Please check your API key.');
+      const img = event.target as HTMLImageElement;
+      img.style.display = 'none';
     };
 
     const getWeatherEmoji = (icon: string): string => {
@@ -168,10 +212,15 @@ export default defineComponent({
       loading.value = true;
       error.value = '';
       weather.value = null;
+      coordinates.value = null;
 
       try {
         const position = await getCurrentLocation();
         const { latitude, longitude } = position.coords;
+
+        // Store coordinates for the map
+        coordinates.value = { lat: latitude, lon: longitude };
+
         await fetchWeather(latitude, longitude);
       } catch (err) {
         error.value = err instanceof Error ? err.message : 'An unexpected error occurred';
@@ -190,11 +239,14 @@ export default defineComponent({
 
     return {
       weather,
+      coordinates,
       loading,
       error,
       retryLocation,
       getWeatherEmoji,
       celsiusToFahrenheit,
+      getStaticMapUrl,
+      handleMapError,
     };
   },
 });

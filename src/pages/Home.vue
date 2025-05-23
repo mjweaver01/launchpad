@@ -7,6 +7,8 @@
     <!-- @TODO create news component - use newsapi.org api -->
 
     <!-- @TODO create task list component (todo app using local storage) -->
+
+    <!-- @TODO create "google" style web search using openai's web_search_preview tool -->
   </div>
 </template>
 

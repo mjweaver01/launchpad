@@ -1,10 +1,10 @@
 import { client, model } from './openai';
-import { generateNewsPrompt } from './prompt';
+import { generateWebSearchPrompt } from './prompt';
 
-export const news = async () => {
+export const webSearch = async () => {
   try {
     // Generate OpenAI Prompt
-    const prompt = generateNewsPrompt({});
+    const prompt = generateWebSearchPrompt({});
 
     // Call OpenAI's Responses API to get the probability of the player appearing in their next game
     // Uses the built-in web_search_preview tool to get real-time data
