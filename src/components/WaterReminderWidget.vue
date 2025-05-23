@@ -183,7 +183,7 @@
     </div>
 
     <!-- Reminders List -->
-    <div class="space-y-3">
+    <div class="space-y-3 max-h-[400px] overflow-y-auto">
       <h3 class="text-lg font-semibold text-gray-800 mb-3">Today's Reminders</h3>
 
       <!-- Empty state -->
