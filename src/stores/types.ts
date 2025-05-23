@@ -122,8 +122,8 @@ export interface GoogleAuthState {
 
 // Cache duration in milliseconds (1 hour)
 export const CACHE_DURATION = 60 * 60 * 1000;
-// Todo cache duration - indefinite
-export const TODO_CACHE_DURATION = 0;
+// Todo cache duration - 1 year
+export const TODO_CACHE_DURATION = 365 * 24 * 60 * 60 * 1000;
 // Search cache duration - shorter since search results can become outdated quickly (30 minutes)
 export const SEARCH_CACHE_DURATION = 30 * 60 * 1000;
 // Calendar cache duration - shorter since events can change frequently (15 minutes)
