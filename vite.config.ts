@@ -12,12 +12,18 @@ export default defineConfig({
       },
     },
   },
+  esbuild: {
+    // Suppress warnings about invalid package.json sideEffects from node_modules
+    logOverride: {
+      'invalid-package-json': 'silent',
+    },
+  },
   server: {
     proxy: {
       '/api': {
         target: 'http://localhost:8888/.netlify/functions',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        rewrite: path => path.replace(/^\/api/, ''),
       },
     },
   },
@@ -26,4 +32,4 @@ export default defineConfig({
       '@': resolve(__dirname, './src'),
     },
   },
-}); 
+});
