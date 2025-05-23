@@ -3,21 +3,22 @@
     <!-- Search Header -->
     <div class="flex items-center justify-between mb-6">
       <h2 class="text-2xl font-semibold text-gray-800">AI Web Search</h2>
-      <button
-        v-if="searchStore.searchHistory.length > 0"
-        @click="showHistory = !showHistory"
-        class="px-3 py-1 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors text-sm flex items-center gap-1"
-        :class="{ 'bg-gray-600 hover:bg-gray-600 text-white': showHistory }"
-      >
-        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-          <path
-            fill-rule="evenodd"
-            d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-            clip-rule="evenodd"
-          />
-        </svg>
-        History
-      </button>
+      <div v-if="searchStore.searchHistory.length > 0" class="flex items-center gap-2">
+        <button
+          @click="showHistory = !showHistory"
+          class="px-3 py-1 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors text-sm flex items-center gap-1"
+          :class="{ 'bg-gray-600 hover:bg-gray-600 text-white': showHistory }"
+        >
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              fill-rule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          History
+        </button>
+      </div>
     </div>
 
     <!-- Search Input -->
@@ -36,14 +37,13 @@
           :disabled="searchStore.loading || !searchQuery.trim()"
           class="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <svg v-if="!searchStore.loading" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
             <path
               fill-rule="evenodd"
               d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
               clip-rule="evenodd"
             />
           </svg>
-          <LoadingSpinner v-else w="5" h="5" />
         </button>
       </div>
 
@@ -179,7 +179,7 @@
 
     <!-- Empty State -->
     <div
-      v-if="!searchStore.loading && !currentResult && !searchStore.error"
+      v-if="!searchStore.loading && !currentResult && !searchStore.error && !showHistory"
       class="text-center py-12"
     >
       <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
