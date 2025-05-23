@@ -68,23 +68,6 @@
         </div>
       </div>
 
-      <div class="text-sm text-gray-700 mb-4">
-        <div class="font-medium">{{ weatherData.location }}</div>
-      </div>
-
-      <!-- Google Maps Static Image -->
-      <div v-if="coordinates" class="mb-4">
-        <img
-          :src="cachedMapImage || getStaticMapUrl(coordinates.lat, coordinates.lon)"
-          :alt="`Map of ${weatherData.location}`"
-          class="w-full h-32 object-cover rounded-lg border border-gray-200"
-          @error="handleMapError"
-        />
-        <p class="text-xs text-gray-500 mt-1">
-          Location: {{ coordinates.lat.toFixed(4) }}, {{ coordinates.lon.toFixed(4) }}
-        </p>
-      </div>
-
       <div class="grid grid-cols-2 gap-4 text-sm">
         <div class="bg-blue-50 rounded-lg p-3">
           <div class="text-blue-600 font-medium">Humidity</div>
@@ -94,6 +77,19 @@
           <div class="text-green-600 font-medium">Wind Speed</div>
           <div class="text-gray-800">{{ weatherData.windSpeed }} m/s</div>
         </div>
+      </div>
+
+      <!-- Google Maps Static Image -->
+      <div v-if="coordinates" class="mt-10">
+        <img
+          :src="cachedMapImage || getStaticMapUrl(coordinates.lat, coordinates.lon)"
+          :alt="`Map of ${weatherData.location}`"
+          class="w-full h-32 object-cover rounded-lg border border-gray-200"
+          @error="handleMapError"
+        />
+        <p class="text-xs text-gray-500 mt-1">
+          Location: {{ coordinates.lat.toFixed(4) }}, {{ coordinates.lon.toFixed(4) }}
+        </p>
       </div>
     </div>
   </div>
