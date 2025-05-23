@@ -1,6 +1,6 @@
 # 🚀 Launchpad
 
-Your personal assistant with weather, news, and task management.
+Your personal assistant with AI search, weather, news, and task management.
 
 ## Quickstart
 
