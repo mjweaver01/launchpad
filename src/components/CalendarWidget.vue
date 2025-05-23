@@ -47,17 +47,15 @@
     <div v-if="!calendarStore.isAuthenticated" class="text-center">
       <div class="mb-4">
         <svg
-          class="w-16 h-16 mx-auto text-gray-400 mb-3"
+          class="w-14 h-14 mx-auto text-gray-400 m-4"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 0V6a2 2 0 012-2h4a2 2 0 012 2v1m-6 0h8m-9 0a1 1 0 00-1 1v10a1 1 0 001 1h10a1 1 0 001-1V8a1 1 0 00-1-1H7z"
-          />
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke-width="2" />
+          <line x1="16" y1="2" x2="16" y2="6" stroke-width="2" />
+          <line x1="8" y1="2" x2="8" y2="6" stroke-width="2" />
+          <line x1="3" y1="10" x2="21" y2="10" stroke-width="2" />
         </svg>
         <p class="text-gray-600 text-sm mb-4">Connect your Google Calendar to see your events</p>
       </div>
@@ -306,7 +304,13 @@
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 0V6a2 2 0 012-2h4a2 2 0 012 2v1m-6 0h8m-9 0a1 1 0 00-1 1v10a1 1 0 001 1h10a1 1 0 001-1V8a1 1 0 00-1-1H7z"
+            d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM5 19V8h14v11H5z"
+          />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M7 10h2v2H7v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zM7 14h2v2H7v-2zm4 0h2v2h-2v-2z"
           />
         </svg>
         <p class="text-gray-600 text-sm">No events coming up this week</p>
