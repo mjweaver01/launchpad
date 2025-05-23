@@ -42,7 +42,7 @@
               clip-rule="evenodd"
             />
           </svg>
-          <LoadingSpinner v-else class="w-5 h-5" />
+          <LoadingSpinner v-else w="5" h="5" />
         </button>
       </div>
 
@@ -122,44 +122,6 @@
               v-html="formatAnswer(currentResult.answer)"
             ></div>
           </div>
-        </div>
-      </div>
-
-      <!-- Sources -->
-      <div v-if="currentResult.sources.length > 0" class="space-y-4">
-        <h3 class="text-lg font-semibold text-gray-900">Sources</h3>
-        <div class="grid gap-4 md:grid-cols-2">
-          <a
-            v-for="(source, index) in currentResult.sources"
-            :key="index"
-            :href="source.url"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="block p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow group"
-          >
-            <div class="flex items-start justify-between">
-              <div class="flex-1">
-                <h4
-                  class="font-medium text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2"
-                >
-                  {{ source.title }}
-                </h4>
-                <p class="text-sm text-gray-600 mt-1 line-clamp-2">{{ source.snippet }}</p>
-                <p class="text-xs text-gray-500 mt-2">{{ getDomain(source.url) }}</p>
-              </div>
-              <svg
-                class="w-4 h-4 text-gray-400 ml-2 flex-shrink-0"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-            </div>
-          </a>
         </div>
       </div>
 
@@ -324,14 +286,6 @@ export default defineComponent({
       return date.toLocaleDateString();
     };
 
-    const getDomain = (url: string) => {
-      try {
-        return new URL(url).hostname.replace('www.', '');
-      } catch {
-        return url;
-      }
-    };
-
     return {
       searchStore,
       searchQuery,
@@ -343,7 +297,6 @@ export default defineComponent({
       selectFromHistory,
       formatAnswer,
       formatDate,
-      getDomain,
       handleInputFocus,
       handleInputBlur,
     };

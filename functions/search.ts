@@ -1,5 +1,5 @@
 import { Handler } from '@netlify/functions';
-import { webSearch } from '../server/search';
+import { search } from '../server/search';
 
 const handler: Handler = async (event, context) => {
   // CORS headers
@@ -37,7 +37,7 @@ const handler: Handler = async (event, context) => {
       };
     }
 
-    const result = await webSearch(query);
+    const result = await search(query);
 
     return {
       statusCode: 200,
