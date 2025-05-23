@@ -54,21 +54,23 @@
     <!-- Todo list -->
     <div class="space-y-2 max-h-80 overflow-y-auto">
       <!-- Empty state -->
-      <div v-if="todoStore.todos.length === 0" class="text-center py-8 text-gray-500">
-        <svg
-          class="w-12 h-12 mx-auto mb-3 text-gray-300"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+      <div v-if="todoStore.todos.length === 0" class="text-center py-12">
+        <div
+          class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M5 13l4 4L19 7"
-          />
-        </svg>
-        <p class="text-sm">No tasks yet. Add one to get started!</p>
+          <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="3"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Stay organized with todos</h3>
+        <p class="text-gray-600 max-w-md mx-auto">
+          Create and manage your tasks to stay productive. Add your first task above to get started.
+        </p>
       </div>
 
       <!-- Todo items -->
