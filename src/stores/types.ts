@@ -53,7 +53,28 @@ export interface TodoData {
   items: TodoItem[];
 }
 
+// Search types
+export interface SearchResult {
+  id: string;
+  query: string;
+  answer: string;
+  sources: SearchSource[];
+  timestamp: number;
+}
+
+export interface SearchSource {
+  title: string;
+  url: string;
+  snippet: string;
+}
+
+export interface SearchHistory {
+  results: SearchResult[];
+}
+
 // Cache duration in milliseconds (1 hour)
 export const CACHE_DURATION = 60 * 60 * 1000;
 // Todo cache duration - longer since it's persistent user data (7 days)
 export const TODO_CACHE_DURATION = 7 * 24 * 60 * 60 * 1000;
+// Search cache duration - shorter since search results can become outdated quickly (30 minutes)
+export const SEARCH_CACHE_DURATION = 30 * 60 * 1000;
