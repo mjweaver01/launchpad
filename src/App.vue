@@ -2,9 +2,7 @@
   <div class="bg-gray-100 min-h-screen">
     <AppHeader />
     <div class="py-8 px-4">
-      <div class="max-w-3xl mx-auto">
-        <router-view />
-      </div>
+      <router-view />
     </div>
   </div>
 </template>

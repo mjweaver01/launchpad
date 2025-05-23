@@ -1,24 +1,10 @@
 <template>
-  <div>
-    <div class="mb-8">
-      <WeatherWidget />
-    </div>
-
-    <div class="mb-8">
-      <NewsWidget />
-    </div>
-
-    <div class="mb-8">
-      <TodoWidget />
-    </div>
-
-    <div class="mb-8">
-      <SearchWidget />
-    </div>
-
-    <div class="mb-8">
-      <CalendarWidget />
-    </div>
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+    <WeatherWidget />
+    <NewsWidget />
+    <TodoWidget />
+    <SearchWidget />
+    <CalendarWidget />
   </div>
 </template>
 

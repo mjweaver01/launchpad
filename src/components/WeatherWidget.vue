@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-lg shadow-md p-6 max-w-sm mx-auto">
+  <div class="bg-white rounded-lg shadow-md p-6 w-full mx-auto">
     <h2 class="text-xl font-semibold text-gray-800 mb-4 text-center">Current Weather</h2>
 
     <!-- Loading state -->

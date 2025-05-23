@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-lg shadow-md p-6 max-w-4xl mx-auto">
+  <div class="bg-white rounded-lg shadow-md p-6 w-full max-h-[500px] overflow-y-auto mx-auto">
     <div class="flex items-center justify-between mb-6">
       <h2 class="text-2xl font-semibold text-gray-800">Latest News</h2>
       <div class="flex gap-2">
@@ -105,7 +105,7 @@
       </div>
 
       <!-- Grid of other articles -->
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="grid md:grid-cols-2 gap-6">
         <article
           v-for="(article, index) in newsData.articles.slice(1)"
           :key="index"

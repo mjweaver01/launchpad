@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-lg shadow-md p-6 max-w-md mx-auto">
+  <div class="bg-white rounded-lg shadow-md p-6 w-full mx-auto">
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-xl font-semibold text-gray-800">Calendar</h2>
       <div class="flex items-center space-x-2">

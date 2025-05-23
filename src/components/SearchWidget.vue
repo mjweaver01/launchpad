@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-lg shadow-md p-6 max-w-4xl mx-auto">
+  <div class="bg-white rounded-lg shadow-md p-6 w-full mx-auto">
     <!-- Search Header -->
     <div class="flex items-center justify-between mb-6">
       <h2 class="text-2xl font-semibold text-gray-800">AI Web Search</h2>

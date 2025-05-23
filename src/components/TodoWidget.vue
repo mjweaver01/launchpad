@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-lg shadow-md p-6 max-w-md mx-auto">
+  <div class="bg-white rounded-lg shadow-md p-6 w-full mx-auto">
     <div class="flex items-center justify-between mb-6">
       <h2 class="text-xl font-semibold text-gray-800">Todo List</h2>
       <div class="text-sm text-gray-500">
