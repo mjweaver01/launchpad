@@ -48,13 +48,14 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import { routes } from '../router';
-import { useWeatherStore, useNewsStore } from '../stores';
+import { useWeatherStore, useNewsStore, useCalendarStore } from '../stores';
 
 export default defineComponent({
   name: 'AppHeader',
   setup() {
     const weatherStore = useWeatherStore();
     const newsStore = useNewsStore();
+    const calendarStore = useCalendarStore();
     const isRefreshing = ref(false);
 
     const handleRefresh = async () => {
@@ -62,7 +63,7 @@ export default defineComponent({
 
       isRefreshing.value = true;
       try {
-        await Promise.all([weatherStore.refresh(), newsStore.refresh()]);
+        await Promise.all([weatherStore.refresh(), newsStore.refresh(), calendarStore.refresh()]);
       } catch (error) {
         console.error('Failed to refresh data:', error);
       } finally {
