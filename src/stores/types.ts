@@ -40,5 +40,20 @@ export interface NewsResponse {
   totalResults: number;
 }
 
+// Todo types
+export interface TodoItem {
+  id: string;
+  title: string;
+  completed: boolean;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface TodoData {
+  items: TodoItem[];
+}
+
 // Cache duration in milliseconds (1 hour)
 export const CACHE_DURATION = 60 * 60 * 1000;
+// Todo cache duration - longer since it's persistent user data (7 days)
+export const TODO_CACHE_DURATION = 7 * 24 * 60 * 60 * 1000;

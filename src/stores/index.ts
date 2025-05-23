@@ -1,6 +1,7 @@
 // Re-export individual stores
 export { useWeatherStore } from './weather';
 export { useNewsStore } from './news';
+export { useTodoStore } from './todo';
 
 // Re-export utilities and types
 export { CacheStorage } from './storage';
