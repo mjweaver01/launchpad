@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles for markdown content */
+.markdown-content a {
+  @apply text-indigo-600 underline transition-colors;
+}
+.markdown-content a:hover {
+  @apply text-indigo-700;
+}
+.markdown-content ul {
+  @apply list-disc pl-6 my-2;
+}
+.markdown-content ol {
+  @apply list-decimal pl-6 my-2;
+}
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3 {
+  @apply font-semibold my-4;
+}
+.markdown-content p {
+  @apply mb-3;
+}
+.markdown-content code {
+  @apply bg-gray-100 px-1.5 py-0.5 rounded font-mono;
+}
+.markdown-content blockquote {
+  @apply border-l-4 border-gray-200 pl-4 italic my-4;
+}

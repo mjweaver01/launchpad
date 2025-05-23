@@ -1,0 +1,12 @@
+# Build outputs
+dist/
+build/
+.netlify/
+
+# Package management
+node_modules/
+package-lock.json
+
+# Config files
+.git/
+.DS_Store 
