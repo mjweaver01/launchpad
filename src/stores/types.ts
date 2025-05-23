@@ -128,3 +128,29 @@ export const TODO_CACHE_DURATION = 365 * 24 * 60 * 60 * 1000;
 export const SEARCH_CACHE_DURATION = 30 * 60 * 1000;
 // Calendar cache duration - shorter since events can change frequently (15 minutes)
 export const CALENDAR_CACHE_DURATION = 15 * 60 * 1000;
+
+// Water reminder types
+export interface WaterReminder {
+  id: string;
+  time: string; // HH:MM format
+  amount: number; // in ounces
+  completed: boolean;
+  completedAt?: number; // timestamp when completed
+}
+
+export interface WaterReminderSettings {
+  weight: number; // in pounds
+  dailyGoal: number; // in ounces
+  reminderInterval: number; // in hours
+  startTime: string; // HH:MM format
+  endTime: string; // HH:MM format
+}
+
+export interface WaterReminderData {
+  settings: WaterReminderSettings;
+  reminders: WaterReminder[];
+  lastResetDate: string; // YYYY-MM-DD format
+}
+
+// Water reminder cache duration - same as todo since it's user-specific data (1 year)
+export const WATER_REMINDER_CACHE_DURATION = 365 * 24 * 60 * 60 * 1000;

@@ -5,6 +5,7 @@
     <NewsWidget />
     <TodoWidget />
     <SearchWidget />
+    <WaterReminderWidget />
   </div>
 </template>
 
@@ -15,6 +16,7 @@ import NewsWidget from '../components/NewsWidget.vue';
 import TodoWidget from '../components/TodoWidget.vue';
 import SearchWidget from '../components/SearchWidget.vue';
 import CalendarWidget from '../components/CalendarWidget.vue';
+import WaterReminderWidget from '../components/WaterReminderWidget.vue';
 
 export default defineComponent({
   name: 'Home',
@@ -24,6 +26,7 @@ export default defineComponent({
     TodoWidget,
     SearchWidget,
     CalendarWidget,
+    WaterReminderWidget,
   },
   setup() {
     return {};
