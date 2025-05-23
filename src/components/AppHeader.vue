@@ -7,7 +7,7 @@
         <div class="flex items-center space-x-4">
           <nav class="flex space-x-4">
             <router-link
-              v-for="route in routes"
+              v-for="route in routes.filter(route => !route.path.includes('google'))"
               :key="route.path"
               :to="route.path"
               class="px-3 py-2 rounded hover:bg-indigo-700 transition-colors"
@@ -78,3 +78,11 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+</style>

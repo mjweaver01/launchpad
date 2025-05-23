@@ -1,9 +1,7 @@
 <template>
   <div class="bg-gray-100 min-h-screen">
     <AppHeader />
-    <div class="py-8 px-4">
-      <router-view />
-    </div>
+    <router-view />
   </div>
 </template>
 

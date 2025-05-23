@@ -31,23 +31,23 @@
     <!-- Weather data -->
     <div v-else-if="weatherData" class="text-center">
       <div class="flex items-center justify-center mb-4">
-        <div class="text-6xl mr-3">{{ getWeatherEmoji(weatherData.icon) }}</div>
+        <div class="text-9xl mr-3">{{ getWeatherEmoji(weatherData.icon) }}</div>
         <div class="text-left">
+          <div class="text-sm text-gray-600 capitalize">{{ weatherData.description }}</div>
           <div class="text-3xl font-bold text-gray-800">
             {{ celsiusToFahrenheit(weatherData.temperature) }}°F
             <span class="text-lg text-gray-500 font-normal">({{ weatherData.temperature }}°C)</span>
           </div>
-          <div class="text-sm text-gray-600 capitalize">{{ weatherData.description }}</div>
+          <div class="text-sm text-gray-600">
+            Feels like {{ celsiusToFahrenheit(weatherData.feelsLike) }}°F ({{
+              weatherData.feelsLike
+            }}°C)
+          </div>
         </div>
       </div>
 
       <div class="text-sm text-gray-700 mb-4">
         <div class="font-medium">{{ weatherData.location }}</div>
-        <div>
-          Feels like {{ celsiusToFahrenheit(weatherData.feelsLike) }}°F ({{
-            weatherData.feelsLike
-          }}°C)
-        </div>
       </div>
 
       <!-- Google Maps Static Image -->
