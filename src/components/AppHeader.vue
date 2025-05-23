@@ -1,8 +1,10 @@
 <template>
   <header class="bg-blue-800 text-white shadow-md">
-    <div class="mx-auto px-4 sm:px-6 py-3">
+    <div class="mx-auto px-4 sm:px-6 py-2.5">
       <div class="flex justify-between items-center">
-        <router-link to="/" class="font-bold text-xl">🚀 Launchpad</router-link>
+        <router-link to="/" class="uppercase tracking-[3px] text-2xl font-bold"
+          >🚀 Launchpad</router-link
+        >
 
         <div class="flex items-center space-x-4">
           <nav class="flex space-x-4">
