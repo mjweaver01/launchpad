@@ -7,6 +7,7 @@
         v-if="searchStore.searchHistory.length > 0"
         @click="showHistory = !showHistory"
         class="px-3 py-1 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors text-sm flex items-center gap-1"
+        :class="{ 'bg-gray-600 hover:bg-gray-600 text-white': showHistory }"
       >
         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
           <path
@@ -100,7 +101,7 @@
     </div>
 
     <!-- Search Results -->
-    <div v-else-if="currentResult" class="space-y-6 max-h-[400px] overflow-y-auto">
+    <div v-else-if="currentResult && !showHistory" class="space-y-6 max-h-[400px] overflow-y-auto">
       <!-- AI Answer -->
       <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
         <div class="flex items-start gap-3">
