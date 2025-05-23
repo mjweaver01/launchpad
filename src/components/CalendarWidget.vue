@@ -7,7 +7,7 @@
           v-if="calendarStore.isAuthenticated"
           @click="refreshCalendar"
           :disabled="calendarStore.loading"
-          class="p-2 text-gray-600 hover:text-indigo-600 transition-colors flex items-center justify-center"
+          class="p-2 text-gray-600 hover:text-blue-600 transition-colors flex items-center justify-center"
           title="Refresh Calendar"
         >
           <svg
@@ -63,7 +63,7 @@
       <button
         @click="signInWithGoogle"
         :disabled="calendarStore.authLoading"
-        class="flex items-center justify-center w-full px-4 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        class="flex items-center justify-center w-full px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <svg
           v-if="calendarStore.authLoading"
@@ -128,7 +128,7 @@
       <p class="text-red-600 text-sm mb-3">{{ calendarStore.error }}</p>
       <button
         @click="retryLoadCalendar"
-        class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors text-sm"
+        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
       >
         Try Again
       </button>
@@ -226,7 +226,7 @@
       <div v-if="calendarStore.upcomingEvents.length > 0">
         <h3 class="text-sm font-medium text-gray-800 mb-2 flex items-center">
           <svg
-            class="w-4 h-4 mr-1 text-indigo-600"
+            class="w-4 h-4 mr-1 text-blue-600"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -244,7 +244,7 @@
           <div
             v-for="event in calendarStore.upcomingEvents.slice(0, 4)"
             :key="event.id"
-            class="p-3 bg-indigo-50 border-l-4 border-indigo-400 rounded-r-lg"
+            class="p-3 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg"
           >
             <div class="flex items-start justify-between">
               <div class="flex-1">
@@ -272,7 +272,7 @@
                 :href="event.htmlLink"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-indigo-600 hover:text-indigo-800 transition-colors"
+                class="text-blue-600 hover:text-blue-800 transition-colors"
                 title="Open in Google Calendar"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

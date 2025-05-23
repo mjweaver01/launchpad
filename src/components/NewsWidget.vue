@@ -6,7 +6,7 @@
         <select
           v-model="selectedCategory"
           @change="resetAndLoadNews"
-          class="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          class="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">All</option>
           <option value="business">Business</option>
@@ -19,7 +19,7 @@
         </select>
         <button
           @click="loadNews"
-          class="p-2 text-gray-600 hover:text-indigo-600 transition-colors flex items-center justify-center"
+          class="p-2 text-gray-600 hover:text-blue-600 transition-colors flex items-center justify-center"
           :disabled="newsStore.loading"
         >
           <svg
@@ -60,7 +60,7 @@
       <p class="text-red-600 text-sm">{{ newsStore.error }}</p>
       <button
         @click="loadNews"
-        class="mt-3 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors text-sm"
+        class="mt-3 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
       >
         Try Again
       </button>
@@ -74,7 +74,7 @@
           <div class="grid md:grid-cols-3 gap-6">
             <div class="md:col-span-2">
               <h3
-                class="text-xl font-bold text-gray-900 mb-3 group-hover:text-indigo-600 transition-colors"
+                class="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors"
               >
                 <a :href="newsData.articles[0].url" target="_blank" rel="noopener noreferrer">
                   {{ newsData.articles[0].title }}
@@ -144,7 +144,7 @@
           </div>
 
           <h4
-            class="font-semibold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors line-clamp-3"
+            class="font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors line-clamp-3"
           >
             <a :href="article.url" target="_blank" rel="noopener noreferrer">
               {{ article.title }}
@@ -190,7 +190,7 @@
               :class="[
                 'px-3 py-1 rounded-md text-sm transition-colors',
                 page === currentPage
-                  ? 'bg-indigo-600 text-white'
+                  ? 'bg-blue-600 text-white'
                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
               ]"
             >

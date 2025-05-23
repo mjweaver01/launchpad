@@ -4,10 +4,10 @@
 
 /* Custom styles for markdown content */
 .markdown-content a {
-  @apply text-indigo-600 underline transition-colors;
+  @apply text-blue-600 underline transition-colors;
 }
 .markdown-content a:hover {
-  @apply text-indigo-700;
+  @apply text-blue-700;
 }
 .markdown-content ul {
   @apply list-disc pl-6 my-2;

@@ -5,7 +5,7 @@
         <!-- Loading State -->
         <div v-if="loading" class="space-y-4">
           <svg
-            class="animate-spin mx-auto h-12 w-12 text-indigo-600"
+            class="animate-spin mx-auto h-12 w-12 text-blue-600"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -66,7 +66,7 @@
           <p class="text-red-600 text-sm">{{ error }}</p>
           <button
             @click="goHome"
-            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
           >
             Go Back to Dashboard
           </button>

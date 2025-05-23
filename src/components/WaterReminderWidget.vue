@@ -4,7 +4,7 @@
       <h2 class="text-2xl font-semibold text-gray-800">💧 Water Reminder</h2>
       <button
         @click="showSettings = !showSettings"
-        class="p-2 text-gray-600 hover:text-indigo-600 transition-colors flex items-center justify-center"
+        class="p-2 text-gray-600 hover:text-blue-600 transition-colors flex items-center justify-center"
         title="Settings"
       >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -52,7 +52,7 @@
       <div class="mb-4">
         <div class="text-sm text-gray-600">
           Daily Goal:
-          <span class="font-semibold text-indigo-600"
+          <span class="font-semibold text-blue-600"
             >{{ waterStore.data.settings.dailyGoal }} oz</span
           >
         </div>
@@ -65,7 +65,7 @@
           <input
             v-model="localStartTime"
             type="time"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             @change="updateTimeSettings"
           />
         </div>
@@ -74,7 +74,7 @@
           <input
             v-model="localEndTime"
             type="time"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             @change="updateTimeSettings"
           />
         </div>
@@ -102,7 +102,7 @@
 
       <button
         @click="showSettings = false"
-        class="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+        class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
       >
         Done
       </button>

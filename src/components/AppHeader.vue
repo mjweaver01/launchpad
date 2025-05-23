@@ -1,5 +1,5 @@
 <template>
-  <header class="bg-indigo-800 text-white shadow-md">
+  <header class="bg-blue-800 text-white shadow-md">
     <div class="mx-auto px-4 sm:px-6 py-3">
       <div class="flex justify-between items-center">
         <router-link to="/" class="font-bold text-xl">🚀 Launchpad</router-link>
@@ -10,8 +10,8 @@
               v-for="route in routes.filter(route => !route.path.includes('google'))"
               :key="route.path"
               :to="route.path"
-              class="px-3 py-2 rounded hover:bg-indigo-700 transition-colors"
-              :class="{ 'bg-indigo-700': $route.path === route.path }"
+              class="px-3 py-2 rounded hover:bg-blue-700 transition-colors"
+              :class="{ 'bg-blue-700': $route.path === route.path }"
             >
               {{ route.name }}
             </router-link>
@@ -21,7 +21,7 @@
           <button
             @click="handleRefresh"
             :disabled="isRefreshing"
-            class="flex items-center space-x-1 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 rounded transition-colors text-sm"
+            class="flex items-center space-x-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 rounded transition-colors text-sm"
             title="Refresh all data"
           >
             <svg

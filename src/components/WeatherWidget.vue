@@ -4,7 +4,7 @@
       <h2 class="text-2xl font-semibold text-gray-800">Current Weather</h2>
       <button
         @click="loadWeather"
-        class="p-2 text-gray-600 hover:text-indigo-600 transition-colors flex items-center justify-center"
+        class="p-2 text-gray-600 hover:text-blue-600 transition-colors flex items-center justify-center"
         :disabled="weatherStore.loading"
       >
         <svg
@@ -44,7 +44,7 @@
       <p class="text-red-600 text-sm">{{ weatherStore.error }}</p>
       <button
         @click="retryLocation"
-        class="mt-3 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors text-sm"
+        class="mt-3 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
       >
         Try Again
       </button>
