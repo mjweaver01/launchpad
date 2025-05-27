@@ -2,12 +2,14 @@
   <div
     ref="widgetElement"
     :class="[
-      'relative transition-all duration-200 cursor-grab active:cursor-grabbing',
+      'group relative transition-all duration-200 cursor-grab active:cursor-grabbing',
       {
-        'opacity-75 scale-[0.98]': widgetStore.isDragging && widgetStore.draggedWidget === widgetId,
-        'ring-2 ring-blue-400 ring-opacity-50':
+        'opacity-60 scale-[0.95] shadow-2xl z-50 rotate-1 ring-4 ring-blue-500/30 ring-offset-2 ring-offset-white':
+          widgetStore.isDragging && widgetStore.draggedWidget === widgetId,
+        'ring-2 ring-blue-400 ring-inset bg-blue-50/30 shadow-lg':
           widgetStore.dragOverIndex === index && widgetStore.draggedWidget !== widgetId,
-        'hover:shadow-lg': !widgetStore.isDragging,
+        'hover:shadow-lg hover:scale-[1.02]': !widgetStore.isDragging,
+        'mb-4': widgetStore.isDragging && widgetStore.draggedWidget === widgetId,
       },
     ]"
     :data-widget-id="widgetId"
@@ -16,19 +18,28 @@
     style="user-select: none; -webkit-user-select: none; -moz-user-select: none"
   >
     <!-- Widget Content -->
-    <div class="h-full widget-content">
+    <div
+      class="h-full widget-content"
+      :class="{
+        'pointer-events-none': widgetStore.isDragging && widgetStore.draggedWidget === widgetId,
+      }"
+    >
       <slot />
     </div>
 
-    <!-- Drop Indicator -->
+    <!-- Enhanced Drop Indicator -->
     <div
       v-if="
         widgetStore.dragOverIndex === index &&
         widgetStore.draggedWidget !== widgetId &&
         widgetStore.isDragging
       "
-      class="absolute inset-0 border-2 border-dashed border-blue-400 rounded-lg bg-blue-50/20 pointer-events-none z-40"
-    />
+      class="absolute inset-0 border-2 border-dashed border-blue-400 rounded-lg bg-blue-50/40 backdrop-blur-sm pointer-events-none z-40 flex items-center justify-center"
+    >
+      <div class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
+        Drop here
+      </div>
+    </div>
   </div>
 </template>
 
@@ -146,5 +157,34 @@ export default defineComponent({
 
 .widget-content > div {
   height: 100%;
+}
+
+/* Smooth transform origin for better drag animation */
+.group {
+  transform-origin: center;
+}
+
+/* Prevent content shift during drag operations */
+.group.opacity-60 {
+  will-change: transform, opacity;
+}
+
+/* Ensure drop zones have smooth transitions */
+.ring-inset {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Better backdrop blur support fallback */
+@supports not (backdrop-filter: blur(4px)) {
+  .backdrop-blur-sm {
+    background-color: rgba(59, 130, 246, 0.1);
+  }
+}
+
+/* Improve drag handle visibility on mobile */
+@media (hover: none) {
+  .group .opacity-0 {
+    opacity: 0.7;
+  }
 }
 </style>
