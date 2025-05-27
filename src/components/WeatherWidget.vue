@@ -87,7 +87,7 @@
         <img
           :src="cachedMapImage || getStaticMapUrl(coordinates.lat, coordinates.lon)"
           :alt="`Map of ${weatherData.location}`"
-          class="w-full h-32 object-cover rounded-lg border border-gray-200"
+          class="w-full h-auto object-cover rounded-lg border border-gray-200"
           @error="handleMapError"
         />
         <p class="text-xs text-gray-500 mt-1">

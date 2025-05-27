@@ -68,7 +68,11 @@
     </div>
 
     <!-- News articles -->
-    <div v-else-if="newsData" class="space-y-6 max-h-[500px] overflow-y-auto">
+    <div
+      v-else-if="newsData"
+      class="space-y-6 overflow-y-auto"
+      :class="{ 'max-h-[500px]': !route.path.includes('widget') }"
+    >
       <!-- Featured article -->
       <div v-if="newsData.articles.length > 0" class="border-b border-gray-200 pb-6">
         <article class="group">
@@ -217,6 +221,7 @@ import { defineComponent, ref, onMounted, computed } from 'vue';
 import LoadingSpinner from './LoadingSpinner.vue';
 import { useNewsStore } from '../stores';
 import ExpandWidget from './ExpandWidget.vue';
+import { useRoute } from 'vue-router';
 
 export default defineComponent({
   name: 'NewsWidget',
@@ -225,6 +230,7 @@ export default defineComponent({
     ExpandWidget,
   },
   setup() {
+    const route = useRoute();
     const newsStore = useNewsStore();
     const newsData = ref(null);
     const selectedCategory = ref('');
@@ -303,6 +309,7 @@ export default defineComponent({
     });
 
     return {
+      route,
       newsStore,
       newsData,
       selectedCategory,
