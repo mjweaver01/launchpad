@@ -43,8 +43,9 @@
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <!-- Visible Widgets (in display order) -->
         <DraggableWidget
-          v-for="(widget, index) in widgetStore.widgets"
+          v-for="(widget, index) in widgetStore.visibleWidgets"
           :key="widget.id"
           :widget-id="widget.id"
           :index="index"
@@ -60,20 +61,47 @@
                     d="M8 9h8M8 15h8"
                   />
                 </svg>
-                <span class="text-sm font-medium">{{ widget.order }}</span>
               </div>
               <span class="text-sm font-medium text-gray-800">{{ widget.name }}</span>
             </div>
             <button
               @click="widgetStore.toggleWidgetVisibility(widget.id)"
-              :class="[
-                'px-3 py-1 rounded text-xs font-medium transition-colors',
-                widget.visible
-                  ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
-              ]"
+              class="px-3 py-1 rounded text-xs font-medium transition-colors bg-green-100 text-green-700 hover:bg-green-200"
             >
-              {{ widget.visible ? 'Visible' : 'Hidden' }}
+              Hide
+            </button>
+          </div>
+        </DraggableWidget>
+
+        <!-- Hidden Widgets -->
+        <DraggableWidget
+          v-for="(widget, index) in widgetStore.hiddenWidgets"
+          :key="widget.id"
+          :widget-id="widget.id"
+          :index="widgetStore.visibleWidgets.length + index"
+        >
+          <div
+            class="flex items-center justify-between p-3 bg-gray-50 rounded border border-dashed opacity-75"
+          >
+            <div class="flex items-center gap-3">
+              <div class="flex items-center gap-2 text-gray-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 9h8M8 15h8"
+                  />
+                </svg>
+                <span class="text-sm font-medium">—</span>
+              </div>
+              <span class="text-sm font-medium text-gray-600">{{ widget.name }}</span>
+            </div>
+            <button
+              @click="widgetStore.toggleWidgetVisibility(widget.id)"
+              class="px-3 py-1 rounded text-xs font-medium transition-colors bg-gray-100 text-gray-600 hover:bg-gray-200"
+            >
+              Show
             </button>
           </div>
         </DraggableWidget>

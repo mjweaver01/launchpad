@@ -82,24 +82,29 @@ export const useWidgetStore = defineStore('widgets', () => {
   };
 
   const reorderWidgets = (fromIndex: number, toIndex: number) => {
-    const currentWidgets = [...widgets.value].sort((a, b) => a.order - b.order);
+    const visibleCount = visibleWidgets.value.length;
+    const hiddenCount = hiddenWidgets.value.length;
+    const totalCount = visibleCount + hiddenCount;
 
     if (
       fromIndex === toIndex ||
       fromIndex < 0 ||
       toIndex < 0 ||
-      fromIndex >= currentWidgets.length ||
-      toIndex >= currentWidgets.length
+      fromIndex >= totalCount ||
+      toIndex >= totalCount
     ) {
       return;
     }
 
-    // Reorder the widgets array
-    const [movedWidget] = currentWidgets.splice(fromIndex, 1);
-    currentWidgets.splice(toIndex, 0, movedWidget);
+    // Create a combined array: visible widgets first, then hidden widgets
+    const combinedWidgets = [...visibleWidgets.value, ...hiddenWidgets.value];
+
+    // Reorder the combined array
+    const [movedWidget] = combinedWidgets.splice(fromIndex, 1);
+    combinedWidgets.splice(toIndex, 0, movedWidget);
 
     // Update the order property for all widgets
-    currentWidgets.forEach((widget, index) => {
+    combinedWidgets.forEach((widget, index) => {
       const originalWidget = widgets.value.find(w => w.id === widget.id);
       if (originalWidget) {
         originalWidget.order = index;
