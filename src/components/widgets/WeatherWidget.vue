@@ -4,7 +4,7 @@
       <h2 class="text-2xl font-semibold text-gray-800">Current Weather</h2>
       <div class="flex items-center gap-2">
         <button
-          @click="loadWeather"
+          @click="loadWeather(true)"
           class="p-2 text-gray-600 hover:text-blue-600 transition-colors flex items-center justify-center"
           :disabled="weatherStore.loading"
         >
@@ -246,9 +246,9 @@ export default defineComponent({
       return iconMap[icon] || '🌤️'; // Default to sun-behind-cloud emoji
     };
 
-    const loadWeather = async () => {
+    const loadWeather = async (forceRefresh = false) => {
       try {
-        const data = await weatherStore.loadWeather();
+        const data = await weatherStore.loadWeather(forceRefresh);
         weatherData.value = data;
         // Load cached map image after weather data is loaded
         await updateMapImage();
@@ -290,6 +290,7 @@ export default defineComponent({
       handleMapError,
       cachedMapImage,
       updateMapImage,
+      loadWeather,
     };
   },
 });

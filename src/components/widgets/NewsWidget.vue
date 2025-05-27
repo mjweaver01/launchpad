@@ -18,7 +18,7 @@
           <option value="technology">Technology</option>
         </select>
         <button
-          @click="loadNews"
+          @click="loadNews(true)"
           class="p-2 text-gray-600 hover:text-blue-600 transition-colors flex items-center justify-center"
           :disabled="newsStore.loading"
         >
@@ -60,7 +60,7 @@
       </div>
       <p class="text-red-600 text-sm">{{ newsStore.error }}</p>
       <button
-        @click="loadNews"
+        @click="loadNews(true)"
         class="mt-3 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
       >
         Try Again
@@ -280,12 +280,13 @@ export default defineComponent({
       visiblePages.value = Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
     };
 
-    const loadNews = async () => {
+    const loadNews = async (forceRefresh = false) => {
       try {
         const data = await newsStore.loadNews(
           selectedCategory.value,
           currentPage.value,
-          pageSize.value
+          pageSize.value,
+          forceRefresh
         );
         newsData.value = data;
         calculatePagination(data);
