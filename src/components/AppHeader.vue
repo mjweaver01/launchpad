@@ -17,11 +17,17 @@
               )"
               :key="route.path"
               :to="route.path"
-              class="px-3 py-2 rounded hover:bg-blue-700 transition-colors"
+              class="px-3 py-2 rounded hover:bg-blue-700 transition-colors leading-[20px]"
               :class="{ 'bg-blue-700': $route.path === route.path }"
             >
               {{ route.name }}
             </router-link>
+            <router-link
+              v-if="$route.path.includes('/widget')"
+              to="/"
+              class="px-3 py-2 rounded hover:bg-blue-700 transition-colors leading-[20px]"
+              >Home</router-link
+            >
           </nav>
 
           <!-- Refresh Button -->

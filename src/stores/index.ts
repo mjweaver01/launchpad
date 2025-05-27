@@ -5,6 +5,7 @@ export { useTodoStore } from './todo';
 export { useSearchStore } from './search';
 export { useCalendarStore } from './calendar';
 export { useWaterReminderStore } from './waterReminder';
+export { useWidgetStore } from './widgets';
 
 // Re-export utilities and types
 export { CacheStorage } from './storage';
