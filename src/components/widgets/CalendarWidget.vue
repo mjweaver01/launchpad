@@ -136,7 +136,11 @@
     </div>
 
     <!-- Calendar data -->
-    <div v-else class="space-y-4 max-h-[500px] overflow-y-auto">
+    <div
+      v-else
+      class="space-y-4 overflow-y-auto"
+      :class="{ 'max-h-[500px]': !route.path.includes('widget') }"
+    >
       <!-- User info -->
       <div
         v-if="calendarStore.authState.userInfo"
@@ -323,6 +327,7 @@
 
 <script lang="ts">
 import { defineComponent, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import LoadingSpinner from '../LoadingSpinner.vue';
 import ExpandWidget from './ExpandWidget.vue';
 import { useCalendarStore } from '../../stores';
@@ -336,6 +341,7 @@ export default defineComponent({
   },
   setup() {
     const calendarStore = useCalendarStore();
+    const route = useRoute();
 
     const loadCalendar = async () => {
       if (calendarStore.isAuthenticated) {
@@ -446,6 +452,7 @@ export default defineComponent({
     });
 
     return {
+      route,
       calendarStore,
       signInWithGoogle,
       refreshCalendar,
