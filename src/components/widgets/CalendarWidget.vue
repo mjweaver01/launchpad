@@ -323,10 +323,10 @@
 
 <script lang="ts">
 import { defineComponent, onMounted } from 'vue';
-import LoadingSpinner from './LoadingSpinner.vue';
-import { useCalendarStore } from '../stores';
-import type { CalendarEvent } from '../stores/types';
+import LoadingSpinner from '../LoadingSpinner.vue';
 import ExpandWidget from './ExpandWidget.vue';
+import { useCalendarStore } from '../../stores';
+import type { CalendarEvent } from '../../stores/types';
 
 export default defineComponent({
   name: 'CalendarWidget',

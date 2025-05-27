@@ -308,8 +308,8 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted } from 'vue';
-import { useWaterReminderStore } from '../stores';
-import type { WaterReminder } from '../stores/types';
+import { useWaterReminderStore } from '../../stores';
+import type { WaterReminder } from '../../stores/types';
 import ExpandWidget from './ExpandWidget.vue';
 
 export default defineComponent({

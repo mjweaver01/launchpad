@@ -204,9 +204,9 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed, watch } from 'vue';
 import { marked } from 'marked';
-import { useSearchStore } from '../stores/search';
-import type { SearchResult } from '../stores/types';
-import LoadingSpinner from './LoadingSpinner.vue';
+import { useSearchStore } from '../../stores/search';
+import type { SearchResult } from '../../stores/types';
+import LoadingSpinner from '../LoadingSpinner.vue';
 import ExpandWidget from './ExpandWidget.vue';
 
 export default defineComponent({

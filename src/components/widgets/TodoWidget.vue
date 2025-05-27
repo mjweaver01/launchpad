@@ -191,8 +191,8 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted, nextTick } from 'vue';
-import { useTodoStore } from '../stores';
-import type { TodoItem } from '../stores/types';
+import { useTodoStore } from '../../stores';
+import type { TodoItem } from '../../stores/types';
 import ExpandWidget from './ExpandWidget.vue';
 
 export default defineComponent({

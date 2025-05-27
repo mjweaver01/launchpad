@@ -100,8 +100,8 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed, watch } from 'vue';
-import LoadingSpinner from './LoadingSpinner.vue';
-import { useWeatherStore } from '../stores';
+import LoadingSpinner from '../LoadingSpinner.vue';
+import { useWeatherStore } from '../../stores';
 import ExpandWidget from './ExpandWidget.vue';
 
 export default defineComponent({

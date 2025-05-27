@@ -11,12 +11,12 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import WeatherWidget from '../components/WeatherWidget.vue';
-import NewsWidget from '../components/NewsWidget.vue';
-import TodoWidget from '../components/TodoWidget.vue';
-import SearchWidget from '../components/SearchWidget.vue';
-import CalendarWidget from '../components/CalendarWidget.vue';
-import WaterReminderWidget from '../components/WaterReminderWidget.vue';
+import WeatherWidget from '../components/widgets/WeatherWidget.vue';
+import NewsWidget from '../components/widgets/NewsWidget.vue';
+import TodoWidget from '../components/widgets/TodoWidget.vue';
+import SearchWidget from '../components/widgets/SearchWidget.vue';
+import CalendarWidget from '../components/widgets/CalendarWidget.vue';
+import WaterReminderWidget from '../components/widgets/WaterReminderWidget.vue';
 
 export default defineComponent({
   name: 'Home',

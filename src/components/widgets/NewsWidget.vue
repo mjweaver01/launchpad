@@ -218,10 +218,10 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed } from 'vue';
-import LoadingSpinner from './LoadingSpinner.vue';
-import { useNewsStore } from '../stores';
-import ExpandWidget from './ExpandWidget.vue';
 import { useRoute } from 'vue-router';
+import LoadingSpinner from '../LoadingSpinner.vue';
+import { useNewsStore } from '../../stores';
+import ExpandWidget from './ExpandWidget.vue';
 
 export default defineComponent({
   name: 'NewsWidget',
