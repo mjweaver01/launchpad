@@ -21,6 +21,10 @@ export default defineComponent({
       type: Number,
       default: 12,
     },
+    my: {
+      type: Number,
+      default: 4,
+    },
   },
 });
 </script>

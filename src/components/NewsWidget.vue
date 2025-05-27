@@ -37,6 +37,7 @@
             />
           </svg>
         </button>
+        <ExpandWidget widgetName="news" displayName="News" />
       </div>
     </div>
 
@@ -215,11 +216,13 @@
 import { defineComponent, ref, onMounted, computed } from 'vue';
 import LoadingSpinner from './LoadingSpinner.vue';
 import { useNewsStore } from '../stores';
+import ExpandWidget from './ExpandWidget.vue';
 
 export default defineComponent({
   name: 'NewsWidget',
   components: {
     LoadingSpinner,
+    ExpandWidget,
   },
   setup() {
     const newsStore = useNewsStore();

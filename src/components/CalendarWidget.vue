@@ -40,6 +40,7 @@
             />
           </svg>
         </button>
+        <ExpandWidget widgetName="calendar" displayName="Calendar" />
       </div>
     </div>
 
@@ -325,11 +326,13 @@ import { defineComponent, onMounted } from 'vue';
 import LoadingSpinner from './LoadingSpinner.vue';
 import { useCalendarStore } from '../stores';
 import type { CalendarEvent } from '../stores/types';
+import ExpandWidget from './ExpandWidget.vue';
 
 export default defineComponent({
   name: 'CalendarWidget',
   components: {
     LoadingSpinner,
+    ExpandWidget,
   },
   setup() {
     const calendarStore = useCalendarStore();

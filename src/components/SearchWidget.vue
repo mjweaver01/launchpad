@@ -18,6 +18,7 @@
           </svg>
           History
         </button>
+        <ExpandWidget widgetName="search" displayName="Search" />
       </div>
     </div>
 
@@ -206,11 +207,13 @@ import { marked } from 'marked';
 import { useSearchStore } from '../stores/search';
 import type { SearchResult } from '../stores/types';
 import LoadingSpinner from './LoadingSpinner.vue';
+import ExpandWidget from './ExpandWidget.vue';
 
 export default defineComponent({
   name: 'SearchWidget',
   components: {
     LoadingSpinner,
+    ExpandWidget,
   },
   setup() {
     const searchStore = useSearchStore();

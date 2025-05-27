@@ -2,8 +2,11 @@
   <div class="bg-white rounded-lg shadow-md p-6 w-full mx-auto">
     <div class="flex items-center justify-between mb-6">
       <h2 class="text-2xl font-semibold text-gray-800">Todo List</h2>
-      <div class="text-sm text-gray-500">
-        {{ todoStore.todoStats.pending }} / {{ todoStore.todoStats.total }} tasks
+      <div class="flex items-center gap-2">
+        <div class="text-sm text-gray-500">
+          {{ todoStore.todoStats.pending }} / {{ todoStore.todoStats.total }} tasks
+        </div>
+        <ExpandWidget widgetName="todo" displayName="Todo" />
       </div>
     </div>
 
@@ -190,9 +193,13 @@
 import { defineComponent, ref, computed, onMounted, nextTick } from 'vue';
 import { useTodoStore } from '../stores';
 import type { TodoItem } from '../stores/types';
+import ExpandWidget from './ExpandWidget.vue';
 
 export default defineComponent({
   name: 'TodoWidget',
+  components: {
+    ExpandWidget,
+  },
   setup() {
     const todoStore = useTodoStore();
     const newTodoTitle = ref('');

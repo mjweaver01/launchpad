@@ -10,7 +10,10 @@
           <nav class="flex space-x-4">
             <router-link
               v-for="route in routes.filter(
-                route => !route.path.includes('google') && route.path !== '/'
+                route =>
+                  !route.path.includes('google') &&
+                  route.path !== '/' &&
+                  !route.path.includes('/widget')
               )"
               :key="route.path"
               :to="route.path"
