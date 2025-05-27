@@ -1,11 +1,13 @@
 <template>
-  <div class="bg-white rounded-lg shadow-md p-6 w-full mx-auto">
+  <div
+    class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 w-full mx-auto transition-colors duration-200"
+  >
     <div class="flex items-center justify-between mb-6">
-      <h2 class="text-2xl font-semibold text-gray-800">Current Weather</h2>
+      <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">Current Weather</h2>
       <div class="flex items-center gap-2">
         <button
           @click="loadWeather(true)"
-          class="p-2 text-gray-600 hover:text-blue-600 transition-colors flex items-center justify-center"
+          class="p-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center justify-center"
           :disabled="weatherStore.loading"
         >
           <svg
@@ -30,12 +32,12 @@
     <!-- Loading state -->
     <div v-if="weatherStore.loading" class="text-center">
       <LoadingSpinner />
-      <p class="text-gray-600 mt-2">Getting your location...</p>
+      <p class="text-gray-600 dark:text-gray-400 mt-2">Getting your location...</p>
     </div>
 
     <!-- Error state -->
     <div v-else-if="weatherStore.error" class="text-center">
-      <div class="text-red-500 mb-2">
+      <div class="text-red-500 dark:text-red-400 mb-2">
         <svg class="w-12 h-12 mx-auto" fill="currentColor" viewBox="0 0 20 20">
           <path
             fill-rule="evenodd"
@@ -44,10 +46,10 @@
           />
         </svg>
       </div>
-      <p class="text-red-600 text-sm">{{ weatherStore.error }}</p>
+      <p class="text-red-600 dark:text-red-400 text-sm">{{ weatherStore.error }}</p>
       <button
         @click="retryLocation"
-        class="mt-3 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+        class="mt-3 px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors text-sm"
       >
         Try Again
       </button>
@@ -58,12 +60,16 @@
       <div class="flex items-center justify-center mb-4">
         <div class="text-9xl mr-10">{{ getWeatherEmoji(weatherData.icon) }}</div>
         <div class="text-left">
-          <div class="text-sm text-gray-600 capitalize">{{ weatherData.description }}</div>
-          <div class="text-3xl font-bold text-gray-800">
-            {{ celsiusToFahrenheit(weatherData.temperature) }}°F
-            <span class="text-lg text-gray-500 font-normal">({{ weatherData.temperature }}°C)</span>
+          <div class="text-sm text-gray-600 dark:text-gray-400 capitalize">
+            {{ weatherData.description }}
           </div>
-          <div class="text-sm text-gray-600">
+          <div class="text-3xl font-bold text-gray-800 dark:text-gray-200">
+            {{ celsiusToFahrenheit(weatherData.temperature) }}°F
+            <span class="text-lg text-gray-500 dark:text-gray-400 font-normal"
+              >({{ weatherData.temperature }}°C)</span
+            >
+          </div>
+          <div class="text-sm text-gray-600 dark:text-gray-400">
             Feels like {{ celsiusToFahrenheit(weatherData.feelsLike) }}°F ({{
               weatherData.feelsLike
             }}°C)
@@ -72,13 +78,13 @@
       </div>
 
       <div class="grid grid-cols-2 gap-4 text-sm mt-8">
-        <div class="bg-blue-50 rounded-lg p-3">
-          <div class="text-blue-600 font-medium">Humidity</div>
-          <div class="text-gray-800">{{ weatherData.humidity }}%</div>
+        <div class="bg-blue-50 dark:bg-blue-900 rounded-lg p-3">
+          <div class="text-blue-600 dark:text-blue-400 font-medium">Humidity</div>
+          <div class="text-gray-800 dark:text-gray-200">{{ weatherData.humidity }}%</div>
         </div>
-        <div class="bg-green-50 rounded-lg p-3">
-          <div class="text-green-600 font-medium">Wind Speed</div>
-          <div class="text-gray-800">{{ weatherData.windSpeed }} m/s</div>
+        <div class="bg-green-50 dark:bg-green-900 rounded-lg p-3">
+          <div class="text-green-600 dark:text-green-400 font-medium">Wind Speed</div>
+          <div class="text-gray-800 dark:text-gray-200">{{ weatherData.windSpeed }} m/s</div>
         </div>
       </div>
 
@@ -87,10 +93,10 @@
         <img
           :src="cachedMapImage || getStaticMapUrl(coordinates.lat, coordinates.lon)"
           :alt="`Map of ${weatherData.location}`"
-          class="w-full h-auto object-cover rounded-lg border border-gray-200"
+          class="w-full h-auto object-cover rounded-lg border border-gray-200 dark:border-gray-600"
           @error="handleMapError"
         />
-        <p class="text-xs text-gray-500 mt-1">
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
           Location: {{ coordinates.lat.toFixed(4) }}, {{ coordinates.lon.toFixed(4) }}
         </p>
       </div>

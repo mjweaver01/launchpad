@@ -1,13 +1,18 @@
 <template>
-  <div class="bg-white rounded-lg shadow-md p-6 w-full mx-auto">
+  <div
+    class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 w-full mx-auto transition-colors duration-200"
+  >
     <!-- Search Header -->
     <div class="flex items-center justify-between mb-6">
-      <h2 class="text-2xl font-semibold text-gray-800">AI Web Search</h2>
+      <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">AI Web Search</h2>
       <div v-if="searchStore.searchHistory.length > 0" class="flex items-center gap-2">
         <button
           @click="showHistory = !showHistory"
-          class="px-3 py-1 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors text-sm flex items-center gap-1"
-          :class="{ 'bg-gray-600 hover:bg-gray-600 text-white': showHistory }"
+          class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-sm flex items-center gap-1"
+          :class="{
+            'bg-gray-600 dark:bg-gray-500 hover:bg-gray-600 dark:hover:bg-gray-500 text-white':
+              showHistory,
+          }"
         >
           <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
             <path
@@ -30,13 +35,13 @@
           @keyup.enter="handleSearch"
           type="text"
           placeholder="Search the web with AI..."
-          class="w-full px-4 py-3 pr-12 text-lg border-2 border-gray-300 rounded-full focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+          class="w-full px-4 py-3 pr-12 text-lg border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400 rounded-full focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 transition-all"
           :disabled="searchStore.loading"
         />
         <button
           @click="handleSearch"
           :disabled="searchStore.loading || !searchQuery.trim()"
-          class="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          class="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 bg-blue-600 dark:bg-blue-700 text-white rounded-full hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
             <path
@@ -51,17 +56,21 @@
       <!-- Recent Searches Dropdown -->
       <div
         v-if="showSuggestions && searchStore.recentSearches.length > 0"
-        class="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg mt-1 z-10"
+        class="absolute top-full left-0 right-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg mt-1 z-10"
       >
         <div class="p-2">
-          <p class="text-xs text-gray-500 mb-2">Recent searches</p>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Recent searches</p>
           <button
             v-for="result in searchStore.recentSearches"
             :key="result.id"
             @click="selectSuggestion(result.query)"
-            class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md flex items-center gap-2"
+            class="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md flex items-center gap-2"
           >
-            <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+            <svg
+              class="w-4 h-4 text-gray-400 dark:text-gray-500"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
               <path
                 fill-rule="evenodd"
                 d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
@@ -76,7 +85,7 @@
 
     <!-- Error State -->
     <div v-if="searchStore.error" class="text-center py-4 mb-6">
-      <div class="text-red-500 mb-2">
+      <div class="text-red-500 dark:text-red-400 mb-2">
         <svg class="w-8 h-8 mx-auto" fill="currentColor" viewBox="0 0 20 20">
           <path
             fill-rule="evenodd"
@@ -85,10 +94,10 @@
           />
         </svg>
       </div>
-      <p class="text-red-600 text-sm">{{ searchStore.error }}</p>
+      <p class="text-red-600 dark:text-red-400 text-sm">{{ searchStore.error }}</p>
       <button
         @click="handleSearch"
-        class="mt-3 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+        class="mt-3 px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors text-sm"
       >
         Try Again
       </button>
@@ -97,17 +106,21 @@
     <!-- Loading State -->
     <div v-else-if="searchStore.loading" class="text-center py-8">
       <LoadingSpinner class="mx-auto mb-4" />
-      <p class="text-gray-600">Searching the web with AI...</p>
-      <p class="text-sm text-gray-500 mt-1">This may take a few moments</p>
+      <p class="text-gray-600 dark:text-gray-400">Searching the web with AI...</p>
+      <p class="text-sm text-gray-500 dark:text-gray-500 mt-1">This may take a few moments</p>
     </div>
 
     <!-- Search Results -->
     <div v-else-if="currentResult && !showHistory" class="space-y-6 max-h-[400px] overflow-y-auto">
       <!-- AI Answer -->
-      <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+      <div
+        class="bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg p-6"
+      >
         <div class="flex items-start gap-3">
           <div class="flex-shrink-0">
-            <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+            <div
+              class="w-8 h-8 bg-blue-600 dark:bg-blue-700 rounded-full flex items-center justify-center"
+            >
               <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fill-rule="evenodd"
@@ -118,9 +131,9 @@
             </div>
           </div>
           <div class="flex-1">
-            <h3 class="font-semibold text-gray-900 mb-2">AI Answer</h3>
+            <h3 class="font-semibold text-gray-900 dark:text-gray-200 mb-2">AI Answer</h3>
             <div
-              class="markdown-content max-w-none text-gray-700"
+              class="markdown-content max-w-none text-gray-700 dark:text-gray-300"
               v-html="formatAnswer(currentResult.answer)"
             ></div>
           </div>
@@ -128,7 +141,9 @@
       </div>
 
       <!-- Search Info -->
-      <div class="text-xs text-gray-500 pt-4 border-t border-gray-200">
+      <div
+        class="text-xs text-gray-500 dark:text-gray-400 pt-4 border-t border-gray-200 dark:border-gray-700"
+      >
         Search performed {{ formatDate(currentResult.timestamp) }}
       </div>
     </div>
@@ -136,13 +151,13 @@
     <!-- Search History -->
     <div
       v-if="showHistory && searchStore.searchHistory.length > 0"
-      class="mt-8 pt-6 border-t border-gray-200"
+      class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700"
     >
       <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold text-gray-900">Search History</h3>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-200">Search History</h3>
         <button
           @click="searchStore.clearHistory"
-          class="text-sm text-red-600 hover:text-red-700 transition-colors"
+          class="text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors"
         >
           Clear History
         </button>
@@ -151,19 +166,21 @@
         <div
           v-for="result in searchStore.searchHistory.slice(0, 10)"
           :key="result.id"
-          class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+          class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
         >
           <button
             @click="selectFromHistory(result)"
-            class="flex-1 text-left text-sm text-gray-700 hover:text-blue-600 transition-colors"
+            class="flex-1 text-left text-sm text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
           >
             {{ result.query }}
           </button>
           <div class="flex items-center gap-2">
-            <span class="text-xs text-gray-500">{{ formatDate(result.timestamp) }}</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400">{{
+              formatDate(result.timestamp)
+            }}</span>
             <button
               @click="searchStore.removeFromHistory(result.id)"
-              class="p-1 text-gray-400 hover:text-red-500 transition-colors"
+              class="p-1 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors"
             >
               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path
@@ -183,8 +200,14 @@
       v-if="!searchStore.loading && !currentResult && !searchStore.error && !showHistory"
       class="text-center py-12"
     >
-      <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-        <svg class="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+      <div
+        class="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4"
+      >
+        <svg
+          class="w-8 h-8 text-gray-400 dark:text-gray-500"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
           <path
             fill-rule="evenodd"
             d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
@@ -192,8 +215,10 @@
           />
         </svg>
       </div>
-      <h3 class="text-lg font-medium text-gray-900 mb-2">Search the web with AI</h3>
-      <p class="text-gray-600 max-w-md mx-auto">
+      <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mb-2">
+        Search the web with AI
+      </h3>
+      <p class="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
         Get intelligent answers and sources from across the web. Ask questions, research topics, or
         find current information.
       </p>

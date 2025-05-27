@@ -1,9 +1,11 @@
 <template>
-  <div class="bg-white rounded-lg shadow-md p-6 w-full mx-auto">
+  <div
+    class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 w-full mx-auto transition-colors duration-200"
+  >
     <div class="flex items-center justify-between mb-6">
-      <h2 class="text-2xl font-semibold text-gray-800">Todo List</h2>
+      <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">Todo List</h2>
       <div class="flex items-center gap-2">
-        <div class="text-sm text-gray-500">
+        <div class="text-sm text-gray-500 dark:text-gray-400">
           {{ todoStore.todoStats.pending }} / {{ todoStore.todoStats.total }} tasks
         </div>
         <ExpandWidget widgetName="todo" displayName="Todo" />
@@ -12,11 +14,11 @@
 
     <!-- Progress bar -->
     <div v-if="todoStore.todoStats.total > 0" class="mb-6">
-      <div class="flex items-center justify-between text-sm text-gray-600 mb-2">
+      <div class="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
         <span>Progress</span>
         <span>{{ todoStore.todoStats.completionRate }}%</span>
       </div>
-      <div class="w-full bg-gray-200 rounded-full h-2">
+      <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
         <div
           class="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300"
           :style="{ width: `${todoStore.todoStats.completionRate}%` }"
@@ -31,13 +33,13 @@
           v-model="newTodoTitle"
           type="text"
           placeholder="Add a new task..."
-          class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           maxlength="200"
         />
         <button
           type="submit"
           :disabled="!newTodoTitle.trim()"
-          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -49,7 +51,7 @@
           </svg>
         </button>
       </div>
-      <div v-if="todoStore.error" class="text-red-500 text-sm mt-2">
+      <div v-if="todoStore.error" class="text-red-500 dark:text-red-400 text-sm mt-2">
         {{ todoStore.error }}
       </div>
     </form>
@@ -59,9 +61,14 @@
       <!-- Empty state -->
       <div v-if="todoStore.todos.length === 0" class="text-center py-12">
         <div
-          class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4"
+          class="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4"
         >
-          <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-8 h-8 text-gray-400 dark:text-gray-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -70,8 +77,10 @@
             />
           </svg>
         </div>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">Stay organized with todos</h3>
-        <p class="text-gray-600 max-w-md mx-auto">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mb-2">
+          Stay organized with todos
+        </h3>
+        <p class="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
           Create and manage your tasks to stay productive. Add your first task above to get started.
         </p>
       </div>
@@ -80,7 +89,7 @@
       <div
         v-for="todo in sortedTodos"
         :key="todo.id"
-        class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+        class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
         :class="{ 'opacity-60': todo.completed }"
       >
         <!-- Checkbox -->
@@ -90,7 +99,7 @@
           :class="
             todo.completed
               ? 'bg-blue-600 border-blue-600 text-white'
-              : 'border-gray-300 hover:border-blue-400'
+              : 'border-gray-300 dark:border-gray-500 hover:border-blue-400 dark:hover:border-blue-400'
           "
         >
           <svg v-if="todo.completed" class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
@@ -107,8 +116,8 @@
           <div
             v-if="!editingId || editingId !== todo.id"
             @dblclick="startEditing(todo)"
-            class="cursor-pointer"
-            :class="{ 'line-through text-gray-500': todo.completed }"
+            class="cursor-pointer text-gray-900 dark:text-gray-200"
+            :class="{ 'line-through text-gray-500 dark:text-gray-400': todo.completed }"
           >
             {{ todo.title }}
           </div>
@@ -118,7 +127,7 @@
             @blur="saveEdit(todo.id)"
             @keyup.enter="saveEdit(todo.id)"
             @keyup.escape="cancelEdit"
-            class="w-full px-2 py-1 border border-blue-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+            class="w-full px-2 py-1 border border-blue-300 dark:border-blue-500 dark:bg-gray-700 dark:text-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
             ref="editInput"
             maxlength="200"
           />
@@ -127,7 +136,7 @@
         <!-- Delete button -->
         <button
           @click="todoStore.deleteTodo(todo.id)"
-          class="flex-shrink-0 p-1 text-gray-400 hover:text-red-500 transition-colors"
+          class="flex-shrink-0 p-1 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors"
           title="Delete task"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -148,14 +157,14 @@
         <button
           v-if="todoStore.completedTodos.length > 0"
           @click="todoStore.clearCompleted"
-          class="px-3 py-1 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+          class="px-3 py-1 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
         >
           Clear completed ({{ todoStore.completedTodos.length }})
         </button>
       </div>
       <button
         @click="showClearAllConfirm = true"
-        class="px-3 py-1 text-sm text-red-600 hover:text-red-800 transition-colors"
+        class="px-3 py-1 text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 transition-colors"
       >
         Clear all
       </button>
@@ -167,19 +176,21 @@
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
       @click="showClearAllConfirm = false"
     >
-      <div class="bg-white rounded-lg p-6 max-w-sm mx-4" @click.stop>
-        <h3 class="text-lg font-semibold text-gray-800 mb-2">Clear all tasks?</h3>
-        <p class="text-gray-600 mb-4">This action cannot be undone.</p>
+      <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-sm mx-4" @click.stop>
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
+          Clear all tasks?
+        </h3>
+        <p class="text-gray-600 dark:text-gray-400 mb-4">This action cannot be undone.</p>
         <div class="flex gap-2 justify-end">
           <button
             @click="showClearAllConfirm = false"
-            class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+            class="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
           >
             Cancel
           </button>
           <button
             @click="confirmClearAll"
-            class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+            class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-md hover:bg-red-700 dark:hover:bg-red-600 transition-colors"
           >
             Clear all
           </button>

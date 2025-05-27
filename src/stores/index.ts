@@ -6,6 +6,7 @@ export { useSearchStore } from './search';
 export { useCalendarStore } from './calendar';
 export { useWaterReminderStore } from './waterReminder';
 export { useWidgetStore } from './widgets';
+export { useDarkModeStore } from './darkMode';
 
 // Re-export utilities and types
 export { CacheStorage } from './storage';

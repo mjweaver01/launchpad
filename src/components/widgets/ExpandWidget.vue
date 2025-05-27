@@ -2,7 +2,7 @@
   <router-link
     v-if="!route.path.includes('widget')"
     :to="`/widget/${widgetName}`"
-    class="p-2 text-gray-600 hover:text-blue-600 transition-colors flex items-center justify-center"
+    class="p-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center justify-center"
     :title="`View ${displayName} in full page`"
   >
     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

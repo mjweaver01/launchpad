@@ -87,6 +87,26 @@ export const useCalendarStore = defineStore('calendar', () => {
       });
   });
 
+  const tomorrowsEvents = computed(() => {
+    if (!calendarCache.value?.data.events) return [];
+
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const startOfDay = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate());
+    const endOfDay = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate() + 1);
+
+    return calendarCache.value.data.events
+      .filter(event => {
+        const eventDate = new Date(event.start.dateTime || event.start.date || '');
+        return eventDate >= startOfDay && eventDate < endOfDay;
+      })
+      .sort((a, b) => {
+        const dateA = new Date(a.start.dateTime || a.start.date || '');
+        const dateB = new Date(b.start.dateTime || b.start.date || '');
+        return dateA.getTime() - dateB.getTime();
+      });
+  });
+
   // Actions
   const initiateGoogleAuth = (): string => {
     console.log('initiateGoogleAuth called');
@@ -310,6 +330,7 @@ export const useCalendarStore = defineStore('calendar', () => {
     isAuthenticated,
     upcomingEvents,
     todaysEvents,
+    tomorrowsEvents,
 
     // Actions
     loadCalendar,

@@ -1,7 +1,7 @@
 <template>
   <div class="flex justify-center" :class="`my-${my}`">
     <div
-      class="rounded-full border-4 border-blue-200 border-t-blue-600 animate-spin"
+      class="rounded-full border-4 border-blue-200 dark:border-gray-600 border-t-blue-600 dark:border-t-blue-400 animate-spin"
       :class="`w-${w} h-${w}`"
     ></div>
   </div>

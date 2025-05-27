@@ -1,5 +1,5 @@
 <template>
-  <header class="bg-blue-800 text-white shadow-md">
+  <header class="bg-blue-800 dark:bg-gray-900 text-white shadow-md transition-colors duration-200">
     <div class="mx-auto px-4 sm:px-6 py-2.5">
       <div class="flex justify-between items-center">
         <router-link to="/" class="uppercase tracking-[2px] text-2xl font-bold"
@@ -17,24 +17,27 @@
               )"
               :key="route.path"
               :to="route.path"
-              class="px-3 py-2 rounded hover:bg-blue-700 transition-colors leading-[20px]"
-              :class="{ 'bg-blue-700': $route.path === route.path }"
+              class="px-3 py-2 rounded hover:bg-blue-700 dark:hover:bg-gray-700 transition-colors leading-[20px]"
+              :class="{ 'bg-blue-700 dark:bg-gray-700': $route.path === route.path }"
             >
               {{ route.name }}
             </router-link>
             <router-link
               v-if="$route.path.includes('/widget')"
               to="/"
-              class="px-3 py-2 rounded hover:bg-blue-700 transition-colors leading-[20px]"
+              class="px-3 py-2 rounded hover:bg-blue-700 dark:hover:bg-gray-700 transition-colors leading-[20px]"
               >Home</router-link
             >
           </nav>
+
+          <!-- Dark Mode Toggle -->
+          <DarkModeToggle />
 
           <!-- Refresh Button -->
           <button
             @click="handleRefresh"
             :disabled="isRefreshing"
-            class="flex items-center space-x-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 rounded transition-colors text-sm"
+            class="flex items-center space-x-1 px-3 py-2 bg-blue-600 dark:bg-gray-800 hover:bg-blue-700 dark:hover:bg-gray-700 disabled:bg-blue-400 dark:disabled:bg-gray-600 rounded transition-colors text-sm"
             title="Refresh all data"
           >
             <svg
@@ -62,9 +65,13 @@
 import { defineComponent, ref } from 'vue';
 import { routes } from '../router';
 import { useWeatherStore, useNewsStore, useCalendarStore } from '../stores';
+import DarkModeToggle from './DarkModeToggle.vue';
 
 export default defineComponent({
   name: 'AppHeader',
+  components: {
+    DarkModeToggle,
+  },
   setup() {
     const weatherStore = useWeatherStore();
     const newsStore = useNewsStore();

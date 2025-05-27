@@ -1,13 +1,15 @@
 <template>
-  <div class="bg-white rounded-lg shadow-md p-6 w-full mx-auto">
+  <div
+    class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 w-full mx-auto transition-colors duration-200"
+  >
     <div class="flex items-center justify-between mb-4">
-      <h2 class="text-2xl font-semibold text-gray-800">Calendar</h2>
+      <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">Calendar</h2>
       <div class="flex items-center space-x-2">
         <button
           v-if="calendarStore.isAuthenticated"
           @click="refreshCalendar"
           :disabled="calendarStore.loading"
-          class="p-2 text-gray-600 hover:text-blue-600 transition-colors flex items-center justify-center"
+          class="p-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center justify-center"
           title="Refresh Calendar"
         >
           <svg
@@ -28,7 +30,7 @@
         <button
           v-if="calendarStore.isAuthenticated"
           @click="signOut"
-          class="p-2 text-gray-600 hover:text-red-600 transition-colors"
+          class="p-2 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
           title="Sign Out"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -48,7 +50,7 @@
     <div v-if="!calendarStore.isAuthenticated" class="text-center">
       <div class="mb-4">
         <svg
-          class="w-14 h-14 mx-auto text-gray-400 m-4"
+          class="w-14 h-14 mx-auto text-gray-400 dark:text-gray-500 m-4"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -58,13 +60,15 @@
           <line x1="8" y1="2" x2="8" y2="6" stroke-width="2" />
           <line x1="3" y1="10" x2="21" y2="10" stroke-width="2" />
         </svg>
-        <p class="text-gray-600 text-sm mb-4">Connect your Google Calendar to see your events</p>
+        <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+          Connect your Google Calendar to see your events
+        </p>
       </div>
 
       <button
         @click="signInWithGoogle"
         :disabled="calendarStore.authLoading"
-        class="flex items-center justify-center w-full px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        class="flex items-center justify-center w-full px-4 py-3 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <svg
           v-if="calendarStore.authLoading"
@@ -112,12 +116,12 @@
     <!-- Loading state -->
     <div v-else-if="calendarStore.loading" class="text-center">
       <LoadingSpinner />
-      <p class="text-gray-600 mt-2">Loading your events...</p>
+      <p class="text-gray-600 dark:text-gray-400 mt-2">Loading your events...</p>
     </div>
 
     <!-- Error state -->
     <div v-else-if="calendarStore.error" class="text-center">
-      <div class="text-red-500 mb-2">
+      <div class="text-red-500 dark:text-red-400 mb-2">
         <svg class="w-12 h-12 mx-auto" fill="currentColor" viewBox="0 0 20 20">
           <path
             fill-rule="evenodd"
@@ -126,10 +130,10 @@
           />
         </svg>
       </div>
-      <p class="text-red-600 text-sm mb-3">{{ calendarStore.error }}</p>
+      <p class="text-red-600 dark:text-red-400 text-sm mb-3">{{ calendarStore.error }}</p>
       <button
         @click="retryLoadCalendar"
-        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+        class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors text-sm"
       >
         Try Again
       </button>
@@ -144,7 +148,7 @@
       <!-- User info -->
       <div
         v-if="calendarStore.authState.userInfo"
-        class="flex items-center p-3 bg-gray-50 rounded-lg"
+        class="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
       >
         <img
           v-if="calendarStore.authState.userInfo.picture"
@@ -153,18 +157,20 @@
           class="w-8 h-8 rounded-full mr-3"
         />
         <div class="flex-1">
-          <p class="text-sm font-medium text-gray-800">
+          <p class="text-sm font-medium text-gray-800 dark:text-gray-200">
             {{ calendarStore.authState.userInfo.name }}
           </p>
-          <p class="text-xs text-gray-600">{{ calendarStore.authState.userInfo.email }}</p>
+          <p class="text-xs text-gray-600 dark:text-gray-400">
+            {{ calendarStore.authState.userInfo.email }}
+          </p>
         </div>
       </div>
 
       <!-- Today's events -->
       <div v-if="calendarStore.todaysEvents.length > 0">
-        <h3 class="text-sm font-medium text-gray-800 mb-2 flex items-center">
+        <h3 class="text-sm font-medium text-gray-800 dark:text-gray-200 mb-2 flex items-center">
           <svg
-            class="w-4 h-4 mr-1 text-green-600"
+            class="w-4 h-4 mr-1 text-green-600 dark:text-green-400"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -182,13 +188,18 @@
           <div
             v-for="event in calendarStore.todaysEvents"
             :key="event.id"
-            class="p-3 bg-green-50 border-l-4 border-green-400 rounded-r-lg"
+            class="p-3 bg-green-50 dark:bg-green-900 border-l-4 border-green-400 dark:border-green-500 rounded-r-lg"
           >
             <div class="flex items-start justify-between">
               <div class="flex-1">
-                <h4 class="text-sm font-medium text-gray-800 mb-1">{{ event.summary }}</h4>
-                <p class="text-xs text-gray-600">{{ formatEventTime(event) }}</p>
-                <p v-if="event.location" class="text-xs text-gray-500 mt-1 flex items-center">
+                <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 mb-1">
+                  {{ event.summary }}
+                </h4>
+                <p class="text-xs text-gray-600 dark:text-gray-400">{{ formatEventTime(event) }}</p>
+                <p
+                  v-if="event.location"
+                  class="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center"
+                >
                   <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       stroke-linecap="round"
@@ -222,16 +233,24 @@
                   />
                 </svg>
               </a>
+              <div class="ml-2">
+                <span
+                  class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                  :class="getEventStatusColor(event)"
+                >
+                  {{ getEventStatus(event) }}
+                </span>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Upcoming events -->
-      <div v-if="calendarStore.upcomingEvents.length > 0">
-        <h3 class="text-sm font-medium text-gray-800 mb-2 flex items-center">
+      <!-- Tomorrow's events -->
+      <div v-if="calendarStore.tomorrowsEvents.length > 0">
+        <h3 class="text-sm font-medium text-gray-800 dark:text-gray-200 mb-2 flex items-center">
           <svg
-            class="w-4 h-4 mr-1 text-blue-600"
+            class="w-4 h-4 mr-1 text-blue-600 dark:text-blue-400"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -240,22 +259,27 @@
               stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
-              d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 0V6a2 2 0 012-2h4a2 2 0 012 2v1m-6 0h8m-9 0a1 1 0 00-1 1v10a1 1 0 001 1h10a1 1 0 001-1V8a1 1 0 00-1-1H7z"
+              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
             />
           </svg>
-          Upcoming This Week
+          Tomorrow
         </h3>
         <div class="space-y-2">
           <div
-            v-for="event in calendarStore.upcomingEvents.slice(0, 4)"
+            v-for="event in calendarStore.tomorrowsEvents.slice(0, 3)"
             :key="event.id"
-            class="p-3 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg"
+            class="p-3 bg-blue-50 dark:bg-blue-900 border-l-4 border-blue-400 dark:border-blue-500 rounded-r-lg"
           >
             <div class="flex items-start justify-between">
               <div class="flex-1">
-                <h4 class="text-sm font-medium text-gray-800 mb-1">{{ event.summary }}</h4>
-                <p class="text-xs text-gray-600">{{ formatEventDateTime(event) }}</p>
-                <p v-if="event.location" class="text-xs text-gray-500 mt-1 flex items-center">
+                <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 mb-1">
+                  {{ event.summary }}
+                </h4>
+                <p class="text-xs text-gray-600 dark:text-gray-400">{{ formatEventTime(event) }}</p>
+                <p
+                  v-if="event.location"
+                  class="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center"
+                >
                   <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       stroke-linecap="round"
@@ -294,32 +318,87 @@
         </div>
       </div>
 
-      <!-- No events -->
+      <!-- Upcoming events -->
+      <div v-if="calendarStore.upcomingEvents.length > 0">
+        <h3 class="text-sm font-medium text-gray-800 dark:text-gray-200 mb-2 flex items-center">
+          <svg
+            class="w-4 h-4 mr-1 text-purple-600 dark:text-purple-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+            />
+          </svg>
+          This Week
+        </h3>
+        <div class="space-y-2">
+          <div
+            v-for="event in calendarStore.upcomingEvents.slice(0, 5)"
+            :key="event.id"
+            class="p-3 bg-purple-50 dark:bg-purple-900 border-l-4 border-purple-400 dark:border-purple-500 rounded-r-lg"
+          >
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 mb-1">
+                  {{ event.summary }}
+                </h4>
+                <p class="text-xs text-gray-600 dark:text-gray-400">
+                  {{ formatEventDate(event) }} at {{ formatEventTime(event) }}
+                </p>
+                <p
+                  v-if="event.location"
+                  class="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center"
+                >
+                  <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                    />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  {{ event.location }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- No events message -->
       <div
-        v-if="calendarStore.todaysEvents.length === 0 && calendarStore.upcomingEvents.length === 0"
-        class="text-center py-8"
+        v-if="
+          calendarStore.todaysEvents.length === 0 &&
+          calendarStore.tomorrowsEvents.length === 0 &&
+          calendarStore.upcomingEvents.length === 0
+        "
+        class="text-center py-12"
       >
-        <svg
-          class="w-12 h-12 mx-auto text-gray-400 mb-3"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM5 19V8h14v11H5z"
-          />
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M7 10h2v2H7v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zM7 14h2v2H7v-2zm4 0h2v2h-2v-2z"
-          />
-        </svg>
-        <p class="text-gray-600 text-sm">No events coming up this week</p>
-        <p class="text-gray-500 text-xs mt-1">Enjoy your free time! 🎉</p>
+        <div class="text-gray-400 dark:text-gray-500 mb-4">
+          <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+            />
+          </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-600 dark:text-gray-400 mb-2">
+          No upcoming events
+        </h3>
+        <p class="text-gray-500 dark:text-gray-500">Your calendar looks clear for the next week.</p>
       </div>
     </div>
   </div>
@@ -405,42 +484,23 @@ export default defineComponent({
       return '';
     };
 
-    const formatEventDateTime = (event: CalendarEvent): string => {
+    const formatEventDate = (event: CalendarEvent): string => {
       if (event.start.date) {
-        // All-day event
         const eventDate = new Date(event.start.date);
-        return (
-          eventDate.toLocaleDateString('en-US', {
-            weekday: 'short',
-            month: 'short',
-            day: 'numeric',
-          }) + ' (All day)'
-        );
-      }
-
-      if (event.start.dateTime) {
-        const startDate = new Date(event.start.dateTime);
-        const endDate = new Date(event.end.dateTime || event.start.dateTime);
-
-        const dateStr = startDate.toLocaleDateString('en-US', {
+        return eventDate.toLocaleDateString('en-US', {
           weekday: 'short',
           month: 'short',
           day: 'numeric',
         });
+      }
 
-        const startTimeStr = startDate.toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true,
+      if (event.start.dateTime) {
+        const eventDate = new Date(event.start.dateTime);
+        return eventDate.toLocaleDateString('en-US', {
+          weekday: 'short',
+          month: 'short',
+          day: 'numeric',
         });
-
-        const endTimeStr = endDate.toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true,
-        });
-
-        return `${dateStr}, ${startTimeStr} - ${endTimeStr}`;
       }
 
       return '';
@@ -459,7 +519,7 @@ export default defineComponent({
       retryLoadCalendar,
       signOut,
       formatEventTime,
-      formatEventDateTime,
+      formatEventDate,
     };
   },
 });

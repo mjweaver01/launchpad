@@ -4,9 +4,9 @@
     :class="[
       'group relative transition-all duration-200 cursor-grab active:cursor-grabbing',
       {
-        'opacity-60 scale-[0.95] shadow-2xl z-50 rotate-1 ring-4 ring-blue-500/30 ring-offset-2 ring-offset-white':
+        'opacity-60 scale-[0.95] shadow-2xl z-50 rotate-1 ring-4 ring-blue-500/30 ring-offset-2 ring-offset-white dark:ring-offset-gray-900':
           widgetStore.isDragging && widgetStore.draggedWidget === widgetId,
-        'ring-2 ring-blue-400 ring-inset bg-blue-50/30 shadow-lg':
+        'ring-2 ring-blue-400 dark:ring-blue-500 ring-inset bg-blue-50/30 dark:bg-blue-900/30 shadow-lg':
           widgetStore.dragOverIndex === index && widgetStore.draggedWidget !== widgetId,
         'hover:shadow-lg hover:scale-[1.02]': !widgetStore.isDragging,
         'mb-4': widgetStore.isDragging && widgetStore.draggedWidget === widgetId,
@@ -34,9 +34,11 @@
         widgetStore.draggedWidget !== widgetId &&
         widgetStore.isDragging
       "
-      class="absolute inset-0 border-2 border-dashed border-blue-400 rounded-lg bg-blue-50/40 backdrop-blur-sm pointer-events-none z-40 flex items-center justify-center"
+      class="absolute inset-0 border-2 border-dashed border-blue-400 dark:border-blue-500 rounded-lg bg-blue-50/40 dark:bg-blue-900/40 backdrop-blur-sm pointer-events-none z-40 flex items-center justify-center"
     >
-      <div class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
+      <div
+        class="bg-blue-600 dark:bg-blue-700 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg"
+      >
         Drop here
       </div>
     </div>

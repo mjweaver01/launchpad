@@ -4,13 +4,13 @@
     <div class="flex items-center justify-between mb-4 sm:mb-6">
       <span></span>
       <div class="flex items-center gap-3">
-        <span class="text-sm text-gray-600">
+        <span class="text-sm text-gray-600 dark:text-gray-400">
           {{ widgetStore.visibleWidgets.length }} of {{ widgetStore.widgets.length }} widgets
           visible
         </span>
         <button
           @click="showWidgetManager = !showWidgetManager"
-          class="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm"
+          class="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors text-sm text-gray-900 dark:text-gray-100"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -26,17 +26,20 @@
     </div>
 
     <!-- Widget Manager Panel -->
-    <div v-if="showWidgetManager" class="mb-6 p-4 bg-gray-50 rounded-lg border">
+    <div
+      v-if="showWidgetManager"
+      class="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+    >
       <div class="flex items-center justify-between mb-4">
         <div>
-          <h3 class="font-semibold text-gray-800">Widget Settings</h3>
-          <p class="text-sm text-gray-600 mt-1">
+          <h3 class="font-semibold text-gray-800 dark:text-gray-200">Widget Settings</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
             Drag tiles below to reorder, or toggle visibility
           </p>
         </div>
         <button
           @click="widgetStore.resetToDefault()"
-          class="text-sm text-red-600 hover:text-red-700"
+          class="text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
         >
           Reset to Default
         </button>
@@ -50,9 +53,11 @@
           :widget-id="widget.id"
           :index="index"
         >
-          <div class="flex items-center justify-between p-3 bg-white rounded border">
+          <div
+            class="flex items-center justify-between p-3 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600"
+          >
             <div class="flex items-center gap-3">
-              <div class="flex items-center gap-2 text-gray-500">
+              <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     stroke-linecap="round"
@@ -62,11 +67,13 @@
                   />
                 </svg>
               </div>
-              <span class="text-sm font-medium text-gray-800">{{ widget.name }}</span>
+              <span class="text-sm font-medium text-gray-800 dark:text-gray-200">{{
+                widget.name
+              }}</span>
             </div>
             <button
               @click="widgetStore.toggleWidgetVisibility(widget.id)"
-              class="px-3 py-1 rounded text-xs font-medium transition-colors bg-green-100 text-green-700 hover:bg-green-200"
+              class="px-3 py-1 rounded text-xs font-medium transition-colors bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800"
             >
               Hide
             </button>
@@ -81,10 +88,10 @@
           :index="widgetStore.visibleWidgets.length + index"
         >
           <div
-            class="flex items-center justify-between p-3 bg-gray-50 rounded border border-dashed opacity-75"
+            class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded border border-dashed border-gray-300 dark:border-gray-600 opacity-75"
           >
             <div class="flex items-center gap-3">
-              <div class="flex items-center gap-2 text-gray-400">
+              <div class="flex items-center gap-2 text-gray-400 dark:text-gray-500">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     stroke-linecap="round"
@@ -95,11 +102,13 @@
                 </svg>
                 <span class="text-sm font-medium">—</span>
               </div>
-              <span class="text-sm font-medium text-gray-600">{{ widget.name }}</span>
+              <span class="text-sm font-medium text-gray-600 dark:text-gray-400">{{
+                widget.name
+              }}</span>
             </div>
             <button
               @click="widgetStore.toggleWidgetVisibility(widget.id)"
-              class="px-3 py-1 rounded text-xs font-medium transition-colors bg-gray-100 text-gray-600 hover:bg-gray-200"
+              class="px-3 py-1 rounded text-xs font-medium transition-colors bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
             >
               Show
             </button>
@@ -162,7 +171,7 @@
 
     <!-- Empty State -->
     <div v-if="widgetStore.visibleWidgets.length === 0" class="text-center py-12">
-      <div class="text-gray-400 mb-4">
+      <div class="text-gray-400 dark:text-gray-500 mb-4">
         <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             stroke-linecap="round"
@@ -172,11 +181,11 @@
           />
         </svg>
       </div>
-      <h3 class="text-lg font-medium text-gray-600 mb-2">No widgets visible</h3>
-      <p class="text-gray-500 mb-4">Enable some widgets to get started</p>
+      <h3 class="text-lg font-medium text-gray-600 dark:text-gray-400 mb-2">No widgets visible</h3>
+      <p class="text-gray-500 dark:text-gray-500 mb-4">Enable some widgets to get started</p>
       <button
         @click="showWidgetManager = true"
-        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
       >
         Manage Widgets
       </button>
