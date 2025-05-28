@@ -52,6 +52,7 @@
           :key="widget.id"
           :widget-id="widget.id"
           :index="index"
+          :draggable-active="showWidgetManager"
         >
           <div
             class="flex items-center justify-between p-3 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600"
@@ -86,6 +87,7 @@
           :key="widget.id"
           :widget-id="widget.id"
           :index="widgetStore.visibleWidgets.length + index"
+          :draggable-active="showWidgetManager"
         >
           <div
             class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded border border-dashed border-gray-300 dark:border-gray-600 opacity-75"
@@ -159,6 +161,7 @@
         :key="widget.id"
         :widget-id="widget.id"
         :index="index"
+        :draggable-active="showWidgetManager"
       >
         <WeatherWidget v-if="widget.component === 'WeatherWidget'" />
         <CalendarWidget v-else-if="widget.component === 'CalendarWidget'" />

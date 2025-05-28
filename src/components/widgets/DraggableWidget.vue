@@ -3,13 +3,14 @@
     ref="widgetElement"
     class="max-h-[calc(50vh-6em)] overflow-hidden"
     :class="[
-      'widget-group relative transition-all duration-200 cursor-grab active:cursor-grabbing',
+      'widget-group relative transition-all duration-200',
       {
+        'cursor-grab active:cursor-grabbing': draggableActive,
         'opacity-60 scale-[0.95] shadow-2xl z-50 rotate-1 ring-4 ring-blue-500/30 ring-offset-2 ring-offset-white dark:ring-offset-gray-900':
           widgetStore.isDragging && widgetStore.draggedWidget === widgetId,
         'ring-2 ring-blue-400 dark:ring-blue-500 ring-inset bg-blue-50/30 dark:bg-blue-900/30 shadow-lg':
           widgetStore.dragOverIndex === index && widgetStore.draggedWidget !== widgetId,
-        'hover:shadow-lg hover:scale-[1.02]': !widgetStore.isDragging,
+        'hover:shadow-lg hover:scale-[1.02]': draggableActive && !widgetStore.isDragging,
         'mb-4': widgetStore.isDragging && widgetStore.draggedWidget === widgetId,
       },
     ]"
@@ -47,7 +48,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, onUnmounted, nextTick } from 'vue';
+import { defineComponent, ref, onMounted, onUnmounted, nextTick, watch } from 'vue';
 import {
   draggable,
   dropTargetForElements,
@@ -65,6 +66,10 @@ export default defineComponent({
       type: Number,
       required: true,
     },
+    draggableActive: {
+      type: Boolean,
+      default: false,
+    },
   },
   setup(props) {
     const widgetElement = ref<HTMLElement>();
@@ -73,12 +78,24 @@ export default defineComponent({
     let dragCleanup: (() => void) | null = null;
     let dropCleanup: (() => void) | null = null;
 
+    const cleanupDragAndDrop = () => {
+      dragCleanup?.();
+      dropCleanup?.();
+      dragCleanup = null;
+      dropCleanup = null;
+    };
+
     const setupDragAndDrop = async () => {
       await nextTick();
 
       if (!widgetElement.value) {
         console.warn('DraggableWidget: Element not ready, retrying...', props.widgetId);
         setTimeout(setupDragAndDrop, 100);
+        return;
+      }
+
+      // Only setup drag and drop if active
+      if (!props.draggableActive) {
         return;
       }
 
@@ -129,13 +146,24 @@ export default defineComponent({
       }
     };
 
+    // Watch for changes to the active prop
+    watch(
+      () => props.draggableActive,
+      newActive => {
+        if (newActive) {
+          setupDragAndDrop();
+        } else {
+          cleanupDragAndDrop();
+        }
+      }
+    );
+
     onMounted(() => {
       setupDragAndDrop();
     });
 
     onUnmounted(() => {
-      dragCleanup?.();
-      dropCleanup?.();
+      cleanupDragAndDrop();
     });
 
     return {
