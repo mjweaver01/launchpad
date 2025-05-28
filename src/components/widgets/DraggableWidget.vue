@@ -3,7 +3,7 @@
     ref="widgetElement"
     class="max-h-[calc(50vh-6em)] overflow-hidden"
     :class="[
-      'group relative transition-all duration-200 cursor-grab active:cursor-grabbing',
+      'widget-group relative transition-all duration-200 cursor-grab active:cursor-grabbing',
       {
         'opacity-60 scale-[0.95] shadow-2xl z-50 rotate-1 ring-4 ring-blue-500/30 ring-offset-2 ring-offset-white dark:ring-offset-gray-900':
           widgetStore.isDragging && widgetStore.draggedWidget === widgetId,
@@ -163,12 +163,12 @@ export default defineComponent({
 }
 
 /* Smooth transform origin for better drag animation */
-.group {
+.widget-group {
   transform-origin: center;
 }
 
 /* Prevent content shift during drag operations */
-.group.opacity-60 {
+.widget-group.opacity-60 {
   will-change: transform, opacity;
 }
 
@@ -186,7 +186,7 @@ export default defineComponent({
 
 /* Improve drag handle visibility on mobile */
 @media (hover: none) {
-  .group .opacity-0 {
+  .widget-group .opacity-0 {
     opacity: 0.7;
   }
 }

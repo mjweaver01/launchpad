@@ -1,5 +1,5 @@
 <template>
-  <header class="bg-blue-800 dark:bg-gray-900 text-white shadow-md transition-colors duration-200">
+  <header class="bg-blue-800 dark:bg-gray-700 text-white shadow-md transition-colors duration-200">
     <div class="mx-auto px-4 sm:px-6 py-2.5">
       <div class="flex justify-between items-center">
         <router-link to="/" class="uppercase tracking-[2px] text-2xl font-bold"

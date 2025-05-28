@@ -27,7 +27,7 @@
       </div>
     </div>
 
-    <div class="h-full">
+    <div class="h-full overflow-y-auto">
       <!-- Search Input -->
       <div class="relative mb-8">
         <div class="relative">
@@ -210,7 +210,7 @@
       <!-- Empty State -->
       <div
         v-if="!searchStore.loading && !currentResult && !searchStore.error && !showHistory"
-        class="text-center py-12"
+        class="text-center h-auto"
       >
         <div
           class="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4"

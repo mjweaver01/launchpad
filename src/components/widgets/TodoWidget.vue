@@ -62,7 +62,7 @@
       <!-- Todo list -->
       <div class="space-y-2">
         <!-- Empty state -->
-        <div v-if="todoStore.todos.length === 0" class="text-center py-12">
+        <div v-if="todoStore.todos.length === 0" class="text-center h-full overflow-y-auto">
           <div
             class="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4"
           >
