@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 w-full mx-auto transition-colors duration-200"
+    class="flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 w-full mx-auto transition-colors duration-200"
   >
     <div class="flex items-center justify-between mb-6">
       <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">💧 Water Reminder</h2>
@@ -29,314 +29,318 @@
       </div>
     </div>
 
-    <!-- Settings Panel -->
-    <div v-if="showSettings" class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-      <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Settings</h3>
+    <div class="h-full overflow-y-auto">
+      <!-- Settings Panel -->
+      <div v-if="showSettings" class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Settings</h3>
 
-      <!-- Weight Slider -->
-      <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Weight: {{ localWeight }} lbs
-        </label>
-        <input
-          v-model.number="localWeight"
-          type="range"
-          min="80"
-          max="400"
-          step="5"
-          class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
-          @input="updateWeight"
-        />
-        <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-          <span>80 lbs</span>
-          <span>400 lbs</span>
-        </div>
-      </div>
-
-      <!-- Daily Goal Display -->
-      <div class="mb-4">
-        <div class="text-sm text-gray-600 dark:text-gray-400">
-          Daily Goal:
-          <span class="font-semibold text-blue-600 dark:text-blue-400"
-            >{{ waterStore.data.settings.dailyGoal }} oz</span
-          >
-        </div>
-      </div>
-
-      <!-- Time Settings -->
-      <div class="grid grid-cols-2 gap-4 mb-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-            >Start Time</label
-          >
+        <!-- Weight Slider -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Weight: {{ localWeight }} lbs
+          </label>
           <input
-            v-model="localStartTime"
-            type="time"
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-600 dark:text-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            @change="updateTimeSettings"
+            v-model.number="localWeight"
+            type="range"
+            min="80"
+            max="400"
+            step="5"
+            class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
+            @input="updateWeight"
           />
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-            >End Time</label
-          >
-          <input
-            v-model="localEndTime"
-            type="time"
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-600 dark:text-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            @change="updateTimeSettings"
-          />
-        </div>
-      </div>
-
-      <!-- Reminder Interval -->
-      <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Reminder Interval: {{ localInterval }} hours
-        </label>
-        <input
-          v-model.number="localInterval"
-          type="range"
-          min="1"
-          max="6"
-          step="0.5"
-          class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
-          @input="updateInterval"
-        />
-        <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-          <span>1 hour</span>
-          <span>6 hours</span>
-        </div>
-      </div>
-
-      <button
-        @click="showSettings = false"
-        class="w-full px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
-      >
-        Done
-      </button>
-    </div>
-
-    <!-- Error State -->
-    <div
-      v-if="waterStore.error"
-      class="mb-4 p-3 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-md"
-    >
-      <p class="text-red-600 dark:text-red-400 text-sm">{{ waterStore.error }}</p>
-    </div>
-
-    <!-- Progress Section -->
-    <div class="mb-6">
-      <div class="flex items-center justify-between mb-2">
-        <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Daily Progress</span>
-        <span class="text-sm text-gray-600 dark:text-gray-400">
-          {{ waterStore.todayCompletedOunces }} / {{ waterStore.data.settings.dailyGoal }} oz
-        </span>
-      </div>
-      <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
-        <div
-          class="bg-gradient-to-r from-blue-400 to-blue-600 h-3 rounded-full transition-all duration-500"
-          :style="{ width: `${waterStore.completionPercentage}%` }"
-        ></div>
-      </div>
-      <div class="text-center mt-2">
-        <span class="text-lg font-bold text-blue-600 dark:text-blue-400"
-          >{{ waterStore.completionPercentage }}%</span
-        >
-      </div>
-    </div>
-
-    <!-- Next Reminder -->
-    <div
-      v-if="waterStore.nextReminder"
-      class="mb-6 p-4 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg"
-    >
-      <div class="flex items-center gap-3">
-        <div
-          class="w-12 h-12 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center"
-        >
-          <svg
-            class="w-6 h-6 text-blue-600 dark:text-blue-400"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-              clip-rule="evenodd"
-            />
-          </svg>
-        </div>
-        <div>
-          <div class="font-medium text-gray-800 dark:text-gray-200">Next Reminder</div>
-          <div class="text-sm text-gray-600 dark:text-gray-400">
-            {{ waterStore.nextReminder.time }} - Drink {{ waterStore.nextReminder.amount }} oz
+          <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <span>80 lbs</span>
+            <span>400 lbs</span>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Overdue Reminders Alert -->
-    <div
-      v-if="waterStore.overdueReminders.length > 0"
-      class="mb-6 p-4 bg-orange-50 dark:bg-orange-900 border border-orange-200 dark:border-orange-700 rounded-lg"
-    >
-      <div class="flex items-center gap-3">
-        <div
-          class="w-12 h-12 bg-orange-100 dark:bg-orange-800 rounded-full flex items-center justify-center"
-        >
-          <svg
-            class="w-6 h-6 text-orange-600 dark:text-orange-400"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-              clip-rule="evenodd"
-            />
-          </svg>
-        </div>
-        <div>
-          <div class="font-medium text-gray-800 dark:text-gray-200">Missed Reminders</div>
+        <!-- Daily Goal Display -->
+        <div class="mb-4">
           <div class="text-sm text-gray-600 dark:text-gray-400">
-            You have {{ waterStore.overdueReminders.length }} overdue reminder{{
-              waterStore.overdueReminders.length > 1 ? 's' : ''
-            }}
+            Daily Goal:
+            <span class="font-semibold text-blue-600 dark:text-blue-400"
+              >{{ waterStore.data.settings.dailyGoal }} oz</span
+            >
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Reminders List -->
-    <div class="space-y-3 max-h-[400px] overflow-y-auto">
-      <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">Today's Reminders</h3>
+        <!-- Time Settings -->
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >Start Time</label
+            >
+            <input
+              v-model="localStartTime"
+              type="time"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-600 dark:text-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              @change="updateTimeSettings"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >End Time</label
+            >
+            <input
+              v-model="localEndTime"
+              type="time"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-600 dark:text-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              @change="updateTimeSettings"
+            />
+          </div>
+        </div>
 
-      <!-- Empty state -->
-      <div
-        v-if="waterStore.data.reminders.length === 0"
-        class="text-center py-8 text-gray-500 dark:text-gray-400"
-      >
-        <svg
-          class="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6l4 2" />
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"
+        <!-- Reminder Interval -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Reminder Interval: {{ localInterval }} hours
+          </label>
+          <input
+            v-model.number="localInterval"
+            type="range"
+            min="1"
+            max="6"
+            step="0.5"
+            class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
+            @input="updateInterval"
           />
-        </svg>
-        <p class="text-sm">Configure your settings to start getting reminders!</p>
-      </div>
+          <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <span>1 hour</span>
+            <span>6 hours</span>
+          </div>
+        </div>
 
-      <!-- Reminder items -->
-      <div
-        v-for="reminder in sortedReminders"
-        :key="reminder.id"
-        class="flex items-center gap-3 p-3 rounded-lg border transition-colors"
-        :class="[
-          reminder.completed
-            ? 'bg-green-50 dark:bg-green-900 border-green-200 dark:border-green-700'
-            : isOverdue(reminder.time)
-              ? 'bg-orange-50 dark:bg-orange-900 border-orange-200 dark:border-orange-700'
-              : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600',
-        ]"
-      >
-        <!-- Water Drop Icon / Checkbox -->
         <button
-          @click="toggleReminder(reminder)"
-          class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-colors"
-          :class="
-            reminder.completed
-              ? 'bg-green-500 text-white'
-              : 'bg-blue-100 dark:bg-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-700'
-          "
+          @click="showSettings = false"
+          class="w-full px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
         >
-          <svg v-if="reminder.completed" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path
-              fill-rule="evenodd"
-              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-              clip-rule="evenodd"
-            />
-          </svg>
-          <svg v-else class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path
-              fill-rule="evenodd"
-              d="M10 2a6 6 0 00-6 6c0 4.314 6 10 6 10s6-5.686 6-10a6 6 0 00-6-6z"
-              clip-rule="evenodd"
-            />
-          </svg>
+          Done
         </button>
+      </div>
 
-        <!-- Reminder Details -->
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-2">
-            <span
-              class="font-medium"
-              :class="[
-                reminder.completed
-                  ? 'text-green-600 dark:text-green-400'
-                  : 'text-gray-800 dark:text-gray-200',
-              ]"
-            >
-              {{ reminder.time }}
-            </span>
-            <span
-              class="text-sm px-2 py-1 rounded-full"
-              :class="[
-                reminder.completed
-                  ? 'bg-green-100 dark:bg-green-800 text-green-600 dark:text-green-300'
-                  : 'bg-blue-100 dark:bg-blue-800 text-blue-600 dark:text-blue-300',
-              ]"
-            >
-              {{ reminder.amount }} oz
-            </span>
-          </div>
-          <div
-            v-if="reminder.completed && reminder.completedAt"
-            class="text-xs text-gray-500 dark:text-gray-400"
-          >
-            Completed {{ formatTime(reminder.completedAt) }}
-          </div>
+      <!-- Error State -->
+      <div
+        v-if="waterStore.error"
+        class="mb-4 p-3 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-md"
+      >
+        <p class="text-red-600 dark:text-red-400 text-sm">{{ waterStore.error }}</p>
+      </div>
+
+      <!-- Progress Section -->
+      <div class="mb-6">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Daily Progress</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">
+            {{ waterStore.todayCompletedOunces }} / {{ waterStore.data.settings.dailyGoal }} oz
+          </span>
         </div>
-
-        <!-- Status Badge -->
-        <div class="flex-shrink-0">
-          <span
-            v-if="reminder.completed"
-            class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200"
+        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+          <div
+            class="bg-gradient-to-r from-blue-400 to-blue-600 h-3 rounded-full transition-all duration-500"
+            :style="{ width: `${waterStore.completionPercentage}%` }"
+          ></div>
+        </div>
+        <div class="text-center mt-2">
+          <span class="text-lg font-bold text-blue-600 dark:text-blue-400"
+            >{{ waterStore.completionPercentage }}%</span
           >
-            Done
-          </span>
-          <span
-            v-else-if="isOverdue(reminder.time)"
-            class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 dark:bg-orange-800 text-orange-800 dark:text-orange-200"
-          >
-            Overdue
-          </span>
-          <span
-            v-else
-            class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300"
-          >
-            Pending
-          </span>
         </div>
       </div>
-    </div>
 
-    <!-- Action Buttons -->
-    <div v-if="waterStore.data.reminders.length > 0" class="mt-6 flex gap-2">
-      <button
-        @click="resetDailyProgress"
-        class="flex-1 px-4 py-2 bg-gray-600 dark:bg-gray-700 text-white rounded-md hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors text-sm"
+      <!-- Next Reminder -->
+      <div
+        v-if="waterStore.nextReminder"
+        class="mb-6 p-4 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg"
       >
-        Reset Day
-      </button>
+        <div class="flex items-center gap-3">
+          <div
+            class="w-12 h-12 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center"
+          >
+            <svg
+              class="w-6 h-6 text-blue-600 dark:text-blue-400"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </div>
+          <div>
+            <div class="font-medium text-gray-800 dark:text-gray-200">Next Reminder</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">
+              {{ waterStore.nextReminder.time }} - Drink {{ waterStore.nextReminder.amount }} oz
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overdue Reminders Alert -->
+      <div
+        v-if="waterStore.overdueReminders.length > 0"
+        class="mb-6 p-4 bg-orange-50 dark:bg-orange-900 border border-orange-200 dark:border-orange-700 rounded-lg"
+      >
+        <div class="flex items-center gap-3">
+          <div
+            class="w-12 h-12 bg-orange-100 dark:bg-orange-800 rounded-full flex items-center justify-center"
+          >
+            <svg
+              class="w-6 h-6 text-orange-600 dark:text-orange-400"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </div>
+          <div>
+            <div class="font-medium text-gray-800 dark:text-gray-200">Missed Reminders</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">
+              You have {{ waterStore.overdueReminders.length }} overdue reminder{{
+                waterStore.overdueReminders.length > 1 ? 's' : ''
+              }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reminders List -->
+      <div class="space-y-3 overflow-y-auto">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">
+          Today's Reminders
+        </h3>
+
+        <!-- Empty state -->
+        <div
+          v-if="waterStore.data.reminders.length === 0"
+          class="text-center py-8 text-gray-500 dark:text-gray-400"
+        >
+          <svg
+            class="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6l4 2" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"
+            />
+          </svg>
+          <p class="text-sm">Configure your settings to start getting reminders!</p>
+        </div>
+
+        <!-- Reminder items -->
+        <div
+          v-for="reminder in sortedReminders"
+          :key="reminder.id"
+          class="flex items-center gap-3 p-3 rounded-lg border transition-colors"
+          :class="[
+            reminder.completed
+              ? 'bg-green-50 dark:bg-green-900 border-green-200 dark:border-green-700'
+              : isOverdue(reminder.time)
+                ? 'bg-orange-50 dark:bg-orange-900 border-orange-200 dark:border-orange-700'
+                : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600',
+          ]"
+        >
+          <!-- Water Drop Icon / Checkbox -->
+          <button
+            @click="toggleReminder(reminder)"
+            class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+            :class="
+              reminder.completed
+                ? 'bg-green-500 text-white'
+                : 'bg-blue-100 dark:bg-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-700'
+            "
+          >
+            <svg v-if="reminder.completed" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fill-rule="evenodd"
+                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            <svg v-else class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fill-rule="evenodd"
+                d="M10 2a6 6 0 00-6 6c0 4.314 6 10 6 10s6-5.686 6-10a6 6 0 00-6-6z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </button>
+
+          <!-- Reminder Details -->
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+              <span
+                class="font-medium"
+                :class="[
+                  reminder.completed
+                    ? 'text-green-600 dark:text-green-400'
+                    : 'text-gray-800 dark:text-gray-200',
+                ]"
+              >
+                {{ reminder.time }}
+              </span>
+              <span
+                class="text-sm px-2 py-1 rounded-full"
+                :class="[
+                  reminder.completed
+                    ? 'bg-green-100 dark:bg-green-800 text-green-600 dark:text-green-300'
+                    : 'bg-blue-100 dark:bg-blue-800 text-blue-600 dark:text-blue-300',
+                ]"
+              >
+                {{ reminder.amount }} oz
+              </span>
+            </div>
+            <div
+              v-if="reminder.completed && reminder.completedAt"
+              class="text-xs text-gray-500 dark:text-gray-400"
+            >
+              Completed {{ formatTime(reminder.completedAt) }}
+            </div>
+          </div>
+
+          <!-- Status Badge -->
+          <div class="flex-shrink-0">
+            <span
+              v-if="reminder.completed"
+              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200"
+            >
+              Done
+            </span>
+            <span
+              v-else-if="isOverdue(reminder.time)"
+              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 dark:bg-orange-800 text-orange-800 dark:text-orange-200"
+            >
+              Overdue
+            </span>
+            <span
+              v-else
+              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300"
+            >
+              Pending
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div v-if="waterStore.data.reminders.length > 0" class="mt-6 flex gap-2">
+        <button
+          @click="resetDailyProgress"
+          class="flex-1 px-4 py-2 bg-gray-600 dark:bg-gray-700 text-white rounded-md hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors text-sm"
+        >
+          Reset Day
+        </button>
+      </div>
     </div>
   </div>
 </template>

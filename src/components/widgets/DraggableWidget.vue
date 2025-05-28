@@ -1,6 +1,7 @@
 <template>
   <div
     ref="widgetElement"
+    class="max-h-[calc(50vh-6em)] overflow-hidden"
     :class="[
       'group relative transition-all duration-200 cursor-grab active:cursor-grabbing',
       {
