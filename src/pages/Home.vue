@@ -34,7 +34,7 @@
         <div>
           <h3 class="font-semibold text-gray-800 dark:text-gray-200">Widget Settings</h3>
           <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-            Drag tiles below to reorder, or toggle visibility
+            Drag tiles below, or the widgets themselves, to reorder
           </p>
         </div>
         <button
