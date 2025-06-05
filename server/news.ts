@@ -42,18 +42,8 @@ export const getTopNews = async (
 
     const data = await response.json();
 
-    // Filter out articles with missing essential data
-    const filteredArticles = data.articles.filter(
-      (article: NewsArticle) =>
-        article.title &&
-        article.description &&
-        article.url &&
-        article.title !== '[Removed]' &&
-        article.description !== '[Removed]'
-    );
-
     return {
-      articles: filteredArticles,
+      articles: data.articles,
       totalResults: data.totalResults,
     };
   } catch (error) {
@@ -80,18 +70,8 @@ export const searchNews = async (query: string, pageSize: number = 20): Promise<
 
     const data = await response.json();
 
-    // Filter out articles with missing essential data
-    const filteredArticles = data.articles.filter(
-      (article: NewsArticle) =>
-        article.title &&
-        article.description &&
-        article.url &&
-        article.title !== '[Removed]' &&
-        article.description !== '[Removed]'
-    );
-
     return {
-      articles: filteredArticles,
+      articles: data.articles,
       totalResults: data.totalResults,
     };
   } catch (error) {
