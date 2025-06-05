@@ -13,7 +13,7 @@ export const useNewsStore = defineStore('news', () => {
 
   // Pagination state
   const currentPage = ref(1);
-  const pageSize = ref(10);
+  const pageSize = ref(8);
   const totalPages = ref(1);
   const selectedCategory = ref('');
   const currentNewsData = ref<NewsResponse | null>(null);
