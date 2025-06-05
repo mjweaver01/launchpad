@@ -17,7 +17,7 @@
               )"
               :key="route.path"
               :to="route.path"
-              class="px-3 py-2 rounded hover:bg-blue-700 dark:hover:bg-gray-700 transition-colors leading-[20px]"
+              class="px-3 py-2 rounded hover:bg-blue-700 dark:hover:bg-gray-600 transition-colors leading-[20px]"
               :class="{ 'bg-blue-700 dark:bg-gray-700': $route.path === route.path }"
             >
               {{ route.name }}
@@ -25,7 +25,7 @@
             <router-link
               v-if="$route.path.includes('/widget')"
               to="/"
-              class="px-3 py-2 rounded hover:bg-blue-700 dark:hover:bg-gray-700 transition-colors leading-[20px]"
+              class="px-3 py-2 rounded hover:bg-blue-700 dark:hover:bg-gray-600 transition-colors leading-[20px]"
               >Home</router-link
             >
           </nav>
