@@ -6,8 +6,8 @@
       <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">Latest News</h2>
       <div class="flex gap-2">
         <select
-          v-model="selectedCategory"
-          @change="resetAndLoadNews"
+          v-model="newsStore.selectedCategory"
+          @change="handleCategoryChange"
           class="px-3 py-1 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">All</option>
@@ -20,7 +20,7 @@
           <option value="technology">Technology</option>
         </select>
         <button
-          @click="loadNews(true)"
+          @click="handleRefresh"
           class="p-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center justify-center"
           :disabled="newsStore.loading"
         >
@@ -63,7 +63,7 @@
         </div>
         <p class="text-red-600 dark:text-red-400 text-sm">{{ newsStore.error }}</p>
         <button
-          @click="loadNews(true)"
+          @click="handleRefresh"
           class="mt-3 px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors text-sm"
         >
           Try Again
@@ -71,10 +71,10 @@
       </div>
 
       <!-- News articles -->
-      <div v-else-if="newsData" class="space-y-6">
+      <div v-else-if="newsStore.currentNewsData" class="space-y-6">
         <!-- Featured article -->
         <div
-          v-if="newsData.articles.length > 0"
+          v-if="newsStore.currentNewsData.articles.length > 0"
           class="border-b border-gray-200 dark:border-gray-700 pb-6"
         >
           <article class="group">
@@ -83,26 +83,34 @@
                 <h3
                   class="text-xl font-bold text-gray-900 dark:text-gray-200 mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors"
                 >
-                  <a :href="newsData.articles[0].url" target="_blank" rel="noopener noreferrer">
-                    {{ newsData.articles[0].title }}
+                  <a
+                    :href="newsStore.currentNewsData.articles[0].url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {{ newsStore.currentNewsData.articles[0].title }}
                   </a>
                 </h3>
                 <p class="text-gray-700 dark:text-gray-300 mb-3 leading-relaxed">
-                  {{ newsData.articles[0].description }}
+                  {{ newsStore.currentNewsData.articles[0].description }}
                 </p>
                 <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                  <span class="font-medium">{{ newsData.articles[0].source.name }}</span>
+                  <span class="font-medium">{{
+                    newsStore.currentNewsData.articles[0].source.name
+                  }}</span>
                   <span class="mx-2">•</span>
-                  <span>{{ formatDate(newsData.articles[0].publishedAt) }}</span>
-                  <span v-if="newsData.articles[0].author" class="mx-2">•</span>
-                  <span v-if="newsData.articles[0].author">{{ newsData.articles[0].author }}</span>
+                  <span>{{ formatDate(newsStore.currentNewsData.articles[0].publishedAt) }}</span>
+                  <span v-if="newsStore.currentNewsData.articles[0].author" class="mx-2">•</span>
+                  <span v-if="newsStore.currentNewsData.articles[0].author">{{
+                    newsStore.currentNewsData.articles[0].author
+                  }}</span>
                 </div>
               </div>
               <div class="md:col-span-1">
                 <img
-                  v-if="newsData.articles[0].urlToImage"
-                  :src="newsData.articles[0].urlToImage"
-                  :alt="newsData.articles[0].title"
+                  v-if="newsStore.currentNewsData.articles[0].urlToImage"
+                  :src="newsStore.currentNewsData.articles[0].urlToImage"
+                  :alt="newsStore.currentNewsData.articles[0].title"
                   class="w-full h-48 object-cover rounded-lg"
                   @error="handleImageError"
                 />
@@ -130,7 +138,7 @@
         <!-- Grid of other articles -->
         <div class="grid md:grid-cols-2 gap-6">
           <article
-            v-for="(article, index) in newsData.articles.slice(1)"
+            v-for="(article, index) in newsStore.currentNewsData.articles.slice(1)"
             :key="index"
             class="group bg-gray-50 dark:bg-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow"
           >
@@ -181,17 +189,20 @@
         <!-- Results summary and pagination -->
         <div class="flex flex-col sm:flex-row items-center justify-between pt-6 gap-4">
           <p class="text-gray-600 dark:text-gray-400 text-sm">
-            Showing {{ (currentPage - 1) * pageSize + 1 }}-{{
-              Math.min(currentPage * pageSize, newsData.totalResults)
+            Showing {{ (newsStore.currentPage - 1) * newsStore.pageSize + 1 }}-{{
+              Math.min(
+                newsStore.currentPage * newsStore.pageSize,
+                newsStore.currentNewsData.totalResults
+              )
             }}
-            of {{ newsData.totalResults }} articles
+            of {{ newsStore.currentNewsData.totalResults }} articles
           </p>
 
           <!-- Pagination controls -->
           <div class="flex items-center gap-2">
             <button
-              @click="goToPage(currentPage - 1)"
-              :disabled="currentPage <= 1"
+              @click="newsStore.goToPage(newsStore.currentPage - 1)"
+              :disabled="newsStore.currentPage <= 1"
               class="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Previous
@@ -199,12 +210,12 @@
 
             <div class="flex items-center gap-1">
               <button
-                v-for="page in visiblePages"
+                v-for="page in newsStore.visiblePages"
                 :key="page"
-                @click="goToPage(page)"
+                @click="newsStore.goToPage(page)"
                 :class="[
                   'px-3 py-1 rounded-md text-sm transition-colors',
-                  page === currentPage
+                  page === newsStore.currentPage
                     ? 'bg-blue-600 dark:bg-blue-700 text-white'
                     : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600',
                 ]"
@@ -214,8 +225,8 @@
             </div>
 
             <button
-              @click="goToPage(currentPage + 1)"
-              :disabled="currentPage >= totalPages"
+              @click="newsStore.goToPage(newsStore.currentPage + 1)"
+              :disabled="newsStore.currentPage >= newsStore.totalPages"
               class="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next
@@ -224,7 +235,7 @@
         </div>
 
         <!-- No articles message -->
-        <div v-if="newsData.articles.length === 0" class="text-center py-12">
+        <div v-if="newsStore.currentNewsData.articles.length === 0" class="text-center py-12">
           <div class="text-gray-400 dark:text-gray-500 mb-4">
             <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -248,7 +259,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed } from 'vue';
+import { defineComponent, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import LoadingSpinner from '../LoadingSpinner.vue';
 import { useNewsStore } from '../../stores';
@@ -263,12 +274,6 @@ export default defineComponent({
   setup() {
     const route = useRoute();
     const newsStore = useNewsStore();
-    const newsData = ref(null);
-    const selectedCategory = ref('');
-    const currentPage = ref(1);
-    const pageSize = ref(10);
-    const totalPages = ref(1);
-    const visiblePages = ref([]);
 
     const formatDate = (dateString: string): string => {
       const date = new Date(dateString);
@@ -294,66 +299,28 @@ export default defineComponent({
       img.style.display = 'none';
     };
 
-    const calculatePagination = (data: any) => {
-      totalPages.value = Math.ceil(data.totalResults / pageSize.value);
-
-      // Calculate visible pages (show max 5 pages around current page)
-      const maxVisiblePages = 5;
-      const halfRange = Math.floor(maxVisiblePages / 2);
-      let startPage = Math.max(1, currentPage.value - halfRange);
-      let endPage = Math.min(totalPages.value, startPage + maxVisiblePages - 1);
-
-      // Adjust start if we're near the end
-      if (endPage - startPage < maxVisiblePages - 1) {
-        startPage = Math.max(1, endPage - maxVisiblePages + 1);
-      }
-
-      visiblePages.value = Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
+    const handleCategoryChange = () => {
+      newsStore.changeCategory(newsStore.selectedCategory);
     };
 
-    const loadNews = async (forceRefresh = false) => {
-      try {
-        const data = await newsStore.loadNews(
-          selectedCategory.value,
-          currentPage.value,
-          pageSize.value,
-          forceRefresh
-        );
-        newsData.value = data;
-        calculatePagination(data);
-      } catch (error) {
-        console.error('Failed to load news:', error);
-      }
-    };
-
-    const resetAndLoadNews = () => {
-      currentPage.value = 1;
-      loadNews();
-    };
-
-    const goToPage = (page: number) => {
-      currentPage.value = page;
-      loadNews();
+    const handleRefresh = () => {
+      newsStore.loadCurrentPage(true);
     };
 
     onMounted(() => {
-      loadNews();
+      // Load initial news if not already loaded
+      if (!newsStore.currentNewsData) {
+        newsStore.loadCurrentPage();
+      }
     });
 
     return {
       route,
       newsStore,
-      newsData,
-      selectedCategory,
-      loadNews,
       formatDate,
       handleImageError,
-      currentPage,
-      pageSize,
-      totalPages,
-      visiblePages,
-      goToPage,
-      resetAndLoadNews,
+      handleCategoryChange,
+      handleRefresh,
     };
   },
 });

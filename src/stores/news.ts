@@ -9,6 +9,29 @@ export const useNewsStore = defineStore('news', () => {
   const newsCache = ref<Map<string, CacheEntry<NewsResponse>>>(new Map());
   const loading = ref(false);
   const error = ref('');
+  const refreshTrigger = ref(0);
+
+  // Pagination state
+  const currentPage = ref(1);
+  const pageSize = ref(10);
+  const totalPages = ref(1);
+  const selectedCategory = ref('');
+  const currentNewsData = ref<NewsResponse | null>(null);
+
+  // Computed for visible pagination pages
+  const visiblePages = computed(() => {
+    const maxVisiblePages = 5;
+    const halfRange = Math.floor(maxVisiblePages / 2);
+    let startPage = Math.max(1, currentPage.value - halfRange);
+    let endPage = Math.min(totalPages.value, startPage + maxVisiblePages - 1);
+
+    // Adjust start if we're near the end
+    if (endPage - startPage < maxVisiblePages - 1) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
+  });
 
   // Initialize from localStorage on store creation
   const initializeFromStorage = () => {
@@ -39,6 +62,17 @@ export const useNewsStore = defineStore('news', () => {
     const cached = newsCache.value.get(cacheKey);
     if (!cached) return false;
     return Date.now() < cached.expiresAt;
+  };
+
+  // Pagination utilities
+  const calculatePagination = (data: NewsResponse) => {
+    totalPages.value = Math.ceil(data.totalResults / pageSize.value);
+  };
+
+  const resetPagination = () => {
+    currentPage.value = 1;
+    selectedCategory.value = '';
+    currentNewsData.value = null;
   };
 
   // Actions
@@ -72,7 +106,10 @@ export const useNewsStore = defineStore('news', () => {
 
     // Return cached data if valid and not forced refresh
     if (!forceRefresh && isNewsCacheValid(cacheKey)) {
-      return newsCache.value.get(cacheKey)!.data;
+      const cachedData = newsCache.value.get(cacheKey)!.data;
+      currentNewsData.value = cachedData;
+      calculatePagination(cachedData);
+      return cachedData;
     }
 
     loading.value = true;
@@ -91,6 +128,10 @@ export const useNewsStore = defineStore('news', () => {
       newsCache.value.set(cacheKey, newsEntry);
       CacheStorage.set(getStorageKey(cacheKey), newsEntry);
 
+      // Update current data and pagination
+      currentNewsData.value = newsData;
+      calculatePagination(newsData);
+
       error.value = '';
       return newsData;
     } catch (err) {
@@ -101,7 +142,29 @@ export const useNewsStore = defineStore('news', () => {
     }
   };
 
+  const loadCurrentPage = async (forceRefresh = false) => {
+    // Reset to page 1 when force refreshing
+    if (forceRefresh) {
+      currentPage.value = 1;
+    }
+    return loadNews(selectedCategory.value, currentPage.value, pageSize.value, forceRefresh);
+  };
+
+  const goToPage = async (page: number) => {
+    currentPage.value = page;
+    return loadCurrentPage();
+  };
+
+  const changeCategory = async (category: string) => {
+    selectedCategory.value = category;
+    currentPage.value = 1; // Reset to first page when changing category
+    return loadCurrentPage();
+  };
+
   const refresh = (category = '', page = 1, pageSize = 10) => {
+    // Increment refresh trigger and reset pagination
+    refreshTrigger.value++;
+    resetPagination();
     return loadNews(category, page, pageSize, true);
   };
 
@@ -114,6 +177,9 @@ export const useNewsStore = defineStore('news', () => {
     keysToRemove.forEach(cacheKey => {
       CacheStorage.remove(getStorageKey(cacheKey));
     });
+
+    // Reset current data
+    currentNewsData.value = null;
   };
 
   const clearExpiredCache = () => {
@@ -138,13 +204,26 @@ export const useNewsStore = defineStore('news', () => {
     // State
     loading,
     error,
+    refreshTrigger,
+
+    // Pagination state
+    currentPage,
+    pageSize,
+    totalPages,
+    selectedCategory,
+    currentNewsData,
+    visiblePages,
 
     // Actions
     loadNews,
+    loadCurrentPage,
+    goToPage,
+    changeCategory,
     refresh,
     clearCache,
     clearExpiredCache,
     initializeFromStorage,
+    resetPagination,
 
     // Cache utilities
     getNewsCacheKey,
