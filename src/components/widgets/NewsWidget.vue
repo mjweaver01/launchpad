@@ -190,10 +190,8 @@
         <div class="flex flex-col sm:flex-row items-center justify-between pt-6 gap-4">
           <p class="text-gray-600 dark:text-gray-400 text-sm">
             Showing {{ (newsStore.currentPage - 1) * newsStore.pageSize + 1 }}-{{
-              Math.min(
-                newsStore.currentPage * newsStore.pageSize,
-                newsStore.currentNewsData.totalResults
-              )
+              (newsStore.currentPage - 1) * newsStore.pageSize +
+              newsStore.currentNewsData.articles.length
             }}
             of {{ newsStore.currentNewsData.totalResults }} articles
           </p>
