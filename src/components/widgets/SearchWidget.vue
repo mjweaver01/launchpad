@@ -114,7 +114,8 @@
       <!-- Search Results -->
       <div
         v-else-if="currentResult && !showHistory"
-        class="space-y-6 overflow-y-auto max-h-[calc(100%-9em)]"
+        class="space-y-6 overflow-y-auto"
+        :style="`max-height: ${route.path.includes('/widget') ? 'calc(100vh - 18.5em)' : 'calc(100% - 6em)'}`"
       >
         <!-- AI Answer -->
         <div
@@ -242,6 +243,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed, watch } from 'vue';
 import { marked } from 'marked';
+import { useRoute } from 'vue-router';
 import { useSearchStore } from '../../stores/search';
 import type { SearchResult } from '../../stores/types';
 import LoadingSpinner from '../LoadingSpinner.vue';
@@ -255,6 +257,7 @@ export default defineComponent({
   },
   setup() {
     const searchStore = useSearchStore();
+    const route = useRoute();
     const searchQuery = ref('');
     const showHistory = ref(false);
     const showSuggestions = ref(false);
@@ -328,6 +331,7 @@ export default defineComponent({
     };
 
     return {
+      route,
       searchStore,
       searchQuery,
       showHistory,
