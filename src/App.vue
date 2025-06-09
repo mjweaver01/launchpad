@@ -6,7 +6,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from 'vue';
+import { defineComponent, onMounted, onUnmounted, ref } from 'vue';
 import AppHeader from './components/AppHeader.vue';
 import { useWeatherStore, useNewsStore, useDarkModeStore, CacheStorage } from './stores';
 
@@ -19,6 +19,20 @@ export default defineComponent({
     const weatherStore = useWeatherStore();
     const newsStore = useNewsStore();
     const darkModeStore = useDarkModeStore();
+    const refreshInterval = ref<NodeJS.Timeout | null>(null);
+
+    const refreshData = async () => {
+      try {
+        console.log('Auto-refreshing data...');
+        // Refresh weather data
+        await weatherStore.fetchWeather();
+        // Refresh news data
+        await newsStore.fetchNews();
+        console.log('Data refreshed successfully');
+      } catch (error) {
+        console.error('Error during auto-refresh:', error);
+      }
+    };
 
     onMounted(() => {
       // Clean up expired entries first
@@ -28,6 +42,21 @@ export default defineComponent({
       weatherStore.initializeFromStorage();
       newsStore.initializeFromStorage();
       darkModeStore.initializeDarkMode();
+
+      // Set up auto-refresh every hour (3600000 milliseconds)
+      refreshInterval.value = setInterval(() => {
+        refreshData();
+      }, 3600000); // 1 hour = 60 * 60 * 1000 milliseconds
+
+      console.log('Auto-refresh set up: data will refresh every hour');
+    });
+
+    onUnmounted(() => {
+      // Clear the interval when component is unmounted
+      if (refreshInterval.value) {
+        clearInterval(refreshInterval.value);
+        console.log('Auto-refresh cleared');
+      }
     });
 
     return {};
