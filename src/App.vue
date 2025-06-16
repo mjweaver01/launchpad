@@ -25,9 +25,9 @@ export default defineComponent({
       try {
         console.log('Auto-refreshing data...');
         // Refresh weather data
-        await weatherStore.fetchWeather();
+        await weatherStore.refresh();
         // Refresh news data
-        await newsStore.fetchNews();
+        await newsStore.refresh();
         console.log('Data refreshed successfully');
       } catch (error) {
         console.error('Error during auto-refresh:', error);
