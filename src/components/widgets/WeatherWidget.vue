@@ -64,7 +64,7 @@
             <div class="text-sm text-gray-600 dark:text-gray-400 capitalize">
               {{ weatherData.description }}
             </div>
-            <div class="text-3xl font-bold text-gray-800 dark:text-gray-200">
+            <div class="text-6xl font-bold text-gray-800 dark:text-gray-200">
               {{ celsiusToFahrenheit(weatherData.temperature) }}°F
               <span class="text-lg text-gray-500 dark:text-gray-400 font-normal"
                 >({{ weatherData.temperature }}°C)</span
@@ -77,12 +77,12 @@
             </div>
 
             <div class="flex flex-wrap gap-4 text-sm mt-4 whitespace-nowrap">
-              <div class="flex flex-wrap gap-4 bg-blue-50 dark:bg-blue-900 rounded-lg p-3">
-                <div class="text-blue-600 dark:text-blue-400 font-medium">Humidity</div>
+              <div class="bg-blue-50 dark:bg-blue-900 rounded-lg px-3 py-2">
+                <div class="text-blue-600 dark:text-blue-400 font-medium text-xs">Humidity</div>
                 <div class="text-gray-800 dark:text-gray-200">{{ weatherData.humidity }}%</div>
               </div>
-              <div class="flex flex-wrap gap-4 bg-green-50 dark:bg-green-900 rounded-lg p-3">
-                <div class="text-green-600 dark:text-green-400 font-medium">Wind Speed</div>
+              <div class="bg-green-50 dark:bg-green-900 rounded-lg px-3 py-2">
+                <div class="text-green-600 dark:text-green-400 font-medium text-xs">Wind Speed</div>
                 <div class="text-gray-800 dark:text-gray-200">{{ weatherData.windSpeed }} m/s</div>
               </div>
             </div>

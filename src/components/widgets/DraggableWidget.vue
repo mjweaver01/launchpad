@@ -1,10 +1,12 @@
 <template>
   <div
     ref="widgetElement"
-    class="max-h-[calc(100vh-2em)] lg:max-h-[calc(50vh-6em)] overflow-hidden"
+    class="overflow-hidden"
     :class="[
       'widget-group relative transition-all duration-200',
       {
+        'max-h-[calc(100vh-2em)] lg:max-h-[calc(50vh-6em)]': !$route.path.includes('fullscreen'),
+        'max-h-[calc(100vh-2em)] lg:max-h-[calc(50vh-1.5em)]': $route.path.includes('fullscreen'),
         'cursor-grab active:cursor-grabbing': draggableActive,
         'opacity-60 scale-[0.95] shadow-2xl z-50 rotate-1 ring-4 ring-blue-500/30 ring-offset-2 ring-offset-white dark:ring-offset-gray-900':
           widgetStore.isDragging && widgetStore.draggedWidget === widgetId,
