@@ -154,9 +154,6 @@
         <div class="text-lg text-gray-600 dark:text-gray-400 mb-1">
           {{ formattedDate }}
         </div>
-        <div class="text-sm text-gray-500 dark:text-gray-500">
-          {{ timeZone }}
-        </div>
         <div
           v-if="locationStore.formattedLocation"
           class="text-sm text-gray-600 dark:text-gray-400 mt-1 flex items-center justify-center"
@@ -225,18 +222,18 @@ export default defineComponent({
     const hourAngle = computed(() => {
       const hours = currentTime.value.getHours() % 12;
       const minutes = currentTime.value.getMinutes();
-      return hours * 30 + minutes * 0.5 - 90; // -90 to start from 12 o'clock
+      return hours * 30 + minutes * 0.5; // SVG is already rotated -90 degrees
     });
 
     const minuteAngle = computed(() => {
       const minutes = currentTime.value.getMinutes();
       const seconds = currentTime.value.getSeconds();
-      return minutes * 6 + seconds * 0.1 - 90; // -90 to start from 12 o'clock
+      return minutes * 6 + seconds * 0.1; // SVG is already rotated -90 degrees
     });
 
     const secondAngle = computed(() => {
       const seconds = currentTime.value.getSeconds();
-      return seconds * 6 - 90; // -90 to start from 12 o'clock
+      return seconds * 6; // SVG is already rotated -90 degrees
     });
 
     const updateTime = () => {
