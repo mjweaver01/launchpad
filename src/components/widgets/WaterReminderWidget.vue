@@ -150,11 +150,13 @@
       <!-- Next Reminder -->
       <div
         v-if="waterStore.nextReminder"
-        class="mb-6 p-4 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg"
+        class="mb-6 p-4 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors"
+        @click="toggleReminder(waterStore.nextReminder)"
       >
         <div class="flex items-center gap-3">
-          <div
-            class="w-12 h-12 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center"
+          <button
+            class="w-12 h-12 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center hover:bg-blue-200 dark:hover:bg-blue-700 transition-colors"
+            @click.stop="toggleReminder(waterStore.nextReminder)"
           >
             <svg
               class="w-6 h-6 text-blue-600 dark:text-blue-400"
@@ -163,12 +165,12 @@
             >
               <path
                 fill-rule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                d="M10 2a6 6 0 00-6 6c0 4.314 6 10 6 10s6-5.686 6-10a6 6 0 00-6-6z"
                 clip-rule="evenodd"
               />
             </svg>
-          </div>
-          <div>
+          </button>
+          <div class="flex-1">
             <div class="font-medium text-gray-800 dark:text-gray-200">Next Reminder</div>
             <div class="text-sm text-gray-600 dark:text-gray-400">
               {{ waterStore.nextReminder.time }} - Drink {{ waterStore.nextReminder.amount }} oz
@@ -183,8 +185,10 @@
         class="mb-6 p-4 bg-orange-50 dark:bg-orange-900 border border-orange-200 dark:border-orange-700 rounded-lg"
       >
         <div class="flex items-center gap-3">
-          <div
-            class="w-12 h-12 bg-orange-100 dark:bg-orange-800 rounded-full flex items-center justify-center"
+          <button
+            class="w-12 h-12 bg-orange-100 dark:bg-orange-800 rounded-full flex items-center justify-center hover:bg-orange-200 dark:hover:bg-orange-700 transition-colors"
+            @click="toggleReminder(waterStore.overdueReminders[0])"
+            :title="`Complete first missed reminder (${waterStore.overdueReminders[0].time})`"
           >
             <svg
               class="w-6 h-6 text-orange-600 dark:text-orange-400"
@@ -193,19 +197,29 @@
             >
               <path
                 fill-rule="evenodd"
-                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                d="M10 2a6 6 0 00-6 6c0 4.314 6 10 6 10s6-5.686 6-10a6 6 0 00-6-6z"
                 clip-rule="evenodd"
               />
             </svg>
-          </div>
-          <div>
+          </button>
+          <div class="flex-1">
             <div class="font-medium text-gray-800 dark:text-gray-200">Missed Reminders</div>
             <div class="text-sm text-gray-600 dark:text-gray-400">
               You have {{ waterStore.overdueReminders.length }} overdue reminder{{
                 waterStore.overdueReminders.length > 1 ? 's' : ''
               }}
             </div>
+            <div class="text-xs text-orange-600 dark:text-orange-400 mt-1">
+              Click water drop to complete oldest, or "Complete All" button
+            </div>
           </div>
+          <button
+            v-if="waterStore.overdueReminders.length > 1"
+            @click="completeAllOverdueReminders"
+            class="px-3 py-1 bg-orange-600 dark:bg-orange-700 text-white text-xs rounded-md hover:bg-orange-700 dark:hover:bg-orange-600 transition-colors"
+          >
+            Complete All ({{ waterStore.overdueReminders.length }})
+          </button>
         </div>
       </div>
 
@@ -427,6 +441,14 @@ export default defineComponent({
       }
     };
 
+    const completeAllOverdueReminders = () => {
+      waterStore.overdueReminders.forEach(reminder => {
+        if (!reminder.completed) {
+          waterStore.completeReminder(reminder.id);
+        }
+      });
+    };
+
     const resetDailyProgress = () => {
       if (
         confirm(
@@ -464,6 +486,7 @@ export default defineComponent({
       updateTimeSettings,
       updateInterval,
       toggleReminder,
+      completeAllOverdueReminders,
       resetDailyProgress,
     };
   },
