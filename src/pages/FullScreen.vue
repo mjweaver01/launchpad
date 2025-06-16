@@ -15,6 +15,7 @@
         <TodoWidget v-else-if="widget.component === 'TodoWidget'" />
         <SearchWidget v-else-if="widget.component === 'SearchWidget'" />
         <WaterReminderWidget v-else-if="widget.component === 'WaterReminderWidget'" />
+        <TimeWidget v-else-if="widget.component === 'TimeWidget'" />
       </DraggableWidget>
     </div>
 
@@ -61,6 +62,7 @@ import TodoWidget from '../components/widgets/TodoWidget.vue';
 import SearchWidget from '../components/widgets/SearchWidget.vue';
 import CalendarWidget from '../components/widgets/CalendarWidget.vue';
 import WaterReminderWidget from '../components/widgets/WaterReminderWidget.vue';
+import TimeWidget from '../components/widgets/TimeWidget.vue';
 
 export default defineComponent({
   name: 'FullScreen',
@@ -72,6 +74,7 @@ export default defineComponent({
     SearchWidget,
     CalendarWidget,
     WaterReminderWidget,
+    TimeWidget,
   },
   setup() {
     const widgetStore = useWidgetStore();

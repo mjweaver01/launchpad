@@ -24,6 +24,7 @@ export const useWidgetStore = defineStore('widgets', () => {
       order: 5,
       visible: true,
     },
+    { id: 'time', name: 'Time', component: 'TimeWidget', order: 6, visible: true },
   ];
 
   // Reactive state

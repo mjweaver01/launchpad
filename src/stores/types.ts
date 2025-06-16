@@ -33,6 +33,15 @@ export interface Coordinates {
   lon: number;
 }
 
+// Location types
+export interface LocationData {
+  city: string;
+  state: string;
+  country: string;
+  formattedAddress: string;
+  coordinates: Coordinates;
+}
+
 // News types
 export interface NewsArticle {
   title: string;

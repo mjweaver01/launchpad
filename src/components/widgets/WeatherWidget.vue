@@ -119,17 +119,47 @@
           </div>
         </div>
 
+        <!-- Location Information -->
+        <div v-if="locationStore.formattedLocation" class="mt-4">
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 text-center">
+            <div class="flex items-center justify-center mb-2">
+              <svg
+                class="w-4 h-4 mr-2 text-gray-600 dark:text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+              <span class="text-lg font-medium text-gray-800 dark:text-gray-200">
+                {{ locationStore.formattedLocation }}
+              </span>
+            </div>
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              {{ coordinates?.lat.toFixed(4) }}, {{ coordinates?.lon.toFixed(4) }}
+            </p>
+          </div>
+        </div>
+
         <!-- Google Maps Static Image -->
-        <div v-if="coordinates" class="mt-10">
+        <div v-if="coordinates" class="mt-6">
           <img
             :src="cachedMapImage || getStaticMapUrl(coordinates.lat, coordinates.lon)"
-            :alt="`Map of ${weatherData.location}`"
+            :alt="`Map of ${locationStore.formattedLocation || weatherData.location}`"
             class="w-full h-auto object-cover rounded-lg border border-gray-200 dark:border-gray-600"
             @error="handleMapError"
           />
-          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            Location: {{ coordinates.lat.toFixed(4) }}, {{ coordinates.lon.toFixed(4) }}
-          </p>
         </div>
       </div>
     </div>
@@ -139,7 +169,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed, watch } from 'vue';
 import LoadingSpinner from '../LoadingSpinner.vue';
-import { useWeatherStore } from '../../stores';
+import { useWeatherStore, useLocationStore } from '../../stores';
 import ExpandWidget from './ExpandWidget.vue';
 import type { WeatherData } from '../../stores/types';
 
@@ -151,6 +181,7 @@ export default defineComponent({
   },
   setup() {
     const weatherStore = useWeatherStore();
+    const locationStore = useLocationStore();
     const weatherData = ref<WeatherData | null>(null);
     const cachedMapImage = ref<string | null>(null);
     const showAllHours = ref(false);
@@ -291,6 +322,16 @@ export default defineComponent({
       try {
         const data = await weatherStore.loadWeather(forceRefresh);
         weatherData.value = data;
+
+        // Load location data if we have coordinates
+        if (coordinates.value) {
+          try {
+            await locationStore.loadLocation(coordinates.value, forceRefresh);
+          } catch (error) {
+            console.warn('Failed to load location data:', error);
+          }
+        }
+
         // Load cached map image after weather data is loaded
         await updateMapImage();
       } catch (error) {
@@ -327,6 +368,7 @@ export default defineComponent({
 
     return {
       weatherStore,
+      locationStore,
       weatherData,
       coordinates,
       retryLocation,

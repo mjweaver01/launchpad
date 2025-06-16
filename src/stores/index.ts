@@ -1,5 +1,6 @@
 // Re-export individual stores
 export { useWeatherStore } from './weather';
+export { useLocationStore } from './location';
 export { useNewsStore } from './news';
 export { useTodoStore } from './todo';
 export { useSearchStore } from './search';
