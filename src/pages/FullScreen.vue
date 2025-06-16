@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen w-full p-4">
     <!-- Widgets Grid - Full Screen View -->
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 w-full">
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
       <DraggableWidget
         v-for="(widget, index) in widgetStore.visibleWidgets"
         :key="widget.id"

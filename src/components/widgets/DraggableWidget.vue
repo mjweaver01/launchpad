@@ -1,7 +1,7 @@
 <template>
   <div
     ref="widgetElement"
-    class="max-h-[calc(50vh-6em)] overflow-hidden"
+    class="max-h-[calc(100vh-2em)] lg:max-h-[calc(50vh-6em)] overflow-hidden"
     :class="[
       'widget-group relative transition-all duration-200',
       {
