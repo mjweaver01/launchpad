@@ -129,7 +129,9 @@
       <!-- Progress Section -->
       <div class="mb-6">
         <div class="flex items-center justify-between mb-2">
-          <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Daily Progress</span>
+          <span class="text-sm font-medium text-gray-600 dark:text-gray-400"
+            >Daily Water Progress</span
+          >
           <span class="text-sm text-gray-600 dark:text-gray-400">
             {{ waterStore.todayCompletedOunces }} / {{ waterStore.data.settings.dailyGoal }} oz
           </span>
