@@ -47,7 +47,7 @@ const reverseGeocode = async (lat: number, lon: number): Promise<LocationRespons
   const GOOGLE_MAPS_API_KEY = process.env.VITE_GOOGLE_MAPS_API_KEY;
 
   // Try Google Maps API first if API key is available
-  if (GOOGLE_MAPS_API_KEY && GOOGLE_MAPS_API_KEY !== 'YOUR_GOOGLE_MAPS_API_KEY') {
+  if (GOOGLE_MAPS_API_KEY) {
     try {
       const googleUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=${GOOGLE_MAPS_API_KEY}`;
       const response = await fetch(googleUrl);
