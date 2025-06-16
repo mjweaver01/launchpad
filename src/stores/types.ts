@@ -7,6 +7,16 @@ export interface CacheEntry<T> {
 }
 
 // Weather types
+export interface HourlyForecast {
+  time: string; // ISO datetime string
+  temperature: number;
+  description: string;
+  icon: string;
+  humidity: number;
+  windSpeed: number;
+  precipitationProbability: number; // percentage
+}
+
 export interface WeatherData {
   location: string;
   temperature: number;
@@ -15,6 +25,7 @@ export interface WeatherData {
   humidity: number;
   windSpeed: number;
   feelsLike: number;
+  hourlyForecast?: HourlyForecast[]; // next 24 hours
 }
 
 export interface Coordinates {

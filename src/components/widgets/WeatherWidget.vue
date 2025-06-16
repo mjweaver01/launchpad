@@ -89,6 +89,36 @@
           </div>
         </div>
 
+        <!-- Hourly Forecast -->
+        <div
+          v-if="weatherData.hourlyForecast && weatherData.hourlyForecast.length > 0"
+          class="mt-4"
+        >
+          <div class="overflow-x-auto">
+            <div class="flex gap-4 pb-2" style="min-width: max-content">
+              <div
+                v-for="(hour, index) in weatherData.hourlyForecast.slice(0, 12)"
+                :key="index"
+                class="flex-shrink-0 bg-gray-50 dark:bg-gray-700 rounded-lg p-3 text-center min-w-20"
+              >
+                <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">
+                  {{ formatHourTime(hour.time) }}
+                </div>
+                <div class="text-2xl mb-1">{{ getWeatherEmoji(hour.icon) }}</div>
+                <div class="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                  {{ celsiusToFahrenheit(hour.temperature) }}°
+                </div>
+                <div
+                  v-if="hour.precipitationProbability > 0"
+                  class="text-xs text-blue-600 dark:text-blue-400 mt-1"
+                >
+                  {{ hour.precipitationProbability }}%
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Google Maps Static Image -->
         <div v-if="coordinates" class="mt-10">
           <img
@@ -111,6 +141,7 @@ import { defineComponent, ref, onMounted, computed, watch } from 'vue';
 import LoadingSpinner from '../LoadingSpinner.vue';
 import { useWeatherStore } from '../../stores';
 import ExpandWidget from './ExpandWidget.vue';
+import type { WeatherData } from '../../stores/types';
 
 export default defineComponent({
   name: 'WeatherWidget',
@@ -120,11 +151,13 @@ export default defineComponent({
   },
   setup() {
     const weatherStore = useWeatherStore();
-    const weatherData = ref(null);
+    const weatherData = ref<WeatherData | null>(null);
     const cachedMapImage = ref<string | null>(null);
+    const showAllHours = ref(false);
 
     // You'll need to add your Google Maps API key here
     const GOOGLE_MAPS_API_KEY =
+      // @ts-ignore
       import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'YOUR_GOOGLE_MAPS_API_KEY';
 
     const coordinates = computed(() => {
@@ -283,6 +316,11 @@ export default defineComponent({
       { immediate: false }
     );
 
+    const formatHourTime = (timeString: string): string => {
+      const date = new Date(timeString);
+      return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    };
+
     onMounted(() => {
       loadWeather();
     });
@@ -299,6 +337,8 @@ export default defineComponent({
       cachedMapImage,
       updateMapImage,
       loadWeather,
+      showAllHours,
+      formatHourTime,
     };
   },
 });
