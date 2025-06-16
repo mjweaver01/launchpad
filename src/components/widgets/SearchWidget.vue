@@ -3,7 +3,7 @@
     class="flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 w-full mx-auto transition-colors duration-200"
   >
     <!-- Search Header -->
-    <div class="flex items-center justify-between mb-6">
+    <div v-if="$route.name !== 'Full Screen'" class="flex items-center justify-between mb-6">
       <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">AI Web Search</h2>
       <div v-if="searchStore.searchHistory.length > 0" class="flex items-center gap-2">
         <button

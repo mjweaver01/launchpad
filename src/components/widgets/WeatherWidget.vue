@@ -2,7 +2,7 @@
   <div
     class="flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 w-full mx-auto transition-colors duration-200"
   >
-    <div class="flex items-center justify-between mb-6">
+    <div v-if="$route.name !== 'Full Screen'" class="flex items-center justify-between mb-6">
       <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">Current Weather</h2>
       <div class="flex items-center gap-2">
         <button

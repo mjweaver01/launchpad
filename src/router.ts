@@ -2,12 +2,18 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import Home from './pages/Home.vue';
 import GoogleCallback from './pages/GoogleCallback.vue';
 import Widget from './pages/Widget.vue';
+import FullScreen from './pages/FullScreen.vue';
 
 export const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'Home',
     component: Home,
+  },
+  {
+    path: '/fullscreen',
+    name: 'Full Screen',
+    component: FullScreen,
   },
   {
     path: '/widget/:name',
