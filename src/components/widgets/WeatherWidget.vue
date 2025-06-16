@@ -75,17 +75,17 @@
                 weatherData.feelsLike
               }}°C)
             </div>
-          </div>
-        </div>
 
-        <div class="grid grid-cols-2 gap-4 text-sm mt-8">
-          <div class="bg-blue-50 dark:bg-blue-900 rounded-lg p-3">
-            <div class="text-blue-600 dark:text-blue-400 font-medium">Humidity</div>
-            <div class="text-gray-800 dark:text-gray-200">{{ weatherData.humidity }}%</div>
-          </div>
-          <div class="bg-green-50 dark:bg-green-900 rounded-lg p-3">
-            <div class="text-green-600 dark:text-green-400 font-medium">Wind Speed</div>
-            <div class="text-gray-800 dark:text-gray-200">{{ weatherData.windSpeed }} m/s</div>
+            <div class="flex flex-wrap gap-4 text-sm mt-4 whitespace-nowrap">
+              <div class="flex flex-wrap gap-4 bg-blue-50 dark:bg-blue-900 rounded-lg p-3">
+                <div class="text-blue-600 dark:text-blue-400 font-medium">Humidity</div>
+                <div class="text-gray-800 dark:text-gray-200">{{ weatherData.humidity }}%</div>
+              </div>
+              <div class="flex flex-wrap gap-4 bg-green-50 dark:bg-green-900 rounded-lg p-3">
+                <div class="text-green-600 dark:text-green-400 font-medium">Wind Speed</div>
+                <div class="text-gray-800 dark:text-gray-200">{{ weatherData.windSpeed }} m/s</div>
+              </div>
+            </div>
           </div>
         </div>
 
