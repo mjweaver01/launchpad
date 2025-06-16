@@ -29,7 +29,7 @@
       </div>
     </div>
 
-    <div class="h-full overflow-y-auto">
+    <div class="h-full max-h-[calc(70vh)] overflow-y-auto">
       <!-- Loading state -->
       <div v-if="weatherStore.loading" class="text-center">
         <LoadingSpinner />
@@ -155,11 +155,27 @@
         <!-- Google Maps Static Image -->
         <div v-if="coordinates" class="mt-6">
           <img
-            :src="cachedMapImage || getStaticMapUrl(coordinates.lat, coordinates.lon)"
+            v-if="cachedMapImage"
+            :src="cachedMapImage"
             :alt="`Map of ${locationStore.formattedLocation || weatherData.location}`"
             class="w-full h-auto object-cover rounded-lg border border-gray-200 dark:border-gray-600"
             @error="handleMapError"
           />
+          <div
+            v-else
+            class="w-full h-[150px] bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 flex items-center justify-center"
+          >
+            <div class="text-gray-500 dark:text-gray-400 text-sm text-center">
+              <svg class="w-8 h-8 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fill-rule="evenodd"
+                  d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              Map loading...
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -185,11 +201,6 @@ export default defineComponent({
     const weatherData = ref<WeatherData | null>(null);
     const cachedMapImage = ref<string | null>(null);
     const showAllHours = ref(false);
-
-    // You'll need to add your Google Maps API key here
-    const GOOGLE_MAPS_API_KEY =
-      // @ts-ignore
-      import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'YOUR_GOOGLE_MAPS_API_KEY';
 
     const coordinates = computed(() => {
       return weatherStore.coordinatesCache?.data || null;
@@ -218,38 +229,23 @@ export default defineComponent({
       }
     };
 
-    const getStaticMapUrl = (lat: number, lon: number): string => {
-      const baseUrl = 'https://maps.googleapis.com/maps/api/staticmap';
+    const getStaticMapFromBackend = async (lat: number, lon: number): Promise<string> => {
       const params = new URLSearchParams({
-        center: `${lat},${lon}`,
+        lat: lat.toString(),
+        lon: lon.toString(),
         zoom: '12',
         size: '400x150',
-        maptype: 'roadmap',
-        markers: `color:red|${lat},${lon}`,
-        key: GOOGLE_MAPS_API_KEY,
-        style: 'feature:poi|visibility:off', // Hide points of interest for cleaner look
       });
 
-      return `${baseUrl}?${params.toString()}`;
-    };
+      const response = await fetch(`/.netlify/functions/static-map?${params.toString()}`);
 
-    const fetchImageAsBase64 = async (url: string): Promise<string> => {
-      try {
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const blob = await response.blob();
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result as string);
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
-        });
-      } catch (error) {
-        console.error('Failed to fetch image as base64:', error);
-        throw error;
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(errorData.error || `HTTP ${response.status}`);
       }
+
+      const data = await response.json();
+      return data.image;
     };
 
     const loadCachedMapImage = async (lat: number, lon: number) => {
@@ -262,10 +258,9 @@ export default defineComponent({
         return;
       }
 
-      // If not cached, fetch and cache it
+      // If not cached, fetch from backend and cache it
       try {
-        const mapUrl = getStaticMapUrl(lat, lon);
-        const base64Image = await fetchImageAsBase64(mapUrl);
+        const base64Image = await getStaticMapFromBackend(lat, lon);
 
         // Cleanup old cached images before storing new one
         cleanupOldCachedImages();
@@ -275,8 +270,8 @@ export default defineComponent({
         cachedMapImage.value = base64Image;
       } catch (error) {
         console.error('Failed to load and cache map image:', error);
-        // Fallback to direct URL if caching fails
-        cachedMapImage.value = getStaticMapUrl(lat, lon);
+        // Clear cached image on error
+        cachedMapImage.value = null;
       }
     };
 
@@ -374,7 +369,6 @@ export default defineComponent({
       retryLocation,
       getWeatherEmoji,
       celsiusToFahrenheit,
-      getStaticMapUrl,
       handleMapError,
       cachedMapImage,
       updateMapImage,
