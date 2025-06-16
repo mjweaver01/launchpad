@@ -12,19 +12,19 @@ export interface Widget {
 export const useWidgetStore = defineStore('widgets', () => {
   // Default widget configuration
   const defaultWidgets: Widget[] = [
-    { id: 'weather', name: 'Weather', component: 'WeatherWidget', order: 0, visible: true },
-    { id: 'calendar', name: 'Calendar', component: 'CalendarWidget', order: 1, visible: true },
-    { id: 'news', name: 'News', component: 'NewsWidget', order: 2, visible: true },
-    { id: 'todo', name: 'Todo', component: 'TodoWidget', order: 3, visible: true },
-    { id: 'search', name: 'Search', component: 'SearchWidget', order: 4, visible: true },
+    { id: 'time', name: 'Time', component: 'TimeWidget', order: 0, visible: true },
+    { id: 'weather', name: 'Weather', component: 'WeatherWidget', order: 1, visible: true },
+    { id: 'calendar', name: 'Calendar', component: 'CalendarWidget', order: 2, visible: true },
+    { id: 'news', name: 'News', component: 'NewsWidget', order: 3, visible: true },
+    { id: 'todo', name: 'Todo', component: 'TodoWidget', order: 4, visible: true },
+    { id: 'search', name: 'Search', component: 'SearchWidget', order: 5, visible: true },
     {
       id: 'water-reminder',
       name: 'Water Reminder',
       component: 'WaterReminderWidget',
-      order: 5,
+      order: 6,
       visible: true,
     },
-    { id: 'time', name: 'Time', component: 'TimeWidget', order: 6, visible: true },
   ];
 
   // Reactive state

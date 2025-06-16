@@ -9,13 +9,13 @@
         :index="index"
         :draggable-active="false"
       >
-        <WeatherWidget v-if="widget.component === 'WeatherWidget'" />
+        <TimeWidget v-if="widget.component === 'TimeWidget'" />
+        <WeatherWidget v-else-if="widget.component === 'WeatherWidget'" />
         <CalendarWidget v-else-if="widget.component === 'CalendarWidget'" />
         <NewsWidget v-else-if="widget.component === 'NewsWidget'" />
         <TodoWidget v-else-if="widget.component === 'TodoWidget'" />
         <SearchWidget v-else-if="widget.component === 'SearchWidget'" />
         <WaterReminderWidget v-else-if="widget.component === 'WaterReminderWidget'" />
-        <TimeWidget v-else-if="widget.component === 'TimeWidget'" />
       </DraggableWidget>
     </div>
 
