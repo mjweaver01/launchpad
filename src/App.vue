@@ -8,7 +8,13 @@
 <script lang="ts">
 import { defineComponent, onMounted, onUnmounted, ref } from 'vue';
 import AppHeader from './components/AppHeader.vue';
-import { useWeatherStore, useNewsStore, useDarkModeStore, CacheStorage } from './stores';
+import {
+  useWeatherStore,
+  useNewsStore,
+  useDarkModeStore,
+  CacheStorage,
+  useCalendarStore,
+} from './stores';
 
 export default defineComponent({
   name: 'App',
@@ -18,6 +24,7 @@ export default defineComponent({
   setup() {
     const weatherStore = useWeatherStore();
     const newsStore = useNewsStore();
+    const calendarStore = useCalendarStore();
     const darkModeStore = useDarkModeStore();
     const refreshInterval = ref<NodeJS.Timeout | null>(null);
 
@@ -28,6 +35,8 @@ export default defineComponent({
         await weatherStore.refresh();
         // Refresh news data
         await newsStore.refresh();
+        // Refresh calendar data
+        // await calendarStore.refresh();
         console.log('Data refreshed successfully');
       } catch (error) {
         console.error('Error during auto-refresh:', error);
@@ -42,6 +51,7 @@ export default defineComponent({
       weatherStore.initializeFromStorage();
       newsStore.initializeFromStorage();
       darkModeStore.initializeDarkMode();
+      // calendarStore.initializeFromStorage();
 
       // Set up auto-refresh every hour (3600000 milliseconds)
       refreshInterval.value = setInterval(() => {
