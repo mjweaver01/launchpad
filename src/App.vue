@@ -36,7 +36,7 @@ export default defineComponent({
         // Refresh news data
         await newsStore.refresh();
         // Refresh calendar data
-        // await calendarStore.refresh();
+        await calendarStore.refresh();
         console.log('Data refreshed successfully');
       } catch (error) {
         console.error('Error during auto-refresh:', error);
@@ -51,7 +51,7 @@ export default defineComponent({
       weatherStore.initializeFromStorage();
       newsStore.initializeFromStorage();
       darkModeStore.initializeDarkMode();
-      // calendarStore.initializeFromStorage();
+      calendarStore.initializeFromStorage();
 
       // Set up auto-refresh every hour (3600000 milliseconds)
       refreshInterval.value = setInterval(() => {

@@ -165,8 +165,8 @@
       >
         <TimeWidget v-if="widget.component === 'TimeWidget'" />
         <WeatherWidget v-else-if="widget.component === 'WeatherWidget'" />
-        <CalendarWidget v-else-if="widget.component === 'CalendarWidget'" />
         <NewsWidget v-else-if="widget.component === 'NewsWidget'" />
+        <CalendarWidget v-else-if="widget.component === 'CalendarWidget'" />
         <TodoWidget v-else-if="widget.component === 'TodoWidget'" />
         <SearchWidget v-else-if="widget.component === 'SearchWidget'" />
         <WaterReminderWidget v-else-if="widget.component === 'WaterReminderWidget'" />
@@ -201,25 +201,25 @@
 import { defineComponent, ref } from 'vue';
 import { useWidgetStore } from '../stores/widgets';
 import DraggableWidget from '../components/widgets/DraggableWidget.vue';
+import TimeWidget from '../components/widgets/TimeWidget.vue';
 import WeatherWidget from '../components/widgets/WeatherWidget.vue';
 import NewsWidget from '../components/widgets/NewsWidget.vue';
 import TodoWidget from '../components/widgets/TodoWidget.vue';
 import SearchWidget from '../components/widgets/SearchWidget.vue';
 import CalendarWidget from '../components/widgets/CalendarWidget.vue';
 import WaterReminderWidget from '../components/widgets/WaterReminderWidget.vue';
-import TimeWidget from '../components/widgets/TimeWidget.vue';
 
 export default defineComponent({
   name: 'Home',
   components: {
     DraggableWidget,
+    TimeWidget,
     WeatherWidget,
     NewsWidget,
     TodoWidget,
     SearchWidget,
     CalendarWidget,
     WaterReminderWidget,
-    TimeWidget,
   },
   setup() {
     const widgetStore = useWidgetStore();
