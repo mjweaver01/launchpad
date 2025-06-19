@@ -165,6 +165,7 @@ export const useWeatherStore = defineStore('weather', () => {
     // State
     loading,
     error,
+    weatherCache,
     coordinatesCache,
 
     // Computed

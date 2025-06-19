@@ -510,6 +510,41 @@ export default defineComponent({
       return '';
     };
 
+    const getEventStatus = (event: CalendarEvent): string => {
+      if (event.start.date) {
+        return 'All Day';
+      }
+
+      const now = new Date();
+      const startTime = new Date(event.start.dateTime || '');
+      const endTime = new Date(event.end.dateTime || event.start.dateTime || '');
+
+      if (now < startTime) {
+        return 'Upcoming';
+      } else if (now >= startTime && now <= endTime) {
+        return 'In Progress';
+      } else {
+        return 'Completed';
+      }
+    };
+
+    const getEventStatusColor = (event: CalendarEvent): string => {
+      const status = getEventStatus(event);
+
+      switch (status) {
+        case 'In Progress':
+          return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+        case 'Upcoming':
+          return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+        case 'All Day':
+          return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
+        case 'Completed':
+          return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+        default:
+          return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+      }
+    };
+
     onMounted(() => {
       calendarStore.initializeFromStorage();
       loadCalendar();
@@ -524,6 +559,8 @@ export default defineComponent({
       signOut,
       formatEventTime,
       formatEventDate,
+      getEventStatus,
+      getEventStatusColor,
     };
   },
 });

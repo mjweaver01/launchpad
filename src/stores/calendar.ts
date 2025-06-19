@@ -324,6 +324,7 @@ export const useCalendarStore = defineStore('calendar', () => {
     error,
     authLoading,
     authState,
+    calendarCache,
 
     // Computed
     isCalendarCacheValid,

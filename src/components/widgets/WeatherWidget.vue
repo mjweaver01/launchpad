@@ -198,12 +198,16 @@ export default defineComponent({
   setup() {
     const weatherStore = useWeatherStore();
     const locationStore = useLocationStore();
-    const weatherData = ref<WeatherData | null>(null);
     const cachedMapImage = ref<string | null>(null);
     const showAllHours = ref(false);
 
     const coordinates = computed(() => {
       return weatherStore.coordinatesCache?.data || null;
+    });
+
+    // Get weather data directly from store instead of local ref
+    const weatherData = computed(() => {
+      return weatherStore.weatherCache?.data || null;
     });
 
     const celsiusToFahrenheit = (celsius: number): number => {
@@ -315,8 +319,7 @@ export default defineComponent({
 
     const loadWeather = async (forceRefresh = false) => {
       try {
-        const data = await weatherStore.loadWeather(forceRefresh);
-        weatherData.value = data;
+        await weatherStore.loadWeather(forceRefresh);
 
         // Load location data if we have coordinates
         if (coordinates.value) {

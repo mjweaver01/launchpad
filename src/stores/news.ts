@@ -205,6 +205,7 @@ export const useNewsStore = defineStore('news', () => {
     loading,
     error,
     refreshTrigger,
+    newsCache,
 
     // Pagination state
     currentPage,
