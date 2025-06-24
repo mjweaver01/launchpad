@@ -29,7 +29,7 @@
       </div>
     </div>
 
-    <div class="h-full max-h-[calc(70vh)] overflow-y-auto">
+    <div class="h-full overflow-y-auto">
       <!-- Loading state -->
       <div v-if="weatherStore.loading" class="text-center">
         <LoadingSpinner />
