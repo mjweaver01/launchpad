@@ -14,6 +14,7 @@ import {
   useNewsStore,
   useDarkModeStore,
   useRedHueStore,
+  useAutoThemeStore,
   CacheStorage,
   useCalendarStore,
 } from './stores';
@@ -29,7 +30,8 @@ export default defineComponent({
     const calendarStore = useCalendarStore();
     const darkModeStore = useDarkModeStore();
     const redHueStore = useRedHueStore();
-    const refreshInterval = ref<NodeJS.Timeout | null>(null);
+    const autoThemeStore = useAutoThemeStore();
+    const refreshInterval = ref<number | null>(null);
 
     const refreshData = async () => {
       try {
@@ -57,6 +59,9 @@ export default defineComponent({
       redHueStore.initializeRedHue();
       calendarStore.initializeFromStorage();
 
+      // Initialize auto-theme system
+      autoThemeStore.initializeAutoTheme();
+
       // Set up auto-refresh every hour (3600000 milliseconds)
       refreshInterval.value = setInterval(() => {
         refreshData();
@@ -71,6 +76,9 @@ export default defineComponent({
         clearInterval(refreshInterval.value);
         console.log('Auto-refresh cleared');
       }
+
+      // Cleanup auto-theme
+      autoThemeStore.cleanup();
     });
 
     return {

@@ -3,6 +3,7 @@ import Home from './pages/Home.vue';
 import GoogleCallback from './pages/GoogleCallback.vue';
 import Widget from './pages/Widget.vue';
 import FullScreen from './pages/FullScreen.vue';
+import Settings from './pages/Settings.vue';
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -14,6 +15,11 @@ export const routes: Array<RouteRecordRaw> = [
     path: '/fullscreen',
     name: 'Full Screen',
     component: FullScreen,
+  },
+  {
+    path: '/settings',
+    name: 'Settings',
+    component: Settings,
   },
   {
     path: '/widget/:name',

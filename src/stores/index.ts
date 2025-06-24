@@ -9,6 +9,7 @@ export { useWaterReminderStore } from './waterReminder';
 export { useWidgetStore } from './widgets';
 export { useDarkModeStore } from './darkMode';
 export { useRedHueStore } from './redHue';
+export { useAutoThemeStore } from './autoTheme';
 
 // Re-export utilities and types
 export { CacheStorage } from './storage';

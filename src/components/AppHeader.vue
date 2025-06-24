@@ -30,6 +30,7 @@
           <div class="flex items-center space-x-4">
             <DarkModeToggle />
             <RedHueToggle />
+            <AutoThemeSimpleToggle />
           </div>
 
           <!-- Refresh Button -->
@@ -150,12 +151,14 @@ import { routes } from '../router';
 import { useWeatherStore, useNewsStore, useCalendarStore } from '../stores';
 import DarkModeToggle from './DarkModeToggle.vue';
 import RedHueToggle from './RedHueToggle.vue';
+import AutoThemeSimpleToggle from './AutoThemeSimpleToggle.vue';
 
 export default defineComponent({
   name: 'AppHeader',
   components: {
     DarkModeToggle,
     RedHueToggle,
+    AutoThemeSimpleToggle,
   },
   setup() {
     const route = useRoute();
