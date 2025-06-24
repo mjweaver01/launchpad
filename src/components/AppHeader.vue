@@ -26,8 +26,11 @@
             >
           </nav>
 
-          <!-- Dark Mode Toggle -->
-          <DarkModeToggle />
+          <!-- Theme Toggles -->
+          <div class="flex items-center space-x-4">
+            <DarkModeToggle />
+            <RedHueToggle />
+          </div>
 
           <!-- Refresh Button -->
           <button
@@ -55,8 +58,11 @@
 
         <!-- Mobile Menu Button and Controls -->
         <div class="md:hidden flex items-center space-x-2">
-          <!-- Dark Mode Toggle (Mobile) -->
-          <DarkModeToggle />
+          <!-- Theme Toggles (Mobile) -->
+          <div class="flex items-center space-x-2">
+            <DarkModeToggle />
+            <RedHueToggle />
+          </div>
 
           <!-- Refresh Button (Mobile) -->
           <button
@@ -143,11 +149,13 @@ import { useRoute } from 'vue-router';
 import { routes } from '../router';
 import { useWeatherStore, useNewsStore, useCalendarStore } from '../stores';
 import DarkModeToggle from './DarkModeToggle.vue';
+import RedHueToggle from './RedHueToggle.vue';
 
 export default defineComponent({
   name: 'AppHeader',
   components: {
     DarkModeToggle,
+    RedHueToggle,
   },
   setup() {
     const route = useRoute();

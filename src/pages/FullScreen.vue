@@ -81,7 +81,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useWidgetStore } from '../stores/widgets';
+import { useWidgetStore, useRedHueStore } from '../stores';
 import DraggableWidget from '../components/widgets/DraggableWidget.vue';
 import TimeWidget from '../components/widgets/TimeWidget.vue';
 import WeatherWidget from '../components/widgets/WeatherWidget.vue';
@@ -105,6 +105,7 @@ export default defineComponent({
   },
   setup() {
     const widgetStore = useWidgetStore();
+    const redHueStore = useRedHueStore();
     const router = useRouter();
     const showExitButton = ref(false);
     const mouseTimeout = ref<NodeJS.Timeout | null>(null);
@@ -154,6 +155,7 @@ export default defineComponent({
 
     return {
       widgetStore,
+      redHueStore,
       showExitButton,
       exitFullScreen,
       handleMouseMove,

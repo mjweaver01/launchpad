@@ -8,6 +8,7 @@ export { useCalendarStore } from './calendar';
 export { useWaterReminderStore } from './waterReminder';
 export { useWidgetStore } from './widgets';
 export { useDarkModeStore } from './darkMode';
+export { useRedHueStore } from './redHue';
 
 // Re-export utilities and types
 export { CacheStorage } from './storage';

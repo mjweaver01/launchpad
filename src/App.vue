@@ -2,6 +2,7 @@
   <div class="bg-gray-100 dark:bg-gray-900 min-h-screen transition-colors duration-200">
     <AppHeader v-if="$route.name !== 'Full Screen'" />
     <router-view />
+    <div class="red-hue" v-if="redHueStore.isRedHue"></div>
   </div>
 </template>
 
@@ -12,6 +13,7 @@ import {
   useWeatherStore,
   useNewsStore,
   useDarkModeStore,
+  useRedHueStore,
   CacheStorage,
   useCalendarStore,
 } from './stores';
@@ -26,6 +28,7 @@ export default defineComponent({
     const newsStore = useNewsStore();
     const calendarStore = useCalendarStore();
     const darkModeStore = useDarkModeStore();
+    const redHueStore = useRedHueStore();
     const refreshInterval = ref<NodeJS.Timeout | null>(null);
 
     const refreshData = async () => {
@@ -51,6 +54,7 @@ export default defineComponent({
       weatherStore.initializeFromStorage();
       newsStore.initializeFromStorage();
       darkModeStore.initializeDarkMode();
+      redHueStore.initializeRedHue();
       calendarStore.initializeFromStorage();
 
       // Set up auto-refresh every hour (3600000 milliseconds)
@@ -69,7 +73,9 @@ export default defineComponent({
       }
     });
 
-    return {};
+    return {
+      redHueStore,
+    };
   },
 });
 </script>
