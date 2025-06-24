@@ -64,8 +64,10 @@
             <div class="text-sm text-gray-600 dark:text-gray-400 capitalize">
               {{ weatherData.description }}
             </div>
-            <div class="text-6xl font-bold text-gray-800 dark:text-gray-200">
-              {{ celsiusToFahrenheit(weatherData.temperature) }}°F
+            <div class="flex flex-wrap items-end font-bold text-gray-800 dark:text-gray-200">
+              <span class="text-[5rem] leading-none"
+                >{{ celsiusToFahrenheit(weatherData.temperature) }}°F</span
+              >
               <span class="text-lg text-gray-500 dark:text-gray-400 font-normal"
                 >({{ weatherData.temperature }}°C)</span
               >
