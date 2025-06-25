@@ -36,7 +36,9 @@
     <div class="h-full flex flex-col items-center justify-center">
       <!-- Digital Clock -->
       <div v-if="!showAnalogClock" class="text-center">
-        <div class="text-4xl sm:text-6xl font-mono font-bold text-gray-800 dark:text-gray-200 mb-2">
+        <div
+          class="text-6xl font-mono whitespace-nowrap font-bold text-gray-800 dark:text-gray-200 mb-2"
+        >
           {{ formattedTime }}
         </div>
         <div class="text-lg text-gray-600 dark:text-gray-400 mb-1">
