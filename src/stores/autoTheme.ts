@@ -45,7 +45,7 @@ export const useAutoThemeStore = defineStore('autoTheme', () => {
   const redshiftStartHour = ref(22); // 10 PM default
   const redshiftEndHour = ref(6); // 6 AM default
 
-  let updateInterval: number | null = null;
+  let updateInterval: ReturnType<typeof setInterval> | null = null;
 
   // Computed
   const effectiveThemeLevel = computed(() => {

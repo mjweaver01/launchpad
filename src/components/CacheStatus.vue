@@ -84,7 +84,7 @@ export default defineComponent({
     const weatherStore = useWeatherStore();
     const newsStore = useNewsStore();
     const expanded = ref(false);
-    const cacheInfo = ref({ keys: [], totalSize: 0 });
+    const cacheInfo = ref<{ keys: string[]; totalSize: number }>({ keys: [], totalSize: 0 });
 
     const toggleExpanded = () => {
       expanded.value = !expanded.value;

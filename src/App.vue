@@ -31,7 +31,7 @@ export default defineComponent({
     const darkModeStore = useDarkModeStore();
     const redHueStore = useRedHueStore();
     const autoThemeStore = useAutoThemeStore();
-    const refreshInterval = ref<number | null>(null);
+    const refreshInterval = ref<ReturnType<typeof setInterval> | null>(null);
 
     const refreshData = async () => {
       try {

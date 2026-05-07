@@ -1,6 +1,7 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+/* Class-based dark mode (was `darkMode: 'class'` in Tailwind v3 config) */
+@custom-variant dark (&:where(.dark, .dark *));
 
 /* Custom styles for markdown content */
 .markdown-content a {

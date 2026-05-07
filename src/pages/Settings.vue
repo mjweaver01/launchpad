@@ -149,7 +149,7 @@ export default defineComponent({
 
     // Force reactivity by creating a ref that updates
     const lastUpdate = ref(Date.now());
-    let updateInterval: number | null = null;
+    let updateInterval: ReturnType<typeof setInterval> | null = null;
 
     // Computed properties for current theme status
     const getCurrentThemeColor = computed(() => {
