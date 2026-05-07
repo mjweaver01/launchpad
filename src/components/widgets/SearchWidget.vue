@@ -1,379 +1,217 @@
-<template>
-  <div
-    class="flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 w-full mx-auto transition-colors duration-200"
-  >
-    <!-- Search Header -->
-    <div v-if="$route.name !== 'Full Screen'" class="flex items-center justify-between mb-6">
-      <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">AI Web Search</h2>
-      <div v-if="searchStore.searchHistory.length > 0" class="flex items-center gap-2">
-        <button
-          @click="showHistory = !showHistory"
-          class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-sm flex items-center gap-1"
-          :class="{
-            'bg-gray-600 dark:bg-gray-500 hover:bg-gray-600 dark:hover:bg-gray-500 text-white':
-              showHistory,
-          }"
-        >
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-            <path
-              fill-rule="evenodd"
-              d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-              clip-rule="evenodd"
-            />
-          </svg>
-          History
-        </button>
-        <ExpandWidget widgetName="search" displayName="Search" />
-      </div>
-    </div>
-
-    <div class="h-full overflow-y-auto">
-      <!-- Search Input -->
-      <div class="relative mb-8">
-        <div class="relative">
-          <input
-            v-model="searchQuery"
-            @keyup.enter="handleSearch"
-            type="text"
-            placeholder="Search the web with AI..."
-            class="w-full px-4 py-3 pr-12 text-lg border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400 rounded-full focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 transition-all"
-            :disabled="searchStore.loading"
-          />
-          <button
-            @click="handleSearch"
-            :disabled="searchStore.loading || !searchQuery.trim()"
-            class="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 bg-blue-600 dark:bg-blue-700 text-white rounded-full hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fill-rule="evenodd"
-                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                clip-rule="evenodd"
-              />
-            </svg>
-          </button>
-        </div>
-
-        <!-- Recent Searches Dropdown -->
-        <div
-          v-if="showSuggestions && searchStore.recentSearches.length > 0"
-          class="absolute top-full left-0 right-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg mt-1 z-10"
-        >
-          <div class="p-2">
-            <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Recent searches</p>
-            <button
-              v-for="result in searchStore.recentSearches"
-              :key="result.id"
-              @click="selectSuggestion(result.query)"
-              class="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md flex items-center gap-2"
-            >
-              <svg
-                class="w-4 h-4 text-gray-400 dark:text-gray-500"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-              {{ result.query }}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Error State -->
-      <div v-if="searchStore.error" class="text-center py-4 mb-6">
-        <div class="text-red-500 dark:text-red-400 mb-2">
-          <svg class="w-8 h-8 mx-auto" fill="currentColor" viewBox="0 0 20 20">
-            <path
-              fill-rule="evenodd"
-              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-              clip-rule="evenodd"
-            />
-          </svg>
-        </div>
-        <p class="text-red-600 dark:text-red-400 text-sm">{{ searchStore.error }}</p>
-        <button
-          @click="handleSearch"
-          class="mt-3 px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors text-sm"
-        >
-          Try Again
-        </button>
-      </div>
-
-      <!-- Loading State -->
-      <div v-else-if="searchStore.loading" class="text-center py-8">
-        <LoadingSpinner class="mx-auto mb-4" />
-        <p class="text-gray-600 dark:text-gray-400">Searching the web with AI...</p>
-        <p class="text-sm text-gray-500 dark:text-gray-500 mt-1">This may take a few moments</p>
-      </div>
-
-      <!-- Search Results -->
-      <div
-        v-else-if="currentResult && !showHistory"
-        class="space-y-6 overflow-y-auto"
-        :style="`max-height: ${route.path.includes('/widget') ? 'calc(100vh - 18.5em)' : 'calc(100% - 6em)'}`"
-      >
-        <!-- AI Answer -->
-        <div
-          class="bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg p-6"
-        >
-          <div class="flex items-start gap-3">
-            <div class="flex-shrink-0">
-              <div
-                class="w-8 h-8 bg-blue-600 dark:bg-blue-700 rounded-full flex items-center justify-center"
-              >
-                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fill-rule="evenodd"
-                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-              </div>
-            </div>
-            <div class="flex-1">
-              <h3 class="font-semibold text-gray-900 dark:text-gray-200 mb-2">AI Answer</h3>
-              <div
-                class="markdown-content max-w-none text-gray-700 dark:text-gray-300"
-                v-html="formatAnswer(currentResult.answer)"
-              ></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Search Info -->
-        <div
-          class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 pt-4 border-t border-gray-200 dark:border-gray-700"
-        >
-          <span>Search performed {{ formatDate(currentResult.timestamp) }}</span>
-          <span>
-            <button
-              @click="resetChat"
-              class="text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors"
-            >
-              Reset Chat
-            </button>
-          </span>
-        </div>
-      </div>
-
-      <!-- Search History -->
-      <div
-        v-if="showHistory && searchStore.searchHistory.length > 0"
-        class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700"
-      >
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-200">Search History</h3>
-          <button
-            @click="searchStore.clearHistory"
-            class="text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors"
-          >
-            Clear History
-          </button>
-        </div>
-        <div class="space-y-3">
-          <div
-            v-for="result in searchStore.searchHistory.slice(0, 10)"
-            :key="result.id"
-            class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
-          >
-            <button
-              @click="selectFromHistory(result)"
-              class="flex-1 text-left text-sm text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-            >
-              {{ result.query }}
-            </button>
-            <div class="flex items-center gap-2">
-              <span class="text-xs text-gray-500 dark:text-gray-400">{{
-                formatDate(result.timestamp)
-              }}</span>
-              <button
-                @click="searchStore.removeFromHistory(result.id)"
-                class="p-1 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors"
-              >
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fill-rule="evenodd"
-                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Empty State -->
-      <div
-        v-if="!searchStore.loading && !currentResult && !searchStore.error && !showHistory"
-        class="text-center h-auto"
-      >
-        <div
-          class="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4"
-        >
-          <svg
-            class="w-8 h-8 text-gray-400 dark:text-gray-500"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-              clip-rule="evenodd"
-            />
-          </svg>
-        </div>
-        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mb-2">
-          Search the web with AI
-        </h3>
-        <p class="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
-          Get intelligent answers and sources from across the web. Ask questions, research topics,
-          or find current information.
-        </p>
-      </div>
-    </div>
-  </div>
-</template>
-
-<script lang="ts">
-import { defineComponent, ref, onMounted, computed, watch } from 'vue';
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
 import { marked } from 'marked';
-import { useRoute } from 'vue-router';
+import { Sparkles, Search, History, Trash2, X, RotateCcw } from 'lucide-vue-next';
 import { useSearchStore } from '../../stores/search';
 import type { SearchResult } from '../../stores/types';
-import LoadingSpinner from '../LoadingSpinner.vue';
-import ExpandWidget from './ExpandWidget.vue';
+import WidgetCard from './WidgetCard.vue';
+import IconButton from '../ui/IconButton.vue';
+import UiButton from '../ui/UiButton.vue';
+import EmptyState from '../ui/EmptyState.vue';
+import ErrorState from '../ui/ErrorState.vue';
+import Spinner from '../ui/Spinner.vue';
 
-export default defineComponent({
-  name: 'SearchWidget',
-  components: {
-    LoadingSpinner,
-    ExpandWidget,
-  },
-  setup() {
-    const searchStore = useSearchStore();
-    const route = useRoute();
-    const searchQuery = ref('');
-    const showHistory = ref(false);
-    const showSuggestions = ref(false);
-    const currentResult = ref<SearchResult | null>(null);
+const searchStore = useSearchStore();
+const searchQuery = ref('');
+const showHistory = ref(false);
+const showSuggestions = ref(false);
+const currentResult = ref<SearchResult | null>(null);
 
-    // Initialize store from localStorage
-    onMounted(() => {
-      searchStore.initializeFromStorage();
-    });
+onMounted(() => searchStore.initializeFromStorage());
 
-    // Watch for focus on search input to show suggestions
-    const handleInputFocus = () => {
-      showSuggestions.value = true;
-    };
-
-    const handleInputBlur = () => {
-      // Delay hiding suggestions to allow clicks
-      setTimeout(() => {
-        showSuggestions.value = false;
-      }, 200);
-    };
-
-    const handleSearch = async () => {
-      if (!searchQuery.value.trim()) return;
-
-      try {
-        const result = await searchStore.search(searchQuery.value);
-        if (result) {
-          currentResult.value = result;
-          showHistory.value = false;
-        }
-      } catch (error) {
-        console.error('Search failed:', error);
-      }
-    };
-
-    const selectSuggestion = (query: string) => {
-      searchQuery.value = query;
-      showSuggestions.value = false;
-      handleSearch();
-    };
-
-    const selectFromHistory = (result: SearchResult) => {
-      searchQuery.value = result.query;
+const handleSearch = async () => {
+  if (!searchQuery.value.trim()) return;
+  try {
+    const result = await searchStore.search(searchQuery.value);
+    if (result) {
       currentResult.value = result;
       showHistory.value = false;
-    };
+    }
+  } catch (error) {
+    console.error('Search failed:', error);
+  }
+};
 
-    const formatAnswer = (answer: string) => {
-      // Use marked to parse markdown
-      return marked.parse(answer);
-    };
+const selectSuggestion = (query: string) => {
+  searchQuery.value = query;
+  showSuggestions.value = false;
+  handleSearch();
+};
 
-    const formatDate = (timestamp: number) => {
-      const date = new Date(timestamp);
-      const now = new Date();
-      const diff = now.getTime() - date.getTime();
-      const minutes = Math.floor(diff / 60000);
-      const hours = Math.floor(diff / 3600000);
-      const days = Math.floor(diff / 86400000);
+const selectFromHistory = (result: SearchResult) => {
+  searchQuery.value = result.query;
+  currentResult.value = result;
+  showHistory.value = false;
+};
 
-      if (minutes < 1) return 'just now';
-      if (minutes < 60) return `${minutes}m ago`;
-      if (hours < 24) return `${hours}h ago`;
-      if (days < 7) return `${days}d ago`;
-      return date.toLocaleDateString();
-    };
+const formatAnswer = (answer: string) => marked.parse(answer);
 
-    const resetChat = () => {
-      currentResult.value = null;
-    };
+const formatDate = (timestamp: number) => {
+  const date = new Date(timestamp);
+  const diff = Date.now() - date.getTime();
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+  if (minutes < 1) return 'just now';
+  if (minutes < 60) return `${minutes}m ago`;
+  if (hours < 24) return `${hours}h ago`;
+  if (days < 7) return `${days}d ago`;
+  return date.toLocaleDateString();
+};
 
-    return {
-      route,
-      searchStore,
-      searchQuery,
-      showHistory,
-      showSuggestions,
-      currentResult,
-      handleSearch,
-      selectSuggestion,
-      selectFromHistory,
-      formatAnswer,
-      formatDate,
-      handleInputFocus,
-      handleInputBlur,
-      resetChat,
-    };
-  },
-});
+const resetChat = () => {
+  currentResult.value = null;
+};
+
+const handleBlur = () => setTimeout(() => (showSuggestions.value = false), 200);
 </script>
 
+<template>
+  <WidgetCard title="AI Search" :icon="Sparkles" widgetName="search" displayName="Search">
+    <template #actions>
+      <IconButton
+        v-if="searchStore.searchHistory.length > 0"
+        :icon="History"
+        :label="showHistory ? 'Hide history' : 'Show history'"
+        @click="showHistory = !showHistory"
+      />
+    </template>
+
+    <div class="relative mb-5">
+      <Search
+        class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[color:var(--color-fg-subtle)] pointer-events-none"
+      />
+      <input
+        v-model="searchQuery"
+        type="text"
+        placeholder="Ask anything…"
+        class="ui-input !pl-10 !pr-12 !py-2.5"
+        :disabled="searchStore.loading"
+        @keyup.enter="handleSearch"
+        @focus="showSuggestions = true"
+        @blur="handleBlur"
+      />
+      <button
+        class="absolute right-1.5 top-1/2 -translate-y-1/2 ui-icon-btn"
+        :disabled="searchStore.loading || !searchQuery.trim()"
+        aria-label="Search"
+        @click="handleSearch"
+      >
+        <Search />
+      </button>
+
+      <Transition name="ui-popover">
+        <div
+          v-if="showSuggestions && searchStore.recentSearches.length > 0"
+          class="absolute top-full left-0 right-0 mt-1.5 z-10 ui-card !p-1.5 !shadow-[var(--shadow-popover)]"
+        >
+          <p class="text-[0.7rem] uppercase tracking-wider text-[color:var(--color-fg-subtle)] px-2 pt-1.5 pb-1">
+            Recent
+          </p>
+          <button
+            v-for="result in searchStore.recentSearches"
+            :key="result.id"
+            class="w-full text-left px-2 py-1.5 text-sm rounded-md text-[color:var(--color-fg-muted)] hover:bg-[color:var(--color-surface-2)] hover:text-[color:var(--color-fg)] flex items-center gap-2 transition-colors"
+            @mousedown="selectSuggestion(result.query)"
+          >
+            <History class="h-3.5 w-3.5 text-[color:var(--color-fg-subtle)] flex-shrink-0" />
+            <span class="truncate">{{ result.query }}</span>
+          </button>
+        </div>
+      </Transition>
+    </div>
+
+    <ErrorState
+      v-if="searchStore.error"
+      :message="searchStore.error"
+      @retry="handleSearch"
+    />
+
+    <div v-else-if="searchStore.loading" class="text-center py-10">
+      <Spinner :size="28" />
+      <p class="text-sm text-[color:var(--color-fg-muted)] mt-3">Searching the web with AI…</p>
+      <p class="text-xs text-[color:var(--color-fg-subtle)] mt-1">This may take a few moments</p>
+    </div>
+
+    <div v-else-if="currentResult && !showHistory">
+      <div
+        class="rounded-xl bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] p-5"
+      >
+        <div class="flex items-center gap-2 mb-3">
+          <div
+            class="flex h-7 w-7 items-center justify-center rounded-lg bg-[color:var(--color-brand-600)] text-white"
+          >
+            <Sparkles class="h-4 w-4" />
+          </div>
+          <h3 class="text-sm font-semibold text-[color:var(--color-fg)]">AI Answer</h3>
+        </div>
+        <div
+          class="markdown-content text-sm text-[color:var(--color-fg-muted)] leading-relaxed"
+          v-html="formatAnswer(currentResult.answer)"
+        />
+      </div>
+      <div
+        class="flex items-center justify-between text-xs text-[color:var(--color-fg-subtle)] pt-3 mt-3 border-t border-[color:var(--color-border)]"
+      >
+        <span>{{ formatDate(currentResult.timestamp) }}</span>
+        <UiButton variant="ghost" size="sm" :leading-icon="RotateCcw" @click="resetChat">
+          Reset
+        </UiButton>
+      </div>
+    </div>
+
+    <div v-if="showHistory && searchStore.searchHistory.length > 0">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-sm font-semibold text-[color:var(--color-fg)]">History</h3>
+        <UiButton variant="danger" size="sm" :leading-icon="Trash2" @click="searchStore.clearHistory">
+          Clear
+        </UiButton>
+      </div>
+      <div class="space-y-1.5">
+        <div
+          v-for="result in searchStore.searchHistory.slice(0, 10)"
+          :key="result.id"
+          class="group flex items-center gap-2 rounded-lg border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 transition-colors hover:bg-[color:var(--color-surface-2)]"
+        >
+          <button
+            class="flex-1 text-left text-sm text-[color:var(--color-fg)] hover:text-[color:var(--color-brand-600)] transition-colors truncate"
+            @click="selectFromHistory(result)"
+          >
+            {{ result.query }}
+          </button>
+          <span class="text-xs text-[color:var(--color-fg-subtle)] flex-shrink-0">
+            {{ formatDate(result.timestamp) }}
+          </span>
+          <button
+            class="ui-icon-btn opacity-0 group-hover:opacity-100 transition-opacity"
+            :aria-label="`Remove ${result.query} from history`"
+            @click="searchStore.removeFromHistory(result.id)"
+          >
+            <X />
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <EmptyState
+      v-if="!searchStore.loading && !currentResult && !searchStore.error && !showHistory"
+      :icon="Sparkles"
+      title="Search the web with AI"
+      description="Ask questions, research topics, or find current information."
+    />
+  </WidgetCard>
+</template>
+
 <style scoped>
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.ui-popover-enter-active,
+.ui-popover-leave-active {
+  transition:
+    opacity 150ms ease,
+    transform 150ms ease;
 }
-
-.line-clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.prose {
-  max-width: none;
-}
-
-.prose p {
-  margin-bottom: 0.75rem;
-}
-
-.prose p:last-child {
-  margin-bottom: 0;
+.ui-popover-enter-from,
+.ui-popover-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
 }
 </style>

@@ -1,223 +1,125 @@
-<template>
-  <div
-    ref="widgetElement"
-    class="overflow-hidden"
-    :class="[
-      'widget-group relative transition-all duration-200',
-      {
-        'max-h-[calc(100vh-2em)] lg:max-h-[calc(50vh-6em)]': !$route.path.includes('fullscreen'),
-        'max-h-[calc(100vh-2em)] lg:max-h-[calc(50vh-1.5em)]': $route.path.includes('fullscreen'),
-        'cursor-grab active:cursor-grabbing': draggableActive,
-        'opacity-60 scale-[0.95] shadow-2xl z-50 rotate-1 ring-4 ring-blue-500/30 ring-offset-2 ring-offset-white dark:ring-offset-gray-900':
-          widgetStore.isDragging && widgetStore.draggedWidget === widgetId,
-        'ring-2 ring-blue-400 dark:ring-blue-500 ring-inset bg-blue-50/30 dark:bg-blue-900/30 shadow-lg':
-          widgetStore.dragOverIndex === index && widgetStore.draggedWidget !== widgetId,
-        'hover:shadow-lg hover:scale-[1.02]': draggableActive && !widgetStore.isDragging,
-        'mb-4': widgetStore.isDragging && widgetStore.draggedWidget === widgetId,
-      },
-    ]"
-    :data-widget-id="widgetId"
-    :data-widget-index="index"
-    title="Drag to reorder"
-    style="user-select: none; -webkit-user-select: none; -moz-user-select: none"
-  >
-    <!-- Widget Content -->
-    <div
-      class="h-full widget-content"
-      :class="{
-        'pointer-events-none': widgetStore.isDragging && widgetStore.draggedWidget === widgetId,
-      }"
-    >
-      <slot />
-    </div>
-
-    <!-- Enhanced Drop Indicator -->
-    <div
-      v-if="
-        widgetStore.dragOverIndex === index &&
-        widgetStore.draggedWidget !== widgetId &&
-        widgetStore.isDragging
-      "
-      class="absolute inset-0 border-2 border-dashed border-blue-400 dark:border-blue-500 rounded-lg bg-blue-50/40 dark:bg-blue-900/40 backdrop-blur-sm pointer-events-none z-40 flex items-center justify-center"
-    >
-      <div
-        class="bg-blue-600 dark:bg-blue-700 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg"
-      >
-        Drop here
-      </div>
-    </div>
-  </div>
-</template>
-
-<script lang="ts">
-import { defineComponent, ref, onMounted, onUnmounted, nextTick, watch } from 'vue';
+<script setup lang="ts">
+import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue';
 import {
   draggable,
   dropTargetForElements,
 } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { useWidgetStore } from '../../stores/widgets';
 
-export default defineComponent({
-  name: 'DraggableWidget',
-  props: {
-    widgetId: {
-      type: String,
-      required: true,
-    },
-    index: {
-      type: Number,
-      required: true,
-    },
-    draggableActive: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  setup(props) {
-    const widgetElement = ref<HTMLElement>();
-    const widgetStore = useWidgetStore();
+const props = defineProps<{
+  widgetId: string;
+  index: number;
+  draggableActive?: boolean;
+}>();
 
-    let dragCleanup: (() => void) | null = null;
-    let dropCleanup: (() => void) | null = null;
+const widgetElement = ref<HTMLElement>();
+const widgetStore = useWidgetStore();
 
-    const cleanupDragAndDrop = () => {
-      dragCleanup?.();
-      dropCleanup?.();
-      dragCleanup = null;
-      dropCleanup = null;
-    };
+let dragCleanup: (() => void) | null = null;
+let dropCleanup: (() => void) | null = null;
 
-    const setupDragAndDrop = async () => {
-      await nextTick();
+const cleanupDragAndDrop = () => {
+  dragCleanup?.();
+  dropCleanup?.();
+  dragCleanup = null;
+  dropCleanup = null;
+};
 
-      if (!widgetElement.value) {
-        console.warn('DraggableWidget: Element not ready, retrying...', props.widgetId);
-        setTimeout(setupDragAndDrop, 100);
-        return;
-      }
+const setupDragAndDrop = async () => {
+  await nextTick();
+  if (!widgetElement.value || !props.draggableActive) return;
 
-      // Only setup drag and drop if active
-      if (!props.draggableActive) {
-        return;
-      }
-
-      try {
-        // Make the entire widget draggable
-        dragCleanup = draggable({
-          element: widgetElement.value,
-          // No dragHandle - entire element is draggable
-          getInitialData: () => ({
-            type: 'widget',
-            widgetId: props.widgetId,
-            fromIndex: props.index,
-          }),
-          onDragStart: () => {
-            widgetStore.setDraggedWidget(props.widgetId);
-          },
-          onDrop: () => {
-            widgetStore.setDraggedWidget(null);
-            widgetStore.setDragOverIndex(null);
-          },
-        });
-
-        // Make the widget a drop target
-        dropCleanup = dropTargetForElements({
-          element: widgetElement.value,
-          canDrop: ({ source }) => {
-            return source.data.type === 'widget' && source.data.widgetId !== props.widgetId;
-          },
-          onDragEnter: () => {
-            widgetStore.setDragOverIndex(props.index);
-          },
-          onDragLeave: () => {
-            widgetStore.setDragOverIndex(null);
-          },
-          onDrop: ({ source }) => {
-            const fromIndex = source.data.fromIndex as number;
-            const toIndex = props.index;
-
-            if (fromIndex !== toIndex) {
-              widgetStore.reorderWidgets(fromIndex, toIndex);
-            }
-
-            widgetStore.setDragOverIndex(null);
-          },
-        });
-      } catch (error) {
-        console.error('Failed to setup drag and drop for widget:', props.widgetId, error);
-      }
-    };
-
-    // Watch for changes to the active prop
-    watch(
-      () => props.draggableActive,
-      newActive => {
-        if (newActive) {
-          setupDragAndDrop();
-        } else {
-          cleanupDragAndDrop();
-        }
-      }
-    );
-
-    onMounted(() => {
-      setupDragAndDrop();
+  try {
+    dragCleanup = draggable({
+      element: widgetElement.value,
+      getInitialData: () => ({
+        type: 'widget',
+        widgetId: props.widgetId,
+        fromIndex: props.index,
+      }),
+      onDragStart: () => widgetStore.setDraggedWidget(props.widgetId),
+      onDrop: () => {
+        widgetStore.setDraggedWidget(null);
+        widgetStore.setDragOverIndex(null);
+      },
     });
 
-    onUnmounted(() => {
-      cleanupDragAndDrop();
+    dropCleanup = dropTargetForElements({
+      element: widgetElement.value,
+      canDrop: ({ source }) =>
+        source.data.type === 'widget' && source.data.widgetId !== props.widgetId,
+      onDragEnter: () => widgetStore.setDragOverIndex(props.index),
+      onDragLeave: () => widgetStore.setDragOverIndex(null),
+      onDrop: ({ source }) => {
+        const fromIndex = source.data.fromIndex as number;
+        const toIndex = props.index;
+        if (fromIndex !== toIndex) widgetStore.reorderWidgets(fromIndex, toIndex);
+        widgetStore.setDragOverIndex(null);
+      },
     });
+  } catch (error) {
+    console.error('Failed to setup drag and drop for widget:', props.widgetId, error);
+  }
+};
 
-    return {
-      widgetElement,
-      widgetStore,
-    };
-  },
-});
+watch(
+  () => props.draggableActive,
+  active => {
+    if (active) setupDragAndDrop();
+    else cleanupDragAndDrop();
+  }
+);
+
+onMounted(setupDragAndDrop);
+onUnmounted(cleanupDragAndDrop);
 </script>
 
-<style>
-/* Allow interactive elements within widgets to override drag cursor */
-.cursor-grab
-  :is(button, input, select, textarea, a, [role='button'], [tabindex]):not([tabindex='-1']) {
+<template>
+  <div
+    ref="widgetElement"
+    class="relative overflow-hidden transition-all duration-200 select-none"
+    :class="{
+      'cursor-grab active:cursor-grabbing': draggableActive,
+      'opacity-60 scale-[0.97] z-50 rotate-1 ring-2 ring-[color:var(--color-brand-500)] ring-offset-2 ring-offset-[color:var(--color-surface-2)]':
+        widgetStore.isDragging && widgetStore.draggedWidget === widgetId,
+      'ring-2 ring-[color:var(--color-brand-400)] ring-inset':
+        widgetStore.dragOverIndex === index && widgetStore.draggedWidget !== widgetId,
+      'hover:shadow-[var(--shadow-card-hover)]': draggableActive && !widgetStore.isDragging,
+    }"
+    :data-widget-id="widgetId"
+    :data-widget-index="index"
+  >
+    <div
+      class="h-full"
+      :class="{
+        'pointer-events-none':
+          widgetStore.isDragging && widgetStore.draggedWidget === widgetId,
+      }"
+    >
+      <slot />
+    </div>
+
+    <div
+      v-if="
+        widgetStore.dragOverIndex === index &&
+        widgetStore.draggedWidget !== widgetId &&
+        widgetStore.isDragging
+      "
+      class="absolute inset-0 rounded-[var(--radius-card)] border-2 border-dashed border-[color:var(--color-brand-500)] bg-[color:var(--color-brand-100)]/40 dark:bg-[color:var(--color-brand-900)]/30 backdrop-blur-sm pointer-events-none flex items-center justify-center z-40"
+    >
+      <span
+        class="bg-[color:var(--color-brand-600)] text-white px-3 py-1 rounded-full text-xs font-medium shadow-[var(--shadow-popover)]"
+      >
+        Drop here
+      </span>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.cursor-grab :is(button, input, select, textarea, a, [role='button'], [tabindex]):not(
+    [tabindex='-1']
+  ) {
   cursor: pointer;
-}
-
-.cursor-grab
-  :is(button, input, select, textarea, a, [role='button'], [tabindex]):not([tabindex='-1']):hover {
-  cursor: pointer;
-}
-
-.widget-content > div {
-  height: 100%;
-}
-
-/* Smooth transform origin for better drag animation */
-.widget-group {
-  transform-origin: center;
-}
-
-/* Prevent content shift during drag operations */
-.widget-group.opacity-60 {
-  will-change: transform, opacity;
-}
-
-/* Ensure drop zones have smooth transitions */
-.ring-inset {
-  transition: all 0.2s ease-in-out;
-}
-
-/* Better backdrop blur support fallback */
-@supports not (backdrop-filter: blur(4px)) {
-  .backdrop-blur-sm {
-    background-color: rgba(59, 130, 246, 0.1);
-  }
-}
-
-/* Improve drag handle visibility on mobile */
-@media (hover: none) {
-  .widget-group .opacity-0 {
-    opacity: 0.7;
-  }
 }
 </style>

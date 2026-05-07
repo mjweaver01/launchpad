@@ -1,287 +1,144 @@
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+import { useRoute } from 'vue-router';
+import { Rocket, RefreshCw, Menu, X } from 'lucide-vue-next';
+import { routes } from '../router';
+import { useWeatherStore, useNewsStore, useCalendarStore } from '../stores';
+import IconButton from './ui/IconButton.vue';
+
+const route = useRoute();
+const weatherStore = useWeatherStore();
+const newsStore = useNewsStore();
+const calendarStore = useCalendarStore();
+const isRefreshing = ref(false);
+const isMobileMenuOpen = ref(false);
+
+const filteredRoutes = computed(() =>
+  routes.filter(
+    r => !r.path.includes('google') && r.path !== '/' && !r.path.includes('/widget')
+  )
+);
+
+const showHomeLink = computed(() => route.path.includes('/widget'));
+const hasNavItems = computed(() => filteredRoutes.value.length > 0 || showHomeLink.value);
+
+const handleRefresh = async () => {
+  if (isRefreshing.value) return;
+  isRefreshing.value = true;
+  try {
+    await Promise.all([weatherStore.refresh(), newsStore.refresh(), calendarStore.refresh()]);
+  } catch (error) {
+    console.error('Failed to refresh data:', error);
+  } finally {
+    isRefreshing.value = false;
+  }
+};
+</script>
+
 <template>
-  <header class="bg-blue-800 dark:bg-gray-700 text-white shadow-md transition-colors duration-200">
-    <div class="mx-auto px-4 sm:px-6 py-2.5">
-      <div class="flex justify-between items-center">
-        <router-link to="/" class="uppercase tracking-[2px] text-2xl font-bold"
-          >🚀 <span class="hidden sm:inline">Launchpad</span></router-link
+  <header
+    class="sticky top-0 z-50 backdrop-blur-md bg-[color:var(--color-surface)]/85 border-b border-[color:var(--color-border)]"
+  >
+    <div class="mx-auto max-w-7xl px-4 sm:px-6">
+      <div class="flex h-14 items-center justify-between gap-3">
+        <router-link
+          to="/"
+          class="flex items-center gap-2 text-[color:var(--color-fg)] no-underline"
         >
-
-        <!-- Desktop Navigation -->
-        <div class="hidden md:flex items-center space-x-4">
-          <nav class="flex space-x-4">
-            <router-link
-              v-for="route in filteredRoutes"
-              :key="route.path"
-              :to="route.path"
-              class="px-3 py-2 rounded hover:bg-blue-700 dark:hover:bg-gray-600 transition-colors leading-[20px]"
-              :class="{ 'bg-blue-700 dark:bg-gray-700': $route.path === route.path }"
-            >
-              {{ route.name }}
-            </router-link>
-            <router-link
-              v-if="showHomeLink"
-              to="/"
-              class="px-3 py-2 rounded hover:bg-blue-700 dark:hover:bg-gray-600 transition-colors leading-[20px]"
-              >Home</router-link
-            >
-          </nav>
-
-          <!-- Theme Toggle Button and Controls -->
-          <div class="flex items-center space-x-4">
-            <!-- Settings/Theme Toggle Button -->
-            <button
-              @click="toggleThemeControls"
-              class="flex items-center justify-center p-2 bg-blue-600 dark:bg-gray-800 hover:bg-blue-700 dark:hover:bg-gray-700 rounded transition-colors"
-              title="Toggle theme controls"
-            >
-              <svg
-                :class="[
-                  'w-4 h-4 transition-transform duration-200',
-                  showThemeToggles ? 'rotate-[-90deg]' : 'rotate-[90deg]',
-                ]"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-              <span class="text-sm">Theme</span>
-            </button>
-          </div>
-
-          <!-- Theme Toggles -->
-          <div v-if="showThemeToggles" class="flex items-center space-x-4">
-            <DarkModeToggle />
-            <RedHueToggle />
-            <AutoThemeSimpleToggle />
-          </div>
-
-          <!-- Refresh Button -->
-          <button
-            @click="handleRefresh"
-            :disabled="isRefreshing"
-            class="flex items-center space-x-1 px-3 py-2 bg-blue-600 dark:bg-gray-800 hover:bg-blue-700 dark:hover:bg-gray-700 disabled:bg-blue-400 dark:disabled:bg-gray-600 rounded transition-colors text-sm"
-            title="Refresh all data"
+          <span
+            class="flex h-8 w-8 items-center justify-center rounded-lg bg-[color:var(--color-brand-600)] text-white"
           >
-            <svg
-              :class="['w-4 h-4', isRefreshing ? 'animate-spin' : '']"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-              />
-            </svg>
-            <span>{{ isRefreshing ? 'Refreshing...' : 'Refresh' }}</span>
-          </button>
-        </div>
+            <Rocket class="h-4 w-4" />
+          </span>
+          <span class="font-display text-base font-semibold tracking-tight">Launchpad</span>
+        </router-link>
 
-        <!-- Mobile Menu Button and Controls -->
-        <div class="md:hidden flex items-center space-x-2">
-          <!-- Settings/Theme Toggle Button -->
-          <button
-            @click="toggleThemeControls"
-            class="flex items-center justify-center p-2 bg-blue-600 dark:bg-gray-800 hover:bg-blue-700 dark:hover:bg-gray-700 rounded transition-colors"
-            title="Toggle theme controls"
-          >
-            <svg
-              :class="[
-                'w-4 h-4 transition-transform duration-200',
-                showThemeToggles ? 'rotate-[-90deg]' : 'rotate-[90deg]',
-              ]"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          </button>
-
-          <!-- Theme Toggles (Mobile) -->
-          <div v-if="showThemeToggles" class="flex items-center space-x-2">
-            <DarkModeToggle />
-            <RedHueToggle />
-          </div>
-
-          <!-- Refresh Button (Mobile) -->
-          <button
-            @click="handleRefresh"
-            :disabled="isRefreshing"
-            class="flex items-center justify-center p-2 bg-blue-600 dark:bg-gray-800 hover:bg-blue-700 dark:hover:bg-gray-700 disabled:bg-blue-400 dark:disabled:bg-gray-600 rounded transition-colors"
-            title="Refresh all data"
-          >
-            <svg
-              :class="['w-4 h-4', isRefreshing ? 'animate-spin' : '']"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-              />
-            </svg>
-          </button>
-
-          <!-- Hamburger Menu Button -->
-          <button
-            v-if="hasNavItems"
-            @click="toggleMobileMenu"
-            class="p-1 rounded hover:bg-blue-700 dark:hover:bg-gray-600 transition-colors"
-            :aria-expanded="isMobileMenuOpen"
-            aria-label="Toggle navigation menu"
-          >
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                v-if="!isMobileMenuOpen"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-              <path
-                v-else
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <!-- Mobile Menu -->
-      <div
-        v-if="isMobileMenuOpen && hasNavItems"
-        class="md:hidden mt-4 pb-4 border-t border-blue-700 dark:border-gray-600"
-      >
-        <nav class="flex flex-col space-y-2 mt-4">
+        <!-- Desktop nav -->
+        <nav class="hidden md:flex items-center gap-1">
           <router-link
-            v-for="route in filteredRoutes"
-            :key="route.path"
-            :to="route.path"
-            @click="closeMobileMenu"
-            class="px-3 py-2 rounded hover:bg-blue-700 dark:hover:bg-gray-600 transition-colors"
-            :class="{ 'bg-blue-700 dark:bg-gray-700': $route.path === route.path }"
+            v-for="r in filteredRoutes"
+            :key="r.path"
+            :to="r.path"
+            class="rounded-md px-3 py-1.5 text-sm font-medium text-[color:var(--color-fg-muted)] hover:text-[color:var(--color-fg)] hover:bg-[color:var(--color-surface-2)] transition-colors"
+            :class="{
+              '!text-[color:var(--color-fg)] bg-[color:var(--color-surface-2)]':
+                $route.path === r.path,
+            }"
           >
-            {{ route.name }}
+            {{ r.name }}
           </router-link>
           <router-link
             v-if="showHomeLink"
             to="/"
-            @click="closeMobileMenu"
-            class="px-3 py-2 rounded hover:bg-blue-700 dark:hover:bg-gray-600 transition-colors"
-            >Home</router-link
+            class="rounded-md px-3 py-1.5 text-sm font-medium text-[color:var(--color-fg-muted)] hover:text-[color:var(--color-fg)] hover:bg-[color:var(--color-surface-2)] transition-colors"
           >
+            Home
+          </router-link>
         </nav>
+
+        <!-- Right side -->
+        <div class="flex items-center gap-1">
+          <IconButton
+            :icon="RefreshCw"
+            :spin="isRefreshing"
+            :disabled="isRefreshing"
+            label="Refresh all data"
+            @click="handleRefresh"
+          />
+          <IconButton
+            v-if="hasNavItems"
+            class="md:hidden"
+            :icon="isMobileMenuOpen ? X : Menu"
+            :label="isMobileMenuOpen ? 'Close menu' : 'Open menu'"
+            @click="isMobileMenuOpen = !isMobileMenuOpen"
+          />
+        </div>
       </div>
+
+      <!-- Mobile menu -->
+      <Transition name="ui-mobile-menu">
+        <nav
+          v-if="isMobileMenuOpen && hasNavItems"
+          class="md:hidden flex flex-col gap-1 pb-4 pt-1"
+        >
+          <router-link
+            v-for="r in filteredRoutes"
+            :key="r.path"
+            :to="r.path"
+            class="rounded-md px-3 py-2 text-sm font-medium text-[color:var(--color-fg-muted)] hover:text-[color:var(--color-fg)] hover:bg-[color:var(--color-surface-2)] transition-colors"
+            :class="{
+              '!text-[color:var(--color-fg)] bg-[color:var(--color-surface-2)]':
+                $route.path === r.path,
+            }"
+            @click="isMobileMenuOpen = false"
+          >
+            {{ r.name }}
+          </router-link>
+          <router-link
+            v-if="showHomeLink"
+            to="/"
+            class="rounded-md px-3 py-2 text-sm font-medium text-[color:var(--color-fg-muted)] hover:text-[color:var(--color-fg)] hover:bg-[color:var(--color-surface-2)] transition-colors"
+            @click="isMobileMenuOpen = false"
+          >
+            Home
+          </router-link>
+        </nav>
+      </Transition>
     </div>
   </header>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref, computed } from 'vue';
-import { useRoute } from 'vue-router';
-import { routes } from '../router';
-import { useWeatherStore, useNewsStore, useCalendarStore } from '../stores';
-import DarkModeToggle from './DarkModeToggle.vue';
-import RedHueToggle from './RedHueToggle.vue';
-import AutoThemeSimpleToggle from './AutoThemeSimpleToggle.vue';
-
-export default defineComponent({
-  name: 'AppHeader',
-  components: {
-    DarkModeToggle,
-    RedHueToggle,
-    AutoThemeSimpleToggle,
-  },
-  setup() {
-    const route = useRoute();
-    const weatherStore = useWeatherStore();
-    const newsStore = useNewsStore();
-    const calendarStore = useCalendarStore();
-    const isRefreshing = ref(false);
-    const isMobileMenuOpen = ref(false);
-    const showThemeToggles = ref(false);
-
-    // Computed properties to avoid duplication
-    const filteredRoutes = computed(() => {
-      return routes.filter(
-        route =>
-          !route.path.includes('google') && route.path !== '/' && !route.path.includes('/widget')
-      );
-    });
-
-    const showHomeLink = computed(() => {
-      return route.path.includes('/widget');
-    });
-
-    const handleRefresh = async () => {
-      if (isRefreshing.value) return;
-
-      isRefreshing.value = true;
-      try {
-        await Promise.all([weatherStore.refresh(), newsStore.refresh(), calendarStore.refresh()]);
-      } catch (error) {
-        console.error('Failed to refresh data:', error);
-      } finally {
-        isRefreshing.value = false;
-      }
-    };
-
-    const toggleMobileMenu = () => {
-      isMobileMenuOpen.value = !isMobileMenuOpen.value;
-    };
-
-    const closeMobileMenu = () => {
-      isMobileMenuOpen.value = false;
-    };
-
-    const hasNavItems = computed(() => {
-      return filteredRoutes.value.length > 0 || showHomeLink.value;
-    });
-
-    const toggleThemeControls = () => {
-      showThemeToggles.value = !showThemeToggles.value;
-    };
-
-    return {
-      filteredRoutes,
-      showHomeLink,
-      handleRefresh,
-      isRefreshing,
-      isMobileMenuOpen,
-      toggleMobileMenu,
-      closeMobileMenu,
-      hasNavItems,
-      showThemeToggles,
-      toggleThemeControls,
-    };
-  },
-});
-</script>
-
 <style scoped>
-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
+.ui-mobile-menu-enter-active,
+.ui-mobile-menu-leave-active {
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+  overflow: hidden;
+}
+.ui-mobile-menu-enter-from,
+.ui-mobile-menu-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
 }
 </style>
