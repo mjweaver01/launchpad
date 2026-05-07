@@ -77,8 +77,15 @@ export const useLocationStore = defineStore('location', () => {
       Math.abs(locationCache.value.data.coordinates.lat - coordinates.lat) < 0.01 &&
       Math.abs(locationCache.value.data.coordinates.lon - coordinates.lon) < 0.01;
 
-    // Return cached data if valid, same coordinates, and not forced refresh
-    if (!forceRefresh && isLocationCacheValid.value && locationCache.value && isSameCoordinates) {
+    // Treat cache as invalid if it contains placeholder "Unknown" values
+    const hasMeaningfulData =
+      locationCache.value?.data?.city &&
+      locationCache.value.data.city !== 'Unknown' &&
+      locationCache.value?.data?.country &&
+      locationCache.value.data.country !== 'Unknown';
+
+    // Return cached data if valid, same coordinates, meaningful, and not forced refresh
+    if (!forceRefresh && isLocationCacheValid.value && locationCache.value && isSameCoordinates && hasMeaningfulData) {
       return locationCache.value.data;
     }
 

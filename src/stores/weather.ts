@@ -85,6 +85,35 @@ export const useWeatherStore = defineStore('weather', () => {
     return response.json();
   };
 
+  const loadCoordinates = async (forceRefresh = false): Promise<Coordinates> => {
+    // Initialize from storage if needed
+    if (!coordinatesCache.value) {
+      initializeFromStorage();
+    }
+
+    // Return cached coordinates if valid and not forced refresh
+    if (!forceRefresh && isCoordinatesCacheValid.value && coordinatesCache.value) {
+      return coordinatesCache.value.data;
+    }
+
+    const position = await getCurrentLocation();
+    const coordinates: Coordinates = {
+      lat: position.coords.latitude,
+      lon: position.coords.longitude,
+    };
+
+    const coordinatesEntry: CacheEntry<Coordinates> = {
+      data: coordinates,
+      timestamp: Date.now(),
+      expiresAt: Date.now() + CACHE_DURATION,
+    };
+
+    coordinatesCache.value = coordinatesEntry;
+    CacheStorage.set(COORDINATES_CACHE_KEY, coordinatesEntry);
+
+    return coordinates;
+  };
+
   const loadWeather = async (forceRefresh = false) => {
     // Initialize from storage if needed
     if (!weatherCache.value && !coordinatesCache.value) {
@@ -173,6 +202,7 @@ export const useWeatherStore = defineStore('weather', () => {
     isCoordinatesCacheValid,
 
     // Actions
+    loadCoordinates,
     loadWeather,
     refresh,
     clearCache,

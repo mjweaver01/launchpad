@@ -37,6 +37,14 @@ interface NominatimResult {
   };
 }
 
+interface BigDataCloudResult {
+  city?: string;
+  locality?: string;
+  principalSubdivision?: string;
+  countryName?: string;
+  countryCode?: string;
+}
+
 interface LocationResponse {
   city: string;
   state: string;
@@ -63,7 +71,6 @@ const reverseGeocode = async (lat: number, lon: number): Promise<LocationRespons
         if (data.status === 'OK' && data.results.length > 0) {
           const result = data.results[0];
 
-          // Extract city, state, and country from address components
           let city = '';
           let state = '';
           let country = '';
@@ -72,13 +79,12 @@ const reverseGeocode = async (lat: number, lon: number): Promise<LocationRespons
             if (component.types.includes('locality')) {
               city = component.long_name;
             } else if (component.types.includes('administrative_area_level_1')) {
-              state = component.short_name; // Use short name for states (e.g., "CA" instead of "California")
+              state = component.short_name;
             } else if (component.types.includes('country')) {
               country = component.long_name;
             }
           }
 
-          // Fallback for city if locality is not found
           if (!city) {
             for (const component of result.address_components) {
               if (component.types.includes('administrative_area_level_2')) {
@@ -98,16 +104,42 @@ const reverseGeocode = async (lat: number, lon: number): Promise<LocationRespons
         }
       }
     } catch (error) {
-      console.warn('Google Geocoding API failed, falling back to Nominatim:', error);
+      console.warn('Google Geocoding API failed:', error);
     }
   }
 
-  // Fallback to OpenStreetMap Nominatim (free)
+  // Try BigDataCloud (free, no API key required)
+  try {
+    const bdcUrl = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`;
+    const response = await fetch(bdcUrl);
+
+    if (response.ok) {
+      const data: BigDataCloudResult = await response.json();
+      const city = data.city || data.locality || '';
+      const state = data.principalSubdivision || '';
+      // Normalize "United States of America (the)" → "United States"
+      const country = (data.countryName || '').replace(' of America (the)', '').replace(' (the)', '');
+
+      if (city || state || country) {
+        return {
+          city,
+          state,
+          country,
+          formattedAddress: [city, state, country].filter(Boolean).join(', '),
+          coordinates: { lat, lon },
+        };
+      }
+    }
+  } catch (error) {
+    console.warn('BigDataCloud geocoding failed, trying Nominatim:', error);
+  }
+
+  // Fallback to OpenStreetMap Nominatim
   try {
     const nominatimUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10&addressdetails=1`;
     const response = await fetch(nominatimUrl, {
       headers: {
-        'User-Agent': 'LaunchpadApp/1.0 (your-email@example.com)', // Required by Nominatim
+        'User-Agent': 'Launchpad/1.0',
       },
     });
 
@@ -134,6 +166,8 @@ const reverseGeocode = async (lat: number, lon: number): Promise<LocationRespons
         formattedAddress: data.display_name,
         coordinates: { lat, lon },
       };
+    } else {
+      console.warn('Nominatim returned status:', response.status);
     }
   } catch (error) {
     console.error('Nominatim geocoding failed:', error);

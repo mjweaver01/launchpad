@@ -250,7 +250,18 @@ export default defineComponent({
 
     // Load location data when coordinates are available
     const loadLocationData = async () => {
-      const coordinates = weatherStore.coordinatesCache?.data;
+      let coordinates = weatherStore.coordinatesCache?.data;
+
+      // If no coordinates cached, request them directly
+      if (!coordinates) {
+        try {
+          coordinates = await weatherStore.loadCoordinates();
+        } catch (error) {
+          console.warn('Failed to get coordinates in TimeWidget:', error);
+          return;
+        }
+      }
+
       if (coordinates) {
         try {
           await locationStore.loadLocation(coordinates);

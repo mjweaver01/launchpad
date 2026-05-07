@@ -11,7 +11,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "vue-tsc --noEmit",
-    "netlify": "NODE_OPTIONS=--inspect netlify dev --port 1234",
+    "netlify": "lsof -ti:1234 | xargs kill -9 2>/dev/null; NODE_OPTIONS=--inspect netlify dev --port 1234",
     "n": "npm run netlify",
     "d": "npm run netlify",
     "format": "prettier --write \"src/**/*.{js,ts,vue,jsx,tsx}\""
