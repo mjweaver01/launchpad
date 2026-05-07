@@ -26,6 +26,11 @@ interface NominatimResult {
     city?: string;
     town?: string;
     village?: string;
+    suburb?: string;
+    neighbourhood?: string;
+    county?: string;
+    municipality?: string;
+    district?: string;
     state?: string;
     country?: string;
     country_code?: string;
@@ -84,9 +89,9 @@ const reverseGeocode = async (lat: number, lon: number): Promise<LocationRespons
           }
 
           return {
-            city: city || 'Unknown',
+            city: city || '',
             state: state || '',
-            country: country || 'Unknown',
+            country: country || '',
             formattedAddress: result.formatted_address,
             coordinates: { lat, lon },
           };
@@ -109,9 +114,18 @@ const reverseGeocode = async (lat: number, lon: number): Promise<LocationRespons
     if (response.ok) {
       const data: NominatimResult = await response.json();
 
-      const city = data.address?.city || data.address?.town || data.address?.village || 'Unknown';
+      const city =
+        data.address?.city ||
+        data.address?.town ||
+        data.address?.village ||
+        data.address?.suburb ||
+        data.address?.neighbourhood ||
+        data.address?.municipality ||
+        data.address?.district ||
+        data.address?.county ||
+        '';
       const state = data.address?.state || '';
-      const country = data.address?.country || 'Unknown';
+      const country = data.address?.country || '';
 
       return {
         city,
@@ -127,9 +141,9 @@ const reverseGeocode = async (lat: number, lon: number): Promise<LocationRespons
 
   // Ultimate fallback
   return {
-    city: 'Unknown',
+    city: '',
     state: '',
-    country: 'Unknown',
+    country: '',
     formattedAddress: `${lat.toFixed(4)}, ${lon.toFixed(4)}`,
     coordinates: { lat, lon },
   };

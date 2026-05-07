@@ -33,14 +33,20 @@ export const useLocationStore = defineStore('location', () => {
   const formattedLocation = computed(() => {
     if (!currentLocation.value) return '';
 
-    const { city, state, country } = currentLocation.value;
+    const city = currentLocation.value.city === 'Unknown' ? '' : (currentLocation.value.city || '');
+    const state = currentLocation.value.state || '';
+    const country = currentLocation.value.country === 'Unknown' ? '' : (currentLocation.value.country || '');
+
+    if (!city && !country) return '';
 
     // For US addresses, show "City, State"
     // For international addresses, show "City, Country"
     if (country === 'United States' && state) {
-      return `${city}, ${state}`;
-    } else {
+      return city ? `${city}, ${state}` : state;
+    } else if (city && country) {
       return `${city}, ${country}`;
+    } else {
+      return city || country || '';
     }
   });
 
