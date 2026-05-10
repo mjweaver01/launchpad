@@ -155,58 +155,53 @@ onMounted(() => {
       @retry="retryLocation"
     />
 
-    <div v-else-if="weatherData">
-      <div class="text-sm uppercase tracking-wider text-[color:var(--color-fg-muted)] mb-2">
+    <div v-else-if="weatherData" class="weather-content">
+      <div class="weather-description">
         {{ weatherData.description }}
       </div>
-      <div class="flex items-center justify-between gap-3 min-w-0">
-        <div class="flex items-baseline gap-2 min-w-0">
-          <span
-            class="text-7xl sm:text-8xl font-bold text-[color:var(--color-fg)] leading-[0.9] tabular-nums tracking-tight"
-            >{{ celsiusToFahrenheit(weatherData.temperature) }}°</span
-          >
-          <span class="text-sm text-[color:var(--color-fg-subtle)] tabular-nums whitespace-nowrap"
-            >{{ weatherData.temperature }}°C</span
-          >
+      <div class="weather-hero">
+        <div class="weather-hero-text">
+          <div class="weather-temp-row">
+            <span class="weather-temp"
+              >{{ celsiusToFahrenheit(weatherData.temperature) }}°</span
+            >
+            <span class="weather-temp-c">{{ weatherData.temperature }}°C</span>
+          </div>
+          <div class="weather-feels">
+            Feels like {{ celsiusToFahrenheit(weatherData.feelsLike) }}°
+          </div>
         </div>
         <component
           :is="getWeatherIcon(weatherData.icon)"
-          class="h-20 w-20 sm:h-24 sm:w-24 text-[color:var(--color-brand-600)] flex-shrink-0"
+          class="weather-icon text-[color:var(--color-brand-600)]"
           stroke-width="1.25"
         />
       </div>
-      <div class="text-sm text-[color:var(--color-fg-muted)] mt-1">
-        Feels like {{ celsiusToFahrenheit(weatherData.feelsLike) }}°
-      </div>
 
-      <div class="flex gap-3 mt-5">
+      <div class="weather-stats">
         <div
-          class="flex-1 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-3"
+          class="weather-stat rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]"
         >
-          <div class="flex items-center gap-1.5 text-sm text-[color:var(--color-fg-muted)] mb-1">
-            <Droplets class="h-4 w-4" />
-            Humidity
-          </div>
-          <div class="text-2xl font-semibold text-[color:var(--color-fg)] tabular-nums">
+          <Droplets class="weather-stat-icon text-[color:var(--color-fg-muted)]" />
+          <span class="weather-stat-label text-[color:var(--color-fg-muted)]">Humidity</span>
+          <span class="weather-stat-value font-semibold text-[color:var(--color-fg)] tabular-nums">
             {{ weatherData.humidity }}%
-          </div>
+          </span>
         </div>
         <div
-          class="flex-1 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-3"
+          class="weather-stat rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]"
         >
-          <div class="flex items-center gap-1.5 text-sm text-[color:var(--color-fg-muted)] mb-1">
-            <Wind class="h-4 w-4" />
-            Wind
-          </div>
-          <div class="text-2xl font-semibold text-[color:var(--color-fg)] tabular-nums">
-            {{ weatherData.windSpeed }}<span class="text-sm font-normal"> m/s</span>
-          </div>
+          <Wind class="weather-stat-icon text-[color:var(--color-fg-muted)]" />
+          <span class="weather-stat-label text-[color:var(--color-fg-muted)]">Wind</span>
+          <span class="weather-stat-value font-semibold text-[color:var(--color-fg)] tabular-nums">
+            {{ weatherData.windSpeed }}<span class="weather-stat-unit font-normal"> m/s</span>
+          </span>
         </div>
       </div>
 
       <div
         v-if="weatherData.hourlyForecast && weatherData.hourlyForecast.length > 0"
-        class="mt-5 -mx-6 px-6 overflow-x-auto"
+        class="mt-4 -mx-6 px-6 overflow-x-auto"
       >
         <div class="flex gap-2 pb-1" style="min-width: max-content">
           <div
@@ -237,7 +232,7 @@ onMounted(() => {
 
       <div
         v-if="locationStore.formattedLocation"
-        class="mt-5 flex items-center gap-2 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-3"
+        class="mt-4 flex items-center gap-2 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-3"
       >
         <MapPin class="h-4 w-4 text-[color:var(--color-fg-muted)] flex-shrink-0" />
         <div class="min-w-0">
@@ -261,3 +256,109 @@ onMounted(() => {
     </div>
   </WidgetCard>
 </template>
+
+<style scoped>
+/* Make the weather body a query container so the hero/stats scale with
+   the actual card width rather than viewport-based breakpoints. */
+.weather-content {
+  container-type: inline-size;
+}
+
+.weather-description {
+  font-size: clamp(0.8rem, 3cqi, 1.05rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-fg-muted);
+  margin-bottom: 0.65rem;
+  line-height: 1.2;
+}
+
+.weather-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.weather-hero-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1 1 auto;
+  gap: 0.85rem;
+}
+
+.weather-temp-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4em;
+  min-width: 0;
+}
+
+.weather-temp {
+  font-weight: 700;
+  color: var(--color-fg);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  line-height: 0.9;
+  font-size: clamp(3.25rem, 24cqi, 8rem);
+}
+
+.weather-temp-c {
+  color: var(--color-fg-subtle);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(0.75rem, 3cqi, 1.05rem);
+}
+
+.weather-icon {
+  flex-shrink: 0;
+  width: clamp(5rem, 32cqi, 10rem);
+  height: clamp(5rem, 32cqi, 10rem);
+}
+
+.weather-feels {
+  font-size: clamp(0.8rem, 3.2cqi, 1.05rem);
+  color: var(--color-fg-muted);
+  line-height: 1.2;
+}
+
+.weather-stats {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.weather-stat {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.8rem;
+  line-height: 1.15;
+}
+
+.weather-stat-label {
+  font-size: clamp(0.8rem, 3.2cqi, 1.05rem);
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.weather-stat-icon {
+  width: clamp(0.95rem, 3.6cqi, 1.2rem);
+  height: clamp(0.95rem, 3.6cqi, 1.2rem);
+  flex-shrink: 0;
+}
+
+.weather-stat-value {
+  font-size: clamp(1.1rem, 4.6cqi, 1.55rem);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.weather-stat-unit {
+  font-size: 0.7em;
+}
+</style>
