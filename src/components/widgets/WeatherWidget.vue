@@ -162,9 +162,7 @@ onMounted(() => {
       <div class="weather-hero">
         <div class="weather-hero-text">
           <div class="weather-temp-row">
-            <span class="weather-temp"
-              >{{ celsiusToFahrenheit(weatherData.temperature) }}°</span
-            >
+            <span class="weather-temp">{{ celsiusToFahrenheit(weatherData.temperature) }}°</span>
             <span class="weather-temp-c">{{ weatherData.temperature }}°C</span>
           </div>
           <div class="weather-feels">
@@ -245,7 +243,7 @@ onMounted(() => {
         </div>
       </div>
 
-      <div v-if="coordinates && cachedMapImage" class="mt-3 -mx-6">
+      <div v-if="coordinates && cachedMapImage" class="mt-4">
         <img
           :src="cachedMapImage"
           :alt="`Map of ${locationStore.formattedLocation || weatherData.location}`"

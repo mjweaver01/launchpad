@@ -126,11 +126,7 @@ onMounted(() => {
 
   try {
     const savedMode = localStorage.getItem('timeWidget-clockMode');
-    if (
-      savedMode === 'digital' ||
-      savedMode === 'scoreboard' ||
-      savedMode === 'analog'
-    ) {
+    if (savedMode === 'digital' || savedMode === 'scoreboard' || savedMode === 'analog') {
       clockMode.value = savedMode;
     } else {
       // Migrate the older boolean preference key.
@@ -312,6 +308,6 @@ onUnmounted(() => {
   letter-spacing: 0.08em;
   color: var(--color-fg-muted);
   align-self: flex-end;
-  padding-bottom: 0.6em;
+  padding-bottom: 1em;
 }
 </style>
