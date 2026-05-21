@@ -33,18 +33,44 @@ export const useWidgetStore = defineStore('widgets', () => {
   const isDragging = ref(false);
   const dragOverIndex = ref<number | null>(null);
 
+  const defaultWidgetIds = new Set(defaultWidgets.map(w => w.id));
+
+  const getBaseWidgetId = (id: string): string => {
+    const copyMatch = id.match(/^(.+)-copy-\d+$/);
+    return copyMatch ? copyMatch[1] : id;
+  };
+
+  const generateDuplicateId = (sourceId: string): string => {
+    const baseId = getBaseWidgetId(sourceId);
+    let n = 1;
+    while (widgets.value.some(w => w.id === `${baseId}-copy-${n}`)) {
+      n += 1;
+    }
+    return `${baseId}-copy-${n}`;
+  };
+
+  const generateDuplicateName = (source: Widget): string => {
+    const baseName =
+      defaultWidgets.find(w => w.component === source.component)?.name ??
+      source.name.replace(/\s+\(\d+\)$/, '');
+    const count = widgets.value.filter(w => w.component === source.component).length;
+    return `${baseName} (${count + 1})`;
+  };
+
   // Load widgets from localStorage or use defaults
   const loadWidgets = () => {
     try {
       const stored = localStorage.getItem('widget-order');
       if (stored) {
-        const parsedWidgets = JSON.parse(stored);
+        const parsedWidgets = JSON.parse(stored) as Widget[];
         // Ensure all default widgets are present with their latest configuration
-        const updatedWidgets = defaultWidgets.map(defaultWidget => {
-          const storedWidget = parsedWidgets.find((w: Widget) => w.id === defaultWidget.id);
+        const mergedDefaults = defaultWidgets.map(defaultWidget => {
+          const storedWidget = parsedWidgets.find(w => w.id === defaultWidget.id);
           return storedWidget ? { ...defaultWidget, ...storedWidget } : defaultWidget;
         });
-        widgets.value = updatedWidgets.sort((a, b) => a.order - b.order);
+        // Preserve duplicated / custom widget instances
+        const extras = parsedWidgets.filter(w => !defaultWidgetIds.has(w.id));
+        widgets.value = [...mergedDefaults, ...extras].sort((a, b) => a.order - b.order);
       } else {
         widgets.value = [...defaultWidgets];
       }
@@ -109,6 +135,37 @@ export const useWidgetStore = defineStore('widgets', () => {
       const originalWidget = widgets.value.find(w => w.id === widget.id);
       if (originalWidget) {
         originalWidget.order = index;
+      }
+    });
+
+    saveWidgets();
+  };
+
+  const duplicateWidget = (widgetId: string) => {
+    const source = widgets.value.find(w => w.id === widgetId);
+    if (!source) {
+      console.error('Widget not found:', widgetId);
+      return;
+    }
+
+    const combined = [...visibleWidgets.value, ...hiddenWidgets.value];
+    const sourceIndex = combined.findIndex(w => w.id === widgetId);
+    const insertIndex = sourceIndex === -1 ? combined.length : sourceIndex + 1;
+
+    const duplicate: Widget = {
+      id: generateDuplicateId(source.id),
+      name: generateDuplicateName(source),
+      component: source.component,
+      order: 0,
+      visible: true,
+    };
+
+    widgets.value.push(duplicate);
+    combined.splice(insertIndex, 0, duplicate);
+    combined.forEach((widget, index) => {
+      const original = widgets.value.find(w => w.id === widget.id);
+      if (original) {
+        original.order = index;
       }
     });
 
@@ -184,6 +241,7 @@ export const useWidgetStore = defineStore('widgets', () => {
     setDraggedWidget,
     setDragOverIndex,
     reorderWidgets,
+    duplicateWidget,
     toggleWidgetVisibility,
     resetToDefault,
     loadWidgets,

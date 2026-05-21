@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { LayoutGrid, Eye, EyeOff, GripVertical, RotateCcw, Layers } from 'lucide-vue-next';
+import { LayoutGrid, Eye, EyeOff, GripVertical, RotateCcw, Layers, Copy } from 'lucide-vue-next';
 import { useWidgetStore } from '../stores/widgets';
 import DraggableWidget from '../components/widgets/DraggableWidget.vue';
 import TimeWidget from '../components/widgets/TimeWidget.vue';
@@ -44,7 +44,7 @@ const showWidgetManager = ref(false);
           <div>
             <h3 class="text-sm font-semibold text-[color:var(--color-fg)]">Widget Settings</h3>
             <p class="text-xs text-[color:var(--color-fg-muted)] mt-0.5">
-              Drag tiles below — or the widgets themselves — to reorder.
+              Drag to reorder, duplicate with the copy icon, or hide widgets you do not need.
             </p>
           </div>
           <UiButton
@@ -74,14 +74,24 @@ const showWidgetManager = ref(false);
                   {{ widget.name }}
                 </span>
               </div>
-              <button
-                class="ui-icon-btn"
-                :aria-label="`Hide ${widget.name}`"
-                title="Hide"
-                @click="widgetStore.toggleWidgetVisibility(widget.id)"
-              >
-                <Eye />
-              </button>
+              <div class="flex items-center gap-0.5 flex-shrink-0">
+                <button
+                  class="ui-icon-btn"
+                  :aria-label="`Duplicate ${widget.name}`"
+                  title="Duplicate"
+                  @click="widgetStore.duplicateWidget(widget.id)"
+                >
+                  <Copy class="h-4 w-4" />
+                </button>
+                <button
+                  class="ui-icon-btn"
+                  :aria-label="`Hide ${widget.name}`"
+                  title="Hide"
+                  @click="widgetStore.toggleWidgetVisibility(widget.id)"
+                >
+                  <Eye />
+                </button>
+              </div>
             </div>
           </DraggableWidget>
           <DraggableWidget
@@ -100,14 +110,24 @@ const showWidgetManager = ref(false);
                   {{ widget.name }}
                 </span>
               </div>
-              <button
-                class="ui-icon-btn"
-                :aria-label="`Show ${widget.name}`"
-                title="Show"
-                @click="widgetStore.toggleWidgetVisibility(widget.id)"
-              >
-                <EyeOff />
-              </button>
+              <div class="flex items-center gap-0.5 flex-shrink-0">
+                <button
+                  class="ui-icon-btn"
+                  :aria-label="`Duplicate ${widget.name}`"
+                  title="Duplicate"
+                  @click="widgetStore.duplicateWidget(widget.id)"
+                >
+                  <Copy class="h-4 w-4" />
+                </button>
+                <button
+                  class="ui-icon-btn"
+                  :aria-label="`Show ${widget.name}`"
+                  title="Show"
+                  @click="widgetStore.toggleWidgetVisibility(widget.id)"
+                >
+                  <EyeOff />
+                </button>
+              </div>
             </div>
           </DraggableWidget>
         </div>
