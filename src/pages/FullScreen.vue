@@ -72,13 +72,16 @@ onUnmounted(() => {
           :index="index"
           :draggable-active="false"
         >
-          <TimeWidget v-if="widget.component === 'TimeWidget'" />
+          <TimeWidget v-if="widget.component === 'TimeWidget'" :widget-id="widget.id" />
           <WeatherWidget v-else-if="widget.component === 'WeatherWidget'" />
           <NewsWidget v-else-if="widget.component === 'NewsWidget'" />
           <CalendarWidget v-else-if="widget.component === 'CalendarWidget'" />
           <TodoWidget v-else-if="widget.component === 'TodoWidget'" />
           <SearchWidget v-else-if="widget.component === 'SearchWidget'" />
-          <WaterReminderWidget v-else-if="widget.component === 'WaterReminderWidget'" />
+          <WaterReminderWidget
+            v-else-if="widget.component === 'WaterReminderWidget'"
+            :widget-id="widget.id"
+          />
         </DraggableWidget>
       </div>
 

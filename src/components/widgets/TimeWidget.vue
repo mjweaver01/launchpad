@@ -1,18 +1,29 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
 import { Clock, Watch, LayoutGrid, MapPin } from 'lucide-vue-next';
-import { useLocationStore, useWeatherStore } from '../../stores';
+import { useLocationStore, useWeatherStore, useWidgetSettingsStore } from '../../stores';
+import type { TimeClockMode } from '../../stores/widgetSettings';
 import WidgetCard from './WidgetCard.vue';
 import IconButton from '../ui/IconButton.vue';
 import FlipDigit from './FlipDigit.vue';
 
-type ClockMode = 'digital' | 'scoreboard' | 'analog';
+const props = withDefaults(
+  defineProps<{
+    widgetId?: string;
+  }>(),
+  {
+    widgetId: 'time',
+  }
+);
+
+type ClockMode = TimeClockMode;
 const CLOCK_MODE_ORDER: ClockMode[] = ['digital', 'scoreboard', 'analog'];
 
 const locationStore = useLocationStore();
 const weatherStore = useWeatherStore();
+const widgetSettingsStore = useWidgetSettingsStore();
 const currentTime = ref(new Date());
-const clockMode = ref<ClockMode>('digital');
+const clockMode = ref<ClockMode>(widgetSettingsStore.getTimeSettings(props.widgetId).clockMode);
 let intervalId: ReturnType<typeof setInterval> | null = null;
 
 const formattedTime = computed(() =>
@@ -93,7 +104,7 @@ const nextModeLabel = computed(() => {
 
 const cycleClockMode = () => {
   clockMode.value = nextClockMode.value;
-  localStorage.setItem('timeWidget-clockMode', clockMode.value);
+  widgetSettingsStore.setTimeSettings(props.widgetId, { clockMode: clockMode.value });
 };
 
 const loadLocationData = async () => {
@@ -124,21 +135,7 @@ onMounted(() => {
   locationStore.initializeFromStorage();
   weatherStore.initializeFromStorage();
 
-  try {
-    const savedMode = localStorage.getItem('timeWidget-clockMode');
-    if (savedMode === 'digital' || savedMode === 'scoreboard' || savedMode === 'analog') {
-      clockMode.value = savedMode;
-    } else {
-      // Migrate the older boolean preference key.
-      const legacy = localStorage.getItem('timeWidget-analogClock');
-      if (legacy && JSON.parse(legacy)) {
-        clockMode.value = 'analog';
-        localStorage.setItem('timeWidget-clockMode', 'analog');
-      }
-    }
-  } catch (error) {
-    console.warn('Failed to load clock type preference:', error);
-  }
+  clockMode.value = widgetSettingsStore.getTimeSettings(props.widgetId).clockMode;
 
   intervalId = setInterval(() => {
     currentTime.value = new Date();

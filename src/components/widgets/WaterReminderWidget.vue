@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { Droplet, Settings, Check, AlertCircle } from 'lucide-vue-next';
-import { useWaterReminderStore } from '../../stores';
+import { useWaterReminderInstance } from '../../composables/useWaterReminderInstance';
 import type { WaterReminder } from '../../stores/types';
 import WidgetCard from './WidgetCard.vue';
 import IconButton from '../ui/IconButton.vue';
@@ -9,7 +9,28 @@ import UiButton from '../ui/UiButton.vue';
 import UiPill from '../ui/UiPill.vue';
 import EmptyState from '../ui/EmptyState.vue';
 
-const waterStore = useWaterReminderStore();
+const props = withDefaults(
+  defineProps<{
+    widgetId?: string;
+  }>(),
+  {
+    widgetId: 'water-reminder',
+  }
+);
+
+const {
+  data: waterData,
+  error: waterError,
+  todayCompletedOunces,
+  completionPercentage,
+  nextReminder,
+  overdueReminders,
+  initialize,
+  updateSettings,
+  completeReminder,
+  uncompleteReminder,
+  resetDailyProgress: resetWaterDay,
+} = useWaterReminderInstance(props.widgetId);
 const showSettings = ref(false);
 
 const localWeight = ref(175);
@@ -24,7 +45,7 @@ const isOverdue = (time: string): boolean => {
 };
 
 const sortedReminders = computed(() => {
-  return [...waterStore.data.reminders].sort((a, b) => {
+  return [...waterData.value.reminders].sort((a, b) => {
     if (a.completed !== b.completed) return a.completed ? 1 : -1;
     if (!a.completed && !b.completed) {
       const aOverdue = isOverdue(a.time);
@@ -42,37 +63,37 @@ const formatTime = (timestamp: number) =>
     hour12: true,
   });
 
-const updateWeight = () => waterStore.updateSettings({ weight: localWeight.value });
+const updateWeight = () => updateSettings({ weight: localWeight.value });
 const updateTimeSettings = () =>
-  waterStore.updateSettings({ startTime: localStartTime.value, endTime: localEndTime.value });
-const updateInterval = () => waterStore.updateSettings({ reminderInterval: localInterval.value });
+  updateSettings({ startTime: localStartTime.value, endTime: localEndTime.value });
+const updateInterval = () => updateSettings({ reminderInterval: localInterval.value });
 
 const toggleReminder = (reminder: WaterReminder) => {
-  if (reminder.completed) waterStore.uncompleteReminder(reminder.id);
-  else waterStore.completeReminder(reminder.id);
+  if (reminder.completed) uncompleteReminder(reminder.id);
+  else completeReminder(reminder.id);
 };
 
 const completeAllOverdueReminders = () => {
-  waterStore.overdueReminders.forEach(r => {
-    if (!r.completed) waterStore.completeReminder(r.id);
+  overdueReminders.value.forEach(r => {
+    if (!r.completed) completeReminder(r.id);
   });
 };
 
 const resetDailyProgress = () => {
   if (confirm("Are you sure you want to reset today's progress?")) {
-    waterStore.resetDailyProgress();
+    resetWaterDay();
   }
 };
 
 const syncLocalState = () => {
-  localWeight.value = waterStore.data.settings.weight;
-  localStartTime.value = waterStore.data.settings.startTime;
-  localEndTime.value = waterStore.data.settings.endTime;
-  localInterval.value = waterStore.data.settings.reminderInterval;
+  localWeight.value = waterData.value.settings.weight;
+  localStartTime.value = waterData.value.settings.startTime;
+  localEndTime.value = waterData.value.settings.endTime;
+  localInterval.value = waterData.value.settings.reminderInterval;
 };
 
 onMounted(() => {
-  waterStore.initializeFromStorage();
+  initialize();
   syncLocalState();
 });
 </script>
@@ -111,7 +132,7 @@ onMounted(() => {
         <div class="mb-4 text-sm">
           <span class="text-[color:var(--color-fg-muted)]">Daily Goal:</span>
           <span class="font-semibold text-[color:var(--color-brand-700)] dark:text-[color:var(--color-brand-400)] ml-1 tabular-nums">
-            {{ waterStore.data.settings.dailyGoal }} oz
+            {{ waterData.settings.dailyGoal }} oz
           </span>
         </div>
 
@@ -158,10 +179,10 @@ onMounted(() => {
     </Transition>
 
     <div
-      v-if="waterStore.error"
+      v-if="waterError"
       class="mb-4 rounded-lg border border-[color:var(--color-danger-soft)] bg-[color:var(--color-danger-soft)] text-[color:var(--color-danger)] p-3 text-sm"
     >
-      {{ waterStore.error }}
+      {{ waterError }}
     </div>
 
     <!-- Progress -->
@@ -169,27 +190,27 @@ onMounted(() => {
       <div class="flex items-center justify-between text-xs text-[color:var(--color-fg-muted)] mb-1.5">
         <span>Daily progress</span>
         <span class="tabular-nums">
-          {{ waterStore.todayCompletedOunces }} / {{ waterStore.data.settings.dailyGoal }} oz
+          {{ todayCompletedOunces }} / {{ waterData.settings.dailyGoal }} oz
         </span>
       </div>
       <div class="w-full bg-[color:var(--color-surface-2)] rounded-full h-2 overflow-hidden">
         <div
           class="h-full rounded-full bg-[color:var(--color-brand-600)] transition-all duration-500 ease-out"
-          :style="{ width: `${waterStore.completionPercentage}%` }"
+          :style="{ width: `${completionPercentage}%` }"
         ></div>
       </div>
       <div
         class="text-center mt-2 text-2xl font-bold text-[color:var(--color-brand-700)] dark:text-[color:var(--color-brand-400)] tabular-nums"
       >
-        {{ waterStore.completionPercentage }}%
+        {{ completionPercentage }}%
       </div>
     </div>
 
     <!-- Next reminder -->
     <button
-      v-if="waterStore.nextReminder"
+      v-if="nextReminder"
       class="mb-3 w-full text-left rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] hover:bg-[color:var(--color-surface-3)] transition-colors p-3 flex items-center gap-3"
-      @click="toggleReminder(waterStore.nextReminder)"
+      @click="nextReminder && toggleReminder(nextReminder)"
     >
       <div
         class="flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--color-brand-100)] dark:bg-[color:var(--color-brand-900)]"
@@ -202,24 +223,24 @@ onMounted(() => {
       <div class="flex-1 min-w-0">
         <div class="text-sm font-medium text-[color:var(--color-fg)]">Next reminder</div>
         <div class="text-xs text-[color:var(--color-fg-muted)] tabular-nums">
-          {{ waterStore.nextReminder.time }} · {{ waterStore.nextReminder.amount }} oz
+          {{ nextReminder.time }} · {{ nextReminder.amount }} oz
         </div>
       </div>
     </button>
 
     <!-- Overdue alert -->
     <div
-      v-if="waterStore.overdueReminders.length > 0"
+      v-if="overdueReminders.length > 0"
       class="mb-3 rounded-xl border border-[color:var(--color-warning-soft)] bg-[color:var(--color-warning-soft)] p-3 flex items-center gap-3"
     >
       <AlertCircle class="h-5 w-5 text-[color:var(--color-warning)] flex-shrink-0" />
       <div class="flex-1 min-w-0">
         <div class="text-sm font-medium text-[color:var(--color-fg)]">
-          {{ waterStore.overdueReminders.length }} overdue reminder{{ waterStore.overdueReminders.length > 1 ? 's' : '' }}
+          {{ overdueReminders.length }} overdue reminder{{ overdueReminders.length > 1 ? 's' : '' }}
         </div>
       </div>
       <UiButton
-        v-if="waterStore.overdueReminders.length > 1"
+        v-if="overdueReminders.length > 1"
         variant="primary"
         size="sm"
         @click="completeAllOverdueReminders"
@@ -234,7 +255,7 @@ onMounted(() => {
     </h3>
 
     <EmptyState
-      v-if="waterStore.data.reminders.length === 0"
+      v-if="waterData.reminders.length === 0"
       :icon="Droplet"
       title="No reminders configured"
       description="Adjust your settings to start getting reminders."
@@ -297,7 +318,7 @@ onMounted(() => {
       </div>
     </TransitionGroup>
 
-    <div v-if="waterStore.data.reminders.length > 0" class="mt-5 pt-4 border-t border-[color:var(--color-border)]">
+    <div v-if="waterData.reminders.length > 0" class="mt-5 pt-4 border-t border-[color:var(--color-border)]">
       <UiButton variant="ghost" size="sm" block @click="resetDailyProgress">
         Reset day
       </UiButton>

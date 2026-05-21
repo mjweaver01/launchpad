@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
+import { useWidgetSettingsStore } from './widgetSettings';
 
 export interface Widget {
   id: string;
@@ -169,6 +170,7 @@ export const useWidgetStore = defineStore('widgets', () => {
       }
     });
 
+    useWidgetSettingsStore().copySettings(source.id, duplicate.id);
     saveWidgets();
   };
 
@@ -204,6 +206,7 @@ export const useWidgetStore = defineStore('widgets', () => {
 
       // Clear localStorage
       localStorage.removeItem('widget-order');
+      useWidgetSettingsStore().pruneToWidgetIds(defaultWidgetIds);
 
       // Reset widgets to default configuration with fresh copies
       widgets.value.splice(

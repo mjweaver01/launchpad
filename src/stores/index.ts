@@ -7,6 +7,8 @@ export { useSearchStore } from './search';
 export { useCalendarStore } from './calendar';
 export { useWaterReminderStore } from './waterReminder';
 export { useWidgetStore } from './widgets';
+export { useWidgetSettingsStore } from './widgetSettings';
+export type { TimeClockMode, TimeWidgetSettings } from './widgetSettings';
 export { useDarkModeStore } from './darkMode';
 export { useRedHueStore } from './redHue';
 export { useAutoThemeStore } from './autoTheme';

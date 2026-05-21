@@ -30,11 +30,25 @@ const currentWidget = computed(() => {
   const widgetName = (route.params.name as string)?.toLowerCase();
   return widgetMap[widgetName as keyof typeof widgetMap] || null;
 });
+
+const widgetInstanceId = computed(() => {
+  const widgetName = (route.params.name as string)?.toLowerCase();
+  if (widgetName === 'water') return 'water-reminder';
+  return widgetName ?? 'time';
+});
+
+const widgetInstanceProps = computed(() => {
+  const widgetName = (route.params.name as string)?.toLowerCase();
+  if (widgetName === 'time' || widgetName === 'water' || widgetName === 'water-reminder') {
+    return { widgetId: widgetInstanceId.value };
+  }
+  return {};
+});
 </script>
 
 <template>
   <main class="mx-auto max-w-4xl px-4 sm:px-6 py-6">
-    <component :is="currentWidget" v-if="currentWidget" class="w-full" />
+    <component :is="currentWidget" v-if="currentWidget" v-bind="widgetInstanceProps" class="w-full" />
     <div
       v-else
       class="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8"
