@@ -180,8 +180,10 @@ onMounted(() => {
         <div
           class="weather-stat rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]"
         >
-          <Droplets class="weather-stat-icon text-[color:var(--color-fg-muted)]" />
-          <span class="weather-stat-label text-[color:var(--color-fg-muted)]">Humidity</span>
+          <div class="weather-stat-head">
+            <Droplets class="weather-stat-icon text-[color:var(--color-fg-muted)]" />
+            <span class="weather-stat-label text-[color:var(--color-fg-muted)]">Humidity</span>
+          </div>
           <span class="weather-stat-value font-semibold text-[color:var(--color-fg)] tabular-nums">
             {{ weatherData.humidity }}%
           </span>
@@ -189,8 +191,10 @@ onMounted(() => {
         <div
           class="weather-stat rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]"
         >
-          <Wind class="weather-stat-icon text-[color:var(--color-fg-muted)]" />
-          <span class="weather-stat-label text-[color:var(--color-fg-muted)]">Wind</span>
+          <div class="weather-stat-head">
+            <Wind class="weather-stat-icon text-[color:var(--color-fg-muted)]" />
+            <span class="weather-stat-label text-[color:var(--color-fg-muted)]">Wind</span>
+          </div>
           <span class="weather-stat-value font-semibold text-[color:var(--color-fg)] tabular-nums">
             {{ weatherData.windSpeed }}<span class="weather-stat-unit font-normal"> m/s</span>
           </span>
@@ -323,37 +327,60 @@ onMounted(() => {
 }
 
 .weather-stats {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.5rem;
   margin-top: 1rem;
 }
 
+/* Very narrow cards: give each stat the full row so labels never truncate. */
+@container (max-width: 15rem) {
+  .weather-stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Label sits above the value so the two never compete for width —
+   side-by-side they collided on narrow cards. */
 .weather-stat {
-  flex: 1 1 0;
   min-width: 0;
   display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.6rem 0.85rem 0.65rem;
+}
+
+.weather-stat-head {
+  display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.55rem 0.8rem;
-  line-height: 1.15;
+  gap: 0.375rem;
+  min-width: 0;
 }
 
 .weather-stat-label {
-  font-size: clamp(0.8rem, 3.2cqi, 1.05rem);
-  flex: 1 1 auto;
-  min-width: 0;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .weather-stat-icon {
-  width: clamp(0.95rem, 3.6cqi, 1.2rem);
-  height: clamp(0.95rem, 3.6cqi, 1.2rem);
+  width: 0.875rem;
+  height: 0.875rem;
   flex-shrink: 0;
 }
 
 .weather-stat-value {
-  font-size: clamp(1.1rem, 4.6cqi, 1.55rem);
-  flex-shrink: 0;
+  font-size: clamp(1.15rem, 5cqi, 1.6rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .weather-stat-unit {
