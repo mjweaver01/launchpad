@@ -48,7 +48,24 @@ const hideControls = () => {
 
 // Tap anywhere on the backdrop toggles the controls (touch devices have no
 // mousemove). Taps inside widgets or the control bar are left alone.
+// Browser fullscreen hides the URL bar and Android's system bars even in a
+// normal Chrome tab. Browsers only allow it from a tap, and drop it when the
+// app is backgrounded, so every tap re-requests it if it isn't active.
+// The installed app already launches fullscreen (manifest), so skip it there.
+const enterBrowserFullscreen = () => {
+  if (document.fullscreenElement || !document.fullscreenEnabled) return;
+  if (window.matchMedia('(display-mode: fullscreen)').matches) return;
+  document.documentElement.requestFullscreen({ navigationUI: 'hide' }).catch(() => {
+    /* denied or unsupported: the page still works in a normal window */
+  });
+};
+
+const exitBrowserFullscreen = () => {
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+};
+
 const handleBackdropPointer = (event: PointerEvent) => {
+  enterBrowserFullscreen();
   const target = event.target as HTMLElement | null;
   if (target?.closest('[data-fs-controls]')) return;
   if (target?.closest('button, a, input, select, textarea, [role="button"]')) return;
@@ -62,6 +79,7 @@ const handleMouseMove = () => {
 
 const exitFullScreen = () => {
   fullScreenStore.remember(false);
+  exitBrowserFullscreen();
   router.push('/');
 };
 
@@ -92,6 +110,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+  exitBrowserFullscreen();
   document.removeEventListener('keydown', handleKeydown);
   if (controlsTimeout) clearTimeout(controlsTimeout);
 });
@@ -196,6 +215,19 @@ onUnmounted(() => {
   overflow: hidden;
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
     env(safe-area-inset-left);
+}
+
+/* Hide scrollbars in full screen; content still scrolls by swipe. Older
+   Android Chrome/WebView draws permanent scrollbars instead of fading ones.
+   scrollbar-width covers Chrome 121+ and Firefox; ::-webkit-scrollbar covers
+   older Chrome/WebView. :deep reaches into the widget components. */
+.fs-root,
+.fs-root :deep(*) {
+  scrollbar-width: none;
+}
+.fs-root::-webkit-scrollbar,
+.fs-root :deep(*::-webkit-scrollbar) {
+  display: none;
 }
 
 .fs-stage {

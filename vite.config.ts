@@ -18,7 +18,10 @@ export default defineConfig({
         description: 'Personal dashboard: clock, weather, news, calendar and tasks.',
         theme_color: '#000000',
         background_color: '#000000',
-        display: 'standalone',
+        // fullscreen hides Android's status bar and navigation buttons when
+        // launched from the home screen; browsers without it fall back to standalone.
+        display: 'fullscreen',
+        display_override: ['fullscreen', 'standalone'],
         orientation: 'any',
         start_url: '/',
         icons: [
