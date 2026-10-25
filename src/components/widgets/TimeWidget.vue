@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed, watch, nextTick } from 'vue';
-import { useRoute } from 'vue-router';
-import { Clock, Watch, SquareSplitVertical, MapPin, Settings2 } from 'lucide-vue-next';
+import { Clock, Watch, SquareSplitVertical, MapPin, Settings2, Copy } from 'lucide-vue-next';
 import {
   useAppFontStore,
   useLocationStore,
   useWeatherStore,
   useWidgetSettingsStore,
+  useWidgetStore,
 } from '../../stores';
 import type { TimeClockMode, TimeWidgetSettings } from '../../stores/widgetSettings';
 import { fontSelectOptions, getFont } from '../../assets/fonts';
@@ -34,7 +34,6 @@ const CLOCK_MODE_ORDER: ClockMode[] = ['digital', 'scoreboard', 'analog'];
 const locationStore = useLocationStore();
 const weatherStore = useWeatherStore();
 const widgetSettingsStore = useWidgetSettingsStore();
-const route = useRoute();
 const currentTime = ref(new Date());
 const settings = ref<TimeWidgetSettings>(widgetSettingsStore.getTimeSettings(props.widgetId));
 const clockMode = computed(() => settings.value.clockMode);
@@ -45,13 +44,19 @@ const appFontStore = useAppFontStore();
 const clockFont = computed(() =>
   getFont(settings.value.font === 'app' ? appFontStore.fontId : settings.value.font)
 );
-const isFullScreen = computed(() => route.name === 'Full Screen');
 const settingsPopover = usePopover();
 let intervalId: ReturnType<typeof setInterval> | null = null;
 
 const updateSettings = (patch: Partial<TimeWidgetSettings>) => {
   settings.value = { ...settings.value, ...patch };
   widgetSettingsStore.setTimeSettings(props.widgetId, patch);
+};
+
+const widgetStore = useWidgetStore();
+
+const duplicate = () => {
+  widgetStore.duplicateWidget(props.widgetId);
+  settingsPopover.close();
 };
 
 // Time only: big rounded digits, no seconds, AM/PM, date or location.
@@ -246,65 +251,51 @@ onUnmounted(() => {
       <IconButton :icon="nextModeIcon" :label="nextModeLabel" @click="cycleClockMode" />
     </template>
 
-    <template v-if="clockMode === 'digital'">
-      <!-- Fluid time: SVG text scales uniformly to fill card width without distortion -->
-      <div class="w-full">
-        <svg
-          class="block w-full"
-          :class="{ 'max-h-[70dvh]': isFullScreen }"
-          :viewBox="digitalViewBox"
-          preserveAspectRatio="xMidYMid meet"
-          :aria-label="`Current time ${formattedTime}`"
+    <!-- Every clock style fills this box (see .clock-fit) -->
+    <div class="clock-fit">
+      <svg
+        v-if="clockMode === 'digital'"
+        class="clock-svg"
+        :viewBox="digitalViewBox"
+        preserveAspectRatio="xMidYMid meet"
+        :aria-label="`Current time ${formattedTime}`"
+      >
+        <!-- x/y at the origin: the viewBox is fitted to this text's measured box -->
+        <text
+          ref="digitalText"
+          x="0"
+          y="0"
+          class="fill-fg"
+          font-size="100"
+          :font-weight="clockFont.clock.weight"
+          :style="{
+            fontFamily: clockFont.stack,
+            letterSpacing: clockFont.clock.letterSpacing,
+            fontVariantNumeric: 'tabular-nums',
+          }"
         >
-          <!-- x/y at the origin: the viewBox is fitted to this text's measured box -->
-          <text
-            ref="digitalText"
-            x="0"
-            y="0"
-            class="fill-fg"
-            font-size="100"
-            :font-weight="clockFont.clock.weight"
-            :style="{
-              fontFamily: clockFont.stack,
-              letterSpacing: clockFont.clock.letterSpacing,
-              fontVariantNumeric: 'tabular-nums',
-            }"
-          >
-            <tspan>{{ digitalParts.time }}</tspan>
-            <tspan v-if="digitalParts.period" :dx="PERIOD_GAP">{{ digitalParts.period }}</tspan>
-          </text>
-        </svg>
-      </div>
-      <div
-        v-if="settings.showDate"
-        class="text-sm sm:text-base text-fg-muted mt-2 truncate max-w-full"
-      >
-        {{ formattedDate }}
-      </div>
-    </template>
+          <tspan>{{ digitalParts.time }}</tspan>
+          <tspan v-if="digitalParts.period" :dx="PERIOD_GAP">{{ digitalParts.period }}</tspan>
+        </text>
+      </svg>
 
-    <template v-else-if="clockMode === 'scoreboard'">
-      <div class="scoreboard-wrap">
-        <div class="scoreboard" aria-label="Current time">
-          <FlipDigit :value="scoreboardParts.h1" />
-          <FlipDigit :value="scoreboardParts.h2" />
-          <span class="scoreboard-colon" aria-hidden="true">:</span>
-          <FlipDigit :value="scoreboardParts.m1" />
-          <FlipDigit :value="scoreboardParts.m2" />
-          <span v-if="showPeriod" class="scoreboard-period">{{ scoreboardParts.period }}</span>
-        </div>
-      </div>
       <div
-        v-if="settings.showDate"
-        class="text-sm sm:text-base text-fg-muted mt-3 truncate max-w-full"
+        v-else-if="clockMode === 'scoreboard'"
+        class="scoreboard"
+        :class="{ 'has-period': showPeriod }"
+        aria-label="Current time"
       >
-        {{ formattedDate }}
+        <FlipDigit :value="scoreboardParts.h1" />
+        <FlipDigit :value="scoreboardParts.h2" />
+        <span class="scoreboard-colon" aria-hidden="true">:</span>
+        <FlipDigit :value="scoreboardParts.m1" />
+        <FlipDigit :value="scoreboardParts.m2" />
+        <span v-if="showPeriod" class="scoreboard-period">{{ scoreboardParts.period }}</span>
       </div>
-    </template>
 
-    <template v-else>
-      <div class="relative aspect-square w-full max-w-[min(80%,16rem)]">
-        <svg class="w-full h-full -rotate-90" viewBox="0 0 200 200">
+      <svg v-else class="clock-svg" viewBox="0 0 200 200" aria-label="Current time">
+        <!-- Rotated inside the drawing, not with CSS, so a non-square box can't overflow -->
+        <g transform="rotate(-90 100 100)">
           <circle cx="100" cy="100" r="98" class="fill-surface stroke-border" stroke-width="2" />
           <g v-for="hour in 12" :key="hour" class="text-fg-muted">
             <line
@@ -344,10 +335,16 @@ onUnmounted(() => {
             stroke-linecap="round"
           />
           <circle cx="100" cy="100" r="5" class="fill-fg" />
-        </svg>
-      </div>
-      <div v-if="settings.showDate" class="text-sm text-fg-muted mt-3">{{ formattedDate }}</div>
-    </template>
+        </g>
+      </svg>
+    </div>
+
+    <div
+      v-if="settings.showDate"
+      class="text-sm sm:text-base text-fg-muted mt-2 truncate max-w-full"
+    >
+      {{ formattedDate }}
+    </div>
 
     <div
       v-if="settings.showLocation && locationStore.formattedLocation"
@@ -401,18 +398,44 @@ onUnmounted(() => {
           :model-value="settings.showLocation"
           @update:model-value="v => updateSettings({ showLocation: v })"
         />
-        <UiButton variant="secondary" size="sm" @click="applyTimeOnlyPreset"> Time only </UiButton>
+        <div class="flex gap-2">
+          <UiButton variant="secondary" size="sm" @click="applyTimeOnlyPreset">Time only</UiButton>
+          <UiButton variant="secondary" size="sm" :leading-icon="Copy" @click="duplicate">
+            Duplicate
+          </UiButton>
+        </div>
       </div>
     </Popover>
   </WidgetCard>
 </template>
 
 <style scoped>
-.scoreboard-wrap {
-  container-type: inline-size;
+/* All clock styles fill this box: the card body's free space. A size
+   container lets each style scale from both width and height (cqw/cqh), so
+   the clock grows wide or small with its card and fills full screen.
+   On the phone dashboard cards have no set height, where a size container
+   would collapse to zero, hence the min-height there. From 768px up the card
+   always has a height (dashboard grid, full screen, widget page), so the
+   clock can shrink with a small card instead of overflowing it. */
+.clock-fit {
+  container-type: size;
+  flex: 1 1 auto;
   width: 100%;
+  min-height: 10rem;
   display: flex;
+  align-items: center;
   justify-content: center;
+}
+@media (min-width: 768px) {
+  .clock-fit {
+    min-height: 2rem;
+  }
+}
+
+.clock-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .scoreboard {
@@ -422,13 +445,16 @@ onUnmounted(() => {
   gap: 0.12em;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-weight: 700;
-  /* Scale with the parent card width via container queries.
-     Total content is ~4.2em wide (4 digits + colon + period + gaps),
-     so ~22cqi fills the card while clamp() keeps it sane on tiny/huge layouts. */
-  font-size: clamp(2.25rem, 22cqi, 7rem);
+  /* Four digits and the colon are about 4.1em wide (4.9em with AM/PM) and
+     1em tall: fit whichever of width or height runs out first. */
+  font-size: min(23cqw, 80cqh);
   line-height: 1;
   color: var(--color-fg);
   letter-spacing: 0;
+}
+
+.scoreboard.has-period {
+  font-size: min(19cqw, 80cqh);
 }
 
 .scoreboard-colon {

@@ -8,7 +8,52 @@ export interface Widget {
   component: string;
   order: number;
   visible: boolean;
+  /** Desktop dashboard width in grid columns; unset uses the default. */
+  colSpan?: number;
+  /** Desktop dashboard height in grid rows; unset uses the default for the widget type. */
+  rowSpan?: number;
 }
+
+export interface WidgetSize {
+  colSpan: number;
+  rowSpan: number;
+}
+
+/** Column spans on the six-column desktop dashboard: a third, half, two thirds or full width. */
+export const COLUMN_SPANS = [2, 3, 4, 6] as const;
+// Three rows is the least that fits a card header, padding and a line of content.
+export const ROW_SPAN_LIMITS = { min: 3, max: 16 } as const;
+
+const DEFAULT_COL_SPAN = 2;
+// Heights close to the old auto-sized cards, in grid rows.
+const DEFAULT_ROW_SPANS: Record<string, number> = {
+  TimeWidget: 4,
+  SearchWidget: 6,
+};
+const FALLBACK_ROW_SPAN = 7;
+
+/** Nearest allowed column span for a width measured in columns. */
+export const snapColSpan = (columns: number): number =>
+  COLUMN_SPANS.reduce((best, span) =>
+    Math.abs(span - columns) < Math.abs(best - columns) ? span : best
+  );
+
+export const clampRowSpan = (rows: number): number =>
+  Math.min(ROW_SPAN_LIMITS.max, Math.max(ROW_SPAN_LIMITS.min, Math.round(rows)));
+
+export const defaultWidgetSize = (component: string): WidgetSize => ({
+  colSpan: DEFAULT_COL_SPAN,
+  rowSpan: DEFAULT_ROW_SPANS[component] ?? FALLBACK_ROW_SPAN,
+});
+
+/** A widget's size, falling back to the defaults for its type. */
+export const getWidgetSize = (widget: Widget): WidgetSize => {
+  const defaults = defaultWidgetSize(widget.component);
+  return {
+    colSpan: widget.colSpan ? snapColSpan(widget.colSpan) : defaults.colSpan,
+    rowSpan: widget.rowSpan ? clampRowSpan(widget.rowSpan) : defaults.rowSpan,
+  };
+};
 
 export const useWidgetStore = defineStore('widgets', () => {
   // Default widget configuration
@@ -159,6 +204,8 @@ export const useWidgetStore = defineStore('widgets', () => {
       component: source.component,
       order: 0,
       visible: true,
+      colSpan: source.colSpan,
+      rowSpan: source.rowSpan,
     };
 
     widgets.value.push(duplicate);
@@ -195,6 +242,26 @@ export const useWidgetStore = defineStore('widgets', () => {
     } else {
       console.error('Widget not found:', widgetId);
     }
+  };
+
+  const resizeWidget = (widgetId: string, size: WidgetSize) => {
+    const widget = widgets.value.find(w => w.id === widgetId);
+    if (!widget) return;
+    const colSpan = snapColSpan(size.colSpan);
+    const rowSpan = clampRowSpan(size.rowSpan);
+    if (widget.colSpan === colSpan && widget.rowSpan === rowSpan) return;
+    widget.colSpan = colSpan;
+    widget.rowSpan = rowSpan;
+    saveWidgets();
+  };
+
+  /** Back to the default size for the widget's type. */
+  const resetWidgetSize = (widgetId: string) => {
+    const widget = widgets.value.find(w => w.id === widgetId);
+    if (!widget) return;
+    delete widget.colSpan;
+    delete widget.rowSpan;
+    saveWidgets();
   };
 
   const resetToDefault = () => {
@@ -245,6 +312,8 @@ export const useWidgetStore = defineStore('widgets', () => {
     setDragOverIndex,
     reorderWidgets,
     duplicateWidget,
+    resizeWidget,
+    resetWidgetSize,
     toggleWidgetVisibility,
     resetToDefault,
     loadWidgets,

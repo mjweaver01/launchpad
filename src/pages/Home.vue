@@ -1,20 +1,25 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { LayoutGrid, Eye, EyeOff, GripVertical, RotateCcw, Layers, Copy } from 'lucide-vue-next';
-import { useWidgetStore } from '../stores/widgets';
+import { ref, computed } from 'vue';
+import { LayoutGrid, Eye, EyeOff, GripVertical, RotateCcw, Layers } from 'lucide-vue-next';
+import { useWidgetStore, getWidgetSize } from '../stores/widgets';
 import DraggableWidget from '../components/widgets/DraggableWidget.vue';
-import TimeWidget from '../components/widgets/TimeWidget.vue';
-import WeatherWidget from '../components/widgets/WeatherWidget.vue';
-import NewsWidget from '../components/widgets/NewsWidget.vue';
-import TodoWidget from '../components/widgets/TodoWidget.vue';
-import SearchWidget from '../components/widgets/SearchWidget.vue';
-import CalendarWidget from '../components/widgets/CalendarWidget.vue';
-import WaterReminderWidget from '../components/widgets/WaterReminderWidget.vue';
+import WidgetView from '../components/widgets/WidgetView.vue';
 import UiButton from '../components/ui/UiButton.vue';
 import EmptyState from '../components/ui/EmptyState.vue';
 
 const widgetStore = useWidgetStore();
 const showWidgetManager = ref(false);
+
+// Visible first, then hidden: the same order (and indexes) the store reorders by.
+const managedWidgets = computed(() => [
+  ...widgetStore.visibleWidgets,
+  ...widgetStore.hiddenWidgets,
+]);
+
+const sizeStyle = (widget: (typeof widgetStore.widgets)[number]) => {
+  const { colSpan, rowSpan } = getWidgetSize(widget);
+  return { '--col-span': colSpan, '--row-span': rowSpan };
+};
 </script>
 
 <template>
@@ -34,7 +39,7 @@ const showWidgetManager = ref(false);
       </UiButton>
     </div>
 
-    <!-- Widget Manager -->
+    <!-- Widget manager: order and visibility -->
     <Transition name="ui-collapse">
       <section
         v-if="showWidgetManager"
@@ -42,10 +47,8 @@ const showWidgetManager = ref(false);
       >
         <div class="flex items-center justify-between mb-4">
           <div>
-            <h3 class="text-sm font-semibold text-fg">Widget Settings</h3>
-            <p class="text-xs text-fg-muted mt-0.5">
-              Drag to reorder, duplicate with the copy icon, or hide widgets you do not need.
-            </p>
+            <h3 class="text-sm font-semibold text-fg">Widgets</h3>
+            <p class="text-xs text-fg-muted mt-0.5">Drag to reorder, and show or hide widgets.</p>
           </div>
           <UiButton
             variant="danger"
@@ -59,100 +62,56 @@ const showWidgetManager = ref(false);
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
           <DraggableWidget
-            v-for="(widget, index) in widgetStore.visibleWidgets"
+            v-for="(widget, index) in managedWidgets"
             :key="widget.id"
             :widget-id="widget.id"
             :index="index"
-            :draggable-active="showWidgetManager"
+            draggable-active
           >
             <div
-              class="flex items-center justify-between rounded-lg border border-border bg-surface px-3 py-2"
+              class="flex items-center justify-between rounded-lg border px-3 py-2"
+              :class="
+                widget.visible
+                  ? 'border-border bg-surface'
+                  : 'border-dashed border-border bg-surface-2 opacity-70'
+              "
             >
               <div class="flex items-center gap-2 min-w-0">
                 <GripVertical class="h-4 w-4 text-fg-subtle shrink-0" />
-                <span class="text-sm font-medium text-fg truncate">
+                <span
+                  class="text-sm font-medium truncate"
+                  :class="widget.visible ? 'text-fg' : 'text-fg-muted'"
+                >
                   {{ widget.name }}
                 </span>
               </div>
-              <div class="flex items-center gap-0.5 shrink-0">
-                <button
-                  class="ui-icon-btn"
-                  :aria-label="`Duplicate ${widget.name}`"
-                  title="Duplicate"
-                  @click="widgetStore.duplicateWidget(widget.id)"
-                >
-                  <Copy class="h-4 w-4" />
-                </button>
-                <button
-                  class="ui-icon-btn"
-                  :aria-label="`Hide ${widget.name}`"
-                  title="Hide"
-                  @click="widgetStore.toggleWidgetVisibility(widget.id)"
-                >
-                  <Eye />
-                </button>
-              </div>
-            </div>
-          </DraggableWidget>
-          <DraggableWidget
-            v-for="(widget, index) in widgetStore.hiddenWidgets"
-            :key="widget.id"
-            :widget-id="widget.id"
-            :index="widgetStore.visibleWidgets.length + index"
-            :draggable-active="showWidgetManager"
-          >
-            <div
-              class="flex items-center justify-between rounded-lg border border-dashed border-border bg-surface-2 px-3 py-2 opacity-70"
-            >
-              <div class="flex items-center gap-2 min-w-0">
-                <GripVertical class="h-4 w-4 text-fg-subtle shrink-0" />
-                <span class="text-sm font-medium text-fg-muted truncate">
-                  {{ widget.name }}
-                </span>
-              </div>
-              <div class="flex items-center gap-0.5 shrink-0">
-                <button
-                  class="ui-icon-btn"
-                  :aria-label="`Duplicate ${widget.name}`"
-                  title="Duplicate"
-                  @click="widgetStore.duplicateWidget(widget.id)"
-                >
-                  <Copy class="h-4 w-4" />
-                </button>
-                <button
-                  class="ui-icon-btn"
-                  :aria-label="`Show ${widget.name}`"
-                  title="Show"
-                  @click="widgetStore.toggleWidgetVisibility(widget.id)"
-                >
-                  <EyeOff />
-                </button>
-              </div>
+              <button
+                class="ui-icon-btn shrink-0"
+                :aria-label="`${widget.visible ? 'Hide' : 'Show'} ${widget.name}`"
+                :data-tooltip="widget.visible ? 'Hide' : 'Show'"
+                @click="widgetStore.toggleWidgetVisibility(widget.id)"
+              >
+                <component :is="widget.visible ? Eye : EyeOff" />
+              </button>
             </div>
           </DraggableWidget>
         </div>
       </section>
     </Transition>
 
-    <!-- Widgets grid -->
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+    <!-- Widgets: drag a header to move; on desktop, drag the corner to resize -->
+    <div class="dashboard-grid">
       <DraggableWidget
         v-for="(widget, index) in widgetStore.visibleWidgets"
         :key="widget.id"
         :widget-id="widget.id"
         :index="index"
-        :draggable-active="showWidgetManager"
+        :style="sizeStyle(widget)"
+        draggable-active
+        drag-by-header
+        resizable
       >
-        <TimeWidget v-if="widget.component === 'TimeWidget'" :widget-id="widget.id" />
-        <WeatherWidget v-else-if="widget.component === 'WeatherWidget'" :widget-id="widget.id" />
-        <NewsWidget v-else-if="widget.component === 'NewsWidget'" />
-        <CalendarWidget v-else-if="widget.component === 'CalendarWidget'" />
-        <TodoWidget v-else-if="widget.component === 'TodoWidget'" />
-        <SearchWidget v-else-if="widget.component === 'SearchWidget'" />
-        <WaterReminderWidget
-          v-else-if="widget.component === 'WaterReminderWidget'"
-          :widget-id="widget.id"
-        />
+        <WidgetView :widget="widget" />
       </DraggableWidget>
     </div>
 
@@ -170,6 +129,25 @@ const showWidgetManager = ref(false);
 </template>
 
 <style scoped>
+/* Phones: one column, natural heights. Desktop: a six-column grid with fixed
+   row steps; each widget spans its saved size (see the widget store). */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+}
+@media (min-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-auto-rows: 3.5rem;
+    gap: 1.25rem;
+  }
+  .dashboard-grid > * {
+    grid-column: span var(--col-span) / span var(--col-span);
+    grid-row: span var(--row-span) / span var(--row-span);
+  }
+}
+
 .ui-collapse-enter-active,
 .ui-collapse-leave-active {
   transition:

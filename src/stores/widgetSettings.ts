@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { ref, toRaw } from 'vue';
 import { CacheStorage } from './storage';
 import type { WaterReminderData } from './types';
 import type { FontId } from '../assets/fonts';
@@ -50,6 +50,13 @@ const defaultTimeSettings = (): TimeWidgetSettings => ({
 });
 
 const defaultWeatherSettings = (): WeatherWidgetSettings => ({ layout: 'full', compactScale: 100 });
+
+/**
+ * Deep copy of settings data. structuredClone can't copy Vue's reactive
+ * proxies (it throws DataCloneError), which broke duplicating widgets and
+ * reading or saving water reminder data, so clone the underlying raw object.
+ */
+const cloneSettings = <T>(value: T): T => structuredClone(toRaw(value));
 
 export const useWidgetSettingsStore = defineStore('widgetSettings', () => {
   const byWidgetId = ref<Record<string, WidgetSettingsEntry>>({});
@@ -112,27 +119,27 @@ export const useWidgetSettingsStore = defineStore('widgetSettings', () => {
 
   const getWaterReminderData = (widgetId: string): WaterReminderData | null => {
     const existing = getEntry(widgetId).waterReminder;
-    if (existing) return structuredClone(existing);
+    if (existing) return cloneSettings(existing);
 
     const migrated = migrateLegacyWaterSettings(widgetId);
     if (migrated) {
       getEntry(widgetId).waterReminder = migrated;
       persist();
-      return structuredClone(migrated);
+      return cloneSettings(migrated);
     }
 
     return null;
   };
 
   const setWaterReminderData = (widgetId: string, data: WaterReminderData) => {
-    getEntry(widgetId).waterReminder = structuredClone(data);
+    getEntry(widgetId).waterReminder = cloneSettings(data);
     persist();
   };
 
   const copySettings = (fromWidgetId: string, toWidgetId: string) => {
     const source = byWidgetId.value[fromWidgetId];
     if (!source) return;
-    byWidgetId.value[toWidgetId] = structuredClone(source);
+    byWidgetId.value[toWidgetId] = cloneSettings(source);
     persist();
   };
 

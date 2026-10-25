@@ -30,7 +30,7 @@ const showHeader = computed(() => !props.hideHeader && !isFullScreen.value);
   <section
     class="ui-card flex flex-col overflow-hidden h-full"
     :class="{
-      'max-h-[calc(100vh-6rem)] lg:max-h-[calc(50vh-2rem)]': !inWidgetRoute && !isFullScreen,
+      'max-h-[calc(100vh-6rem)] md:max-h-none': !inWidgetRoute && !isFullScreen,
       'max-h-full': isFullScreen,
     }"
   >

@@ -53,12 +53,10 @@ const widgetInstanceProps = computed(() => {
 
 <template>
   <main class="mx-auto max-w-4xl px-4 sm:px-6 py-6">
-    <component
-      :is="currentWidget"
-      v-if="currentWidget"
-      v-bind="widgetInstanceProps"
-      class="w-full"
-    />
+    <!-- A set height (screen minus header and padding) so widgets like the clock can fill it -->
+    <div v-if="currentWidget" class="h-[calc(100dvh-6.5rem)]">
+      <component :is="currentWidget" v-bind="widgetInstanceProps" class="w-full" />
+    </div>
     <div v-else class="rounded-2xl border border-border bg-surface p-8">
       <EmptyState
         :icon="AlertTriangle"

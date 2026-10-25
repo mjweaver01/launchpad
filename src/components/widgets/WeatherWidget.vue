@@ -16,11 +16,17 @@ import {
   Cloud,
 } from 'lucide-vue-next';
 import type { Component } from 'vue';
-import { Settings2 } from 'lucide-vue-next';
-import { useWeatherStore, useLocationStore, useWidgetSettingsStore } from '../../stores';
+import { Settings2, Copy } from 'lucide-vue-next';
+import {
+  useWeatherStore,
+  useLocationStore,
+  useWidgetSettingsStore,
+  useWidgetStore,
+} from '../../stores';
 import type { WeatherLayout } from '../../stores/widgetSettings';
 import WidgetCard from './WidgetCard.vue';
 import IconButton from '../ui/IconButton.vue';
+import UiButton from '../ui/UiButton.vue';
 import Popover from '../ui/Popover.vue';
 import { usePopover } from '../../composables/usePopover';
 import UiSelect from '../ui/UiSelect.vue';
@@ -46,6 +52,13 @@ const layoutOptions = [
   { label: 'Summary: conditions and next hours', value: 'summary' },
   { label: 'Compact: icon and temperature', value: 'compact' },
 ];
+
+const widgetStore = useWidgetStore();
+
+const duplicate = () => {
+  widgetStore.duplicateWidget(props.widgetId);
+  settingsPopover.close();
+};
 
 const setLayout = (value: WeatherLayout) => {
   layout.value = value;
@@ -391,6 +404,9 @@ onMounted(() => {
             @input="onCompactScale"
           />
         </div>
+        <UiButton variant="secondary" size="sm" :leading-icon="Copy" @click="duplicate">
+          Duplicate
+        </UiButton>
       </div>
     </Popover>
   </WidgetCard>
