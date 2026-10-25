@@ -13,6 +13,7 @@ import { fontSelectOptions, getFont } from '../../assets/fonts';
 import WidgetCard from './WidgetCard.vue';
 import IconButton from '../ui/IconButton.vue';
 import FlipDigit from './FlipDigit.vue';
+import WidgetPaddingSetting from './WidgetPaddingSetting.vue';
 import Popover from '../ui/Popover.vue';
 import { usePopover } from '../../composables/usePopover';
 import UiSelect from '../ui/UiSelect.vue';
@@ -398,6 +399,7 @@ onUnmounted(() => {
           :model-value="settings.showLocation"
           @update:model-value="v => updateSettings({ showLocation: v })"
         />
+        <WidgetPaddingSetting :widget-id="widgetId" />
         <div class="flex gap-2">
           <UiButton variant="secondary" size="sm" @click="applyTimeOnlyPreset">Time only</UiButton>
           <UiButton variant="secondary" size="sm" :leading-icon="Copy" @click="duplicate">
@@ -422,6 +424,8 @@ onUnmounted(() => {
   flex: 1 1 auto;
   width: 100%;
   min-height: 10rem;
+  /* A little room on the sides so digits don't run into the card edge */
+  padding-inline: 0.75rem;
   display: flex;
   align-items: center;
   justify-content: center;

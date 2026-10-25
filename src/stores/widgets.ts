@@ -12,6 +12,8 @@ export interface Widget {
   colSpan?: number;
   /** Desktop dashboard height in grid rows; unset uses the default for the widget type. */
   rowSpan?: number;
+  /** Inner padding of the widget's card in px; unset uses the default. */
+  padding?: number;
 }
 
 export interface WidgetSize {
@@ -40,6 +42,11 @@ export const snapColSpan = (columns: number): number =>
 
 export const clampRowSpan = (rows: number): number =>
   Math.min(ROW_SPAN_LIMITS.max, Math.max(ROW_SPAN_LIMITS.min, Math.round(rows)));
+
+export const WIDGET_PADDING = { min: 0, max: 48, step: 4, default: 24 } as const;
+
+export const getWidgetPadding = (widget: Widget): number =>
+  widget.padding ?? WIDGET_PADDING.default;
 
 export const defaultWidgetSize = (component: string): WidgetSize => ({
   colSpan: DEFAULT_COL_SPAN,
@@ -206,6 +213,7 @@ export const useWidgetStore = defineStore('widgets', () => {
       visible: true,
       colSpan: source.colSpan,
       rowSpan: source.rowSpan,
+      padding: source.padding,
     };
 
     widgets.value.push(duplicate);
@@ -252,6 +260,16 @@ export const useWidgetStore = defineStore('widgets', () => {
     if (widget.colSpan === colSpan && widget.rowSpan === rowSpan) return;
     widget.colSpan = colSpan;
     widget.rowSpan = rowSpan;
+    saveWidgets();
+  };
+
+  const setWidgetPadding = (widgetId: string, padding: number) => {
+    const widget = widgets.value.find(w => w.id === widgetId);
+    if (!widget) return;
+    const { min, max, step } = WIDGET_PADDING;
+    const snapped = Math.min(max, Math.max(min, Math.round(padding / step) * step));
+    if (widget.padding === snapped) return;
+    widget.padding = snapped;
     saveWidgets();
   };
 
@@ -314,6 +332,7 @@ export const useWidgetStore = defineStore('widgets', () => {
     duplicateWidget,
     resizeWidget,
     resetWidgetSize,
+    setWidgetPadding,
     toggleWidgetVisibility,
     resetToDefault,
     loadWidgets,

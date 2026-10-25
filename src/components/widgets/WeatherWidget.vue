@@ -26,6 +26,7 @@ import {
 import type { WeatherLayout } from '../../stores/widgetSettings';
 import WidgetCard from './WidgetCard.vue';
 import IconButton from '../ui/IconButton.vue';
+import WidgetPaddingSetting from './WidgetPaddingSetting.vue';
 import UiButton from '../ui/UiButton.vue';
 import Popover from '../ui/Popover.vue';
 import { usePopover } from '../../composables/usePopover';
@@ -404,6 +405,7 @@ onMounted(() => {
             @input="onCompactScale"
           />
         </div>
+        <WidgetPaddingSetting :widget-id="widgetId" />
         <UiButton variant="secondary" size="sm" :leading-icon="Copy" @click="duplicate">
           Duplicate
         </UiButton>

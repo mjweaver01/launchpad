@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, type Component } from 'vue';
-import type { Widget } from '../../stores/widgets';
+import { getWidgetPadding, type Widget } from '../../stores/widgets';
 import TimeWidget from './TimeWidget.vue';
 import WeatherWidget from './WeatherWidget.vue';
 import NewsWidget from './NewsWidget.vue';
@@ -26,11 +26,14 @@ const COMPONENTS: Record<string, Component> = {
 const TAKES_WIDGET_ID = new Set(['TimeWidget', 'WeatherWidget', 'WaterReminderWidget']);
 
 const component = computed(() => COMPONENTS[props.widget.component]);
+const paddingStyle = computed(() => ({
+  '--widget-padding': `${getWidgetPadding(props.widget)}px`,
+}));
 const instanceProps = computed(() =>
   TAKES_WIDGET_ID.has(props.widget.component) ? { widgetId: props.widget.id } : {}
 );
 </script>
 
 <template>
-  <component :is="component" v-if="component" v-bind="instanceProps" />
+  <component :is="component" v-if="component" v-bind="instanceProps" :style="paddingStyle" />
 </template>

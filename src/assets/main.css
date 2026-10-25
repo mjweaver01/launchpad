@@ -161,7 +161,8 @@ body {
     color: var(--color-brand-400);
   }
   .ui-card-body {
-    padding: 1.5rem;
+    /* --widget-padding: per-widget setting, set by WidgetView */
+    padding: var(--widget-padding, 1.5rem);
     flex: 1 1 auto;
     min-height: 0;
   }
