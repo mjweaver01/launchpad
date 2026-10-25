@@ -15,7 +15,12 @@ export default defineConfig({
       manifest: {
         name: 'Launchpad',
         short_name: 'Launchpad',
+        description: 'Personal dashboard: clock, weather, news, calendar and tasks.',
         theme_color: '#000000',
+        background_color: '#000000',
+        display: 'standalone',
+        orientation: 'any',
+        start_url: '/',
         icons: [
           {
             src: '/icon-192x192.png',

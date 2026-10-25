@@ -16,3 +16,4 @@ export { useAutoThemeStore } from './autoTheme';
 // Re-export utilities and types
 export { CacheStorage } from './storage';
 export type * from './types';
+export { useFullScreenStore } from './fullScreen';

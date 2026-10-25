@@ -4,6 +4,7 @@ import GoogleCallback from './pages/GoogleCallback.vue';
 import Widget from './pages/Widget.vue';
 import FullScreen from './pages/FullScreen.vue';
 import Settings from './pages/Settings.vue';
+import { readRememberedFullScreen } from './stores/fullScreen';
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -43,6 +44,16 @@ const router = createRouter({
     }
     return { top: 0, left: 0 };
   },
+});
+
+// On a cold start (page load / PWA launch), resume full screen mode if it was
+// active last time, so a nightstand phone comes back to the clock after a reload.
+router.beforeEach((to, from) => {
+  const isInitialNavigation = from.matched.length === 0;
+  if (isInitialNavigation && to.path === '/' && readRememberedFullScreen()) {
+    return { name: 'Full Screen', replace: true };
+  }
+  return true;
 });
 
 export default router;
