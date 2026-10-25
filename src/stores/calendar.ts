@@ -110,7 +110,7 @@ export const useCalendarStore = defineStore('calendar', () => {
   // Actions
   const initiateGoogleAuth = (): string => {
     console.log('initiateGoogleAuth called');
-    const clientId = (import.meta as any).env.VITE_GOOGLE_CLIENT_ID;
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
     console.log('Client ID from env:', clientId);
 
     if (!clientId) {

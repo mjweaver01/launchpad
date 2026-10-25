@@ -99,7 +99,7 @@ onUnmounted(() => {
 
 <template>
   <div
-    class="fs-root fixed inset-0 bg-[color:var(--color-surface-2)]"
+    class="fs-root fixed inset-0 bg-surface-2"
     :class="{ 'cursor-none': !showControls }"
     @pointerdown="handleBackdropPointer"
     @mousemove="handleMouseMove"
@@ -121,7 +121,7 @@ onUnmounted(() => {
         </button>
 
         <label class="flex items-center gap-2 flex-1 sm:flex-none min-w-0" title="Brightness">
-          <Sun class="h-4 w-4 flex-shrink-0" />
+          <Sun class="h-4 w-4 shrink-0" />
           <input
             type="range"
             min="0.1"

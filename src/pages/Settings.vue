@@ -86,8 +86,8 @@ onUnmounted(() => {
 <template>
   <main class="mx-auto max-w-3xl px-4 sm:px-6 py-8">
     <header class="mb-8">
-      <h1 class="text-2xl font-bold tracking-tight text-[color:var(--color-fg)]">Settings</h1>
-      <p class="text-sm text-[color:var(--color-fg-muted)] mt-1">
+      <h1 class="text-2xl font-bold tracking-tight text-fg">Settings</h1>
+      <p class="text-sm text-fg-muted mt-1">
         Customize the appearance and theme schedule.
       </p>
     </header>
@@ -133,27 +133,27 @@ onUnmounted(() => {
       </header>
       <div class="ui-card-body space-y-5">
         <div>
-          <h3 class="text-sm font-medium text-[color:var(--color-fg)] mb-2">Schedule</h3>
+          <h3 class="text-sm font-medium text-fg mb-2">Schedule</h3>
           <div
-            class="rounded-xl border border-[color:var(--color-border)] divide-y divide-[color:var(--color-border)] text-sm"
+            class="rounded-xl border border-border divide-y divide-border text-sm"
           >
             <div class="flex justify-between items-center px-4 py-2.5">
-              <span class="text-[color:var(--color-fg-muted)]">Normal</span>
-              <span class="text-[color:var(--color-fg)] tabular-nums">
+              <span class="text-fg-muted">Normal</span>
+              <span class="text-fg tabular-nums">
                 {{ formatHour(autoThemeStore.sunTimes.sunrise) }} –
                 {{ formatHour(autoThemeStore.sunTimes.sunset) }}
               </span>
             </div>
             <div class="flex justify-between items-center px-4 py-2.5">
-              <span class="text-[color:var(--color-fg-muted)]">Dark</span>
-              <span class="text-[color:var(--color-fg)] tabular-nums">
+              <span class="text-fg-muted">Dark</span>
+              <span class="text-fg tabular-nums">
                 {{ formatHour(autoThemeStore.sunTimes.sunset) }} –
                 {{ formatHour(autoThemeStore.redshiftStartHour) }}
               </span>
             </div>
             <div class="flex justify-between items-center px-4 py-2.5">
-              <span class="text-[color:var(--color-fg-muted)]">Redshift</span>
-              <span class="text-[color:var(--color-fg)] tabular-nums">
+              <span class="text-fg-muted">Redshift</span>
+              <span class="text-fg tabular-nums">
                 {{ formatHour(autoThemeStore.redshiftStartHour) }} –
                 {{ formatHour(autoThemeStore.redshiftEndHour) }}
               </span>
@@ -162,7 +162,7 @@ onUnmounted(() => {
         </div>
 
         <div>
-          <h3 class="text-sm font-medium text-[color:var(--color-fg)] mb-2">Manual override</h3>
+          <h3 class="text-sm font-medium text-fg mb-2">Manual override</h3>
           <div class="grid grid-cols-3 gap-2">
             <UiButton
               v-for="level in themeOptions"
@@ -187,12 +187,12 @@ onUnmounted(() => {
         </div>
 
         <div>
-          <h3 class="text-sm font-medium text-[color:var(--color-fg)] mb-3">Redshift hours</h3>
+          <h3 class="text-sm font-medium text-fg mb-3">Redshift hours</h3>
           <div class="space-y-4">
             <div>
               <label class="ui-label flex justify-between">
                 <span>Start</span>
-                <span class="tabular-nums text-[color:var(--color-fg-muted)]">{{
+                <span class="tabular-nums text-fg-muted">{{
                   formatHour(localRedshiftStart)
                 }}</span>
               </label>
@@ -209,7 +209,7 @@ onUnmounted(() => {
             <div>
               <label class="ui-label flex justify-between">
                 <span>End</span>
-                <span class="tabular-nums text-[color:var(--color-fg-muted)]">{{
+                <span class="tabular-nums text-fg-muted">{{
                   formatHour(localRedshiftEnd)
                 }}</span>
               </label>
@@ -235,28 +235,28 @@ onUnmounted(() => {
       </header>
       <div class="ui-card-body space-y-4">
         <div class="flex items-start gap-3">
-          <div class="mt-1.5 h-2 w-2 rounded-full bg-[color:var(--color-warning)]" />
+          <div class="mt-1.5 h-2 w-2 rounded-full bg-warning" />
           <div>
-            <h3 class="text-sm font-medium text-[color:var(--color-fg)]">Normal</h3>
-            <p class="text-xs text-[color:var(--color-fg-muted)] leading-relaxed">
+            <h3 class="text-sm font-medium text-fg">Normal</h3>
+            <p class="text-xs text-fg-muted leading-relaxed">
               Light theme used during daytime hours (sunrise to sunset).
             </p>
           </div>
         </div>
         <div class="flex items-start gap-3">
-          <div class="mt-1.5 h-2 w-2 rounded-full bg-[color:var(--color-brand-600)]" />
+          <div class="mt-1.5 h-2 w-2 rounded-full bg-brand-600" />
           <div>
-            <h3 class="text-sm font-medium text-[color:var(--color-fg)]">Dark</h3>
-            <p class="text-xs text-[color:var(--color-fg-muted)] leading-relaxed">
+            <h3 class="text-sm font-medium text-fg">Dark</h3>
+            <p class="text-xs text-fg-muted leading-relaxed">
               Used during evening hours. Reduces eye strain in low light.
             </p>
           </div>
         </div>
         <div class="flex items-start gap-3">
-          <div class="mt-1.5 h-2 w-2 rounded-full bg-[color:var(--color-danger)]" />
+          <div class="mt-1.5 h-2 w-2 rounded-full bg-danger" />
           <div>
-            <h3 class="text-sm font-medium text-[color:var(--color-fg)]">Redshift</h3>
-            <p class="text-xs text-[color:var(--color-fg-muted)] leading-relaxed">
+            <h3 class="text-sm font-medium text-fg">Redshift</h3>
+            <p class="text-xs text-fg-muted leading-relaxed">
               Dark theme with a red filter for late-night hours. Reduces blue light.
             </p>
           </div>

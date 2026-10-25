@@ -108,9 +108,9 @@ onMounted(() => {
     <Transition name="ui-collapse">
       <div
         v-if="showSettings"
-        class="mb-5 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4"
+        class="mb-5 rounded-xl border border-border bg-surface-2 p-4"
       >
-        <h3 class="text-sm font-semibold text-[color:var(--color-fg)] mb-3">Settings</h3>
+        <h3 class="text-sm font-semibold text-fg mb-3">Settings</h3>
 
         <div class="mb-4">
           <label class="ui-label">Weight: {{ localWeight }} lbs</label>
@@ -123,15 +123,15 @@ onMounted(() => {
             class="ui-range"
             @input="updateWeight"
           />
-          <div class="flex justify-between text-[0.7rem] text-[color:var(--color-fg-subtle)] mt-1 tabular-nums">
+          <div class="flex justify-between text-[0.7rem] text-fg-subtle mt-1 tabular-nums">
             <span>80 lbs</span>
             <span>400 lbs</span>
           </div>
         </div>
 
         <div class="mb-4 text-sm">
-          <span class="text-[color:var(--color-fg-muted)]">Daily Goal:</span>
-          <span class="font-semibold text-[color:var(--color-brand-700)] dark:text-[color:var(--color-brand-400)] ml-1 tabular-nums">
+          <span class="text-fg-muted">Daily Goal:</span>
+          <span class="font-semibold text-brand-700 dark:text-brand-400 ml-1 tabular-nums">
             {{ waterData.settings.dailyGoal }} oz
           </span>
         </div>
@@ -168,7 +168,7 @@ onMounted(() => {
             class="ui-range"
             @input="updateInterval"
           />
-          <div class="flex justify-between text-[0.7rem] text-[color:var(--color-fg-subtle)] mt-1 tabular-nums">
+          <div class="flex justify-between text-[0.7rem] text-fg-subtle mt-1 tabular-nums">
             <span>1 h</span>
             <span>6 h</span>
           </div>
@@ -180,27 +180,27 @@ onMounted(() => {
 
     <div
       v-if="waterError"
-      class="mb-4 rounded-lg border border-[color:var(--color-danger-soft)] bg-[color:var(--color-danger-soft)] text-[color:var(--color-danger)] p-3 text-sm"
+      class="mb-4 rounded-lg border border-danger-soft bg-danger-soft text-danger p-3 text-sm"
     >
       {{ waterError }}
     </div>
 
     <!-- Progress -->
     <div class="mb-5">
-      <div class="flex items-center justify-between text-xs text-[color:var(--color-fg-muted)] mb-1.5">
+      <div class="flex items-center justify-between text-xs text-fg-muted mb-1.5">
         <span>Daily progress</span>
         <span class="tabular-nums">
           {{ todayCompletedOunces }} / {{ waterData.settings.dailyGoal }} oz
         </span>
       </div>
-      <div class="w-full bg-[color:var(--color-surface-2)] rounded-full h-2 overflow-hidden">
+      <div class="w-full bg-surface-2 rounded-full h-2 overflow-hidden">
         <div
-          class="h-full rounded-full bg-[color:var(--color-brand-600)] transition-all duration-500 ease-out"
+          class="h-full rounded-full bg-brand-600 transition-all duration-500 ease-out"
           :style="{ width: `${completionPercentage}%` }"
         ></div>
       </div>
       <div
-        class="text-center mt-2 text-2xl font-bold text-[color:var(--color-brand-700)] dark:text-[color:var(--color-brand-400)] tabular-nums"
+        class="text-center mt-2 text-2xl font-bold text-brand-700 dark:text-brand-400 tabular-nums"
       >
         {{ completionPercentage }}%
       </div>
@@ -209,20 +209,20 @@ onMounted(() => {
     <!-- Next reminder -->
     <button
       v-if="nextReminder"
-      class="mb-3 w-full text-left rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] hover:bg-[color:var(--color-surface-3)] transition-colors p-3 flex items-center gap-3"
+      class="mb-3 w-full text-left rounded-xl border border-border bg-surface-2 hover:bg-surface-3 transition-colors p-3 flex items-center gap-3"
       @click="nextReminder && toggleReminder(nextReminder)"
     >
       <div
-        class="flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--color-brand-100)] dark:bg-[color:var(--color-brand-900)]"
+        class="flex h-10 w-10 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900"
       >
         <Droplet
-          class="h-5 w-5 text-[color:var(--color-brand-600)] dark:text-[color:var(--color-brand-300)]"
+          class="h-5 w-5 text-brand-600 dark:text-brand-300"
           fill="currentColor"
         />
       </div>
       <div class="flex-1 min-w-0">
-        <div class="text-sm font-medium text-[color:var(--color-fg)]">Next reminder</div>
-        <div class="text-xs text-[color:var(--color-fg-muted)] tabular-nums">
+        <div class="text-sm font-medium text-fg">Next reminder</div>
+        <div class="text-xs text-fg-muted tabular-nums">
           {{ nextReminder.time }} · {{ nextReminder.amount }} oz
         </div>
       </div>
@@ -231,11 +231,11 @@ onMounted(() => {
     <!-- Overdue alert -->
     <div
       v-if="overdueReminders.length > 0"
-      class="mb-3 rounded-xl border border-[color:var(--color-warning-soft)] bg-[color:var(--color-warning-soft)] p-3 flex items-center gap-3"
+      class="mb-3 rounded-xl border border-warning-soft bg-warning-soft p-3 flex items-center gap-3"
     >
-      <AlertCircle class="h-5 w-5 text-[color:var(--color-warning)] flex-shrink-0" />
+      <AlertCircle class="h-5 w-5 text-warning shrink-0" />
       <div class="flex-1 min-w-0">
-        <div class="text-sm font-medium text-[color:var(--color-fg)]">
+        <div class="text-sm font-medium text-fg">
           {{ overdueReminders.length }} overdue reminder{{ overdueReminders.length > 1 ? 's' : '' }}
         </div>
       </div>
@@ -250,7 +250,7 @@ onMounted(() => {
     </div>
 
     <!-- Reminders list -->
-    <h3 class="text-[0.7rem] uppercase tracking-wider font-semibold text-[color:var(--color-fg-muted)] mb-2">
+    <h3 class="text-[0.7rem] uppercase tracking-wider font-semibold text-fg-muted mb-2">
       Today's reminders
     </h3>
 
@@ -265,14 +265,14 @@ onMounted(() => {
       <div
         v-for="reminder in sortedReminders"
         :key="reminder.id"
-        class="flex items-center gap-3 rounded-lg border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2"
+        class="flex items-center gap-3 rounded-lg border border-border bg-surface px-3 py-2"
       >
         <button
-          class="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-colors"
+          class="shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-colors"
           :class="
             reminder.completed
-              ? 'bg-[color:var(--color-success)] text-white'
-              : 'bg-[color:var(--color-brand-100)] dark:bg-[color:var(--color-brand-900)] text-[color:var(--color-brand-600)] dark:text-[color:var(--color-brand-300)] hover:bg-[color:var(--color-brand-200)] dark:hover:bg-[color:var(--color-brand-800)]'
+              ? 'bg-success text-white'
+              : 'bg-brand-100 dark:bg-brand-900 text-brand-600 dark:text-brand-300 hover:bg-brand-200 dark:hover:bg-brand-800'
           "
           :aria-label="reminder.completed ? 'Mark incomplete' : 'Mark complete'"
           @click="toggleReminder(reminder)"
@@ -287,8 +287,8 @@ onMounted(() => {
               class="text-sm font-medium tabular-nums"
               :class="
                 reminder.completed
-                  ? 'text-[color:var(--color-fg-subtle)] line-through'
-                  : 'text-[color:var(--color-fg)]'
+                  ? 'text-fg-subtle line-through'
+                  : 'text-fg'
               "
             >
               {{ reminder.time }}
@@ -297,7 +297,7 @@ onMounted(() => {
           </div>
           <div
             v-if="reminder.completed && reminder.completedAt"
-            class="text-[0.7rem] text-[color:var(--color-fg-subtle)]"
+            class="text-[0.7rem] text-fg-subtle"
           >
             Done {{ formatTime(reminder.completedAt) }}
           </div>
@@ -318,7 +318,7 @@ onMounted(() => {
       </div>
     </TransitionGroup>
 
-    <div v-if="waterData.reminders.length > 0" class="mt-5 pt-4 border-t border-[color:var(--color-border)]">
+    <div v-if="waterData.reminders.length > 0" class="mt-5 pt-4 border-t border-border">
       <UiButton variant="ghost" size="sm" block @click="resetDailyProgress">
         Reset day
       </UiButton>

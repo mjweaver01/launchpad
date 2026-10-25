@@ -176,7 +176,7 @@ onUnmounted(() => {
     :icon="Clock"
     widgetName="time"
     displayName="Time"
-    body-class="!flex flex-col items-center justify-center text-center"
+    body-class="flex! flex-col items-center justify-center text-center"
   >
     <template #actions>
       <IconButton
@@ -239,10 +239,10 @@ onUnmounted(() => {
             cx="100"
             cy="100"
             r="98"
-            class="fill-[color:var(--color-surface)] stroke-[color:var(--color-border)]"
+            class="fill-surface stroke-border"
             stroke-width="2"
           />
-          <g v-for="hour in 12" :key="hour" class="text-[color:var(--color-fg-muted)]">
+          <g v-for="hour in 12" :key="hour" class="text-fg-muted">
             <line
               :x1="100 + 85 * Math.cos(((hour * 30 - 90) * Math.PI) / 180)"
               :y1="100 + 85 * Math.sin(((hour * 30 - 90) * Math.PI) / 180)"
@@ -257,7 +257,7 @@ onUnmounted(() => {
             y1="100"
             :x2="100 + 50 * Math.cos((hourAngle * Math.PI) / 180)"
             :y2="100 + 50 * Math.sin((hourAngle * Math.PI) / 180)"
-            class="stroke-[color:var(--color-fg)]"
+            class="stroke-fg"
             stroke-width="6"
             stroke-linecap="round"
           />
@@ -266,7 +266,7 @@ onUnmounted(() => {
             y1="100"
             :x2="100 + 70 * Math.cos((minuteAngle * Math.PI) / 180)"
             :y2="100 + 70 * Math.sin((minuteAngle * Math.PI) / 180)"
-            class="stroke-[color:var(--color-fg-muted)]"
+            class="stroke-fg-muted"
             stroke-width="4"
             stroke-linecap="round"
           />
@@ -275,21 +275,21 @@ onUnmounted(() => {
             y1="100"
             :x2="100 + 80 * Math.cos((secondAngle * Math.PI) / 180)"
             :y2="100 + 80 * Math.sin((secondAngle * Math.PI) / 180)"
-            class="stroke-[color:var(--color-brand-600)]"
+            class="stroke-brand-600"
             stroke-width="2"
             stroke-linecap="round"
           />
-          <circle cx="100" cy="100" r="5" class="fill-[color:var(--color-fg)]" />
+          <circle cx="100" cy="100" r="5" class="fill-fg" />
         </svg>
       </div>
-      <div class="text-sm text-[color:var(--color-fg-muted)] mt-3">{{ formattedDate }}</div>
+      <div class="text-sm text-fg-muted mt-3">{{ formattedDate }}</div>
     </template>
 
     <div
       v-if="locationStore.formattedLocation"
-      class="text-xs text-[color:var(--color-fg-muted)] mt-2 flex items-center justify-center gap-1 truncate max-w-full"
+      class="text-xs text-fg-muted mt-2 flex items-center justify-center gap-1 truncate max-w-full"
     >
-      <MapPin class="h-3 w-3 flex-shrink-0" />
+      <MapPin class="h-3 w-3 shrink-0" />
       <span class="truncate">{{ locationStore.formattedLocation }}</span>
     </div>
   </WidgetCard>

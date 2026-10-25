@@ -32,16 +32,16 @@ const handleRefresh = async () => {
 
 <template>
   <header
-    class="sticky top-0 z-50 backdrop-blur-md bg-[color:var(--color-surface)]/85 border-b border-[color:var(--color-border)]"
+    class="sticky top-0 z-50 backdrop-blur-md bg-surface/85 border-b border-border"
   >
     <div class="mx-auto max-w-7xl px-4 sm:px-6">
       <div class="flex h-14 items-center justify-between gap-3">
         <router-link
           to="/"
-          class="flex items-center gap-2 text-[color:var(--color-fg)] no-underline"
+          class="flex items-center gap-2 text-fg no-underline"
         >
           <span
-            class="flex h-8 w-8 items-center justify-center rounded-lg bg-[color:var(--color-brand-600)] text-white"
+            class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-white"
           >
             <Rocket class="h-4 w-4" />
           </span>
@@ -54,9 +54,9 @@ const handleRefresh = async () => {
             v-for="r in filteredRoutes"
             :key="r.path"
             :to="r.path"
-            class="rounded-md px-3 py-1.5 text-sm font-medium text-[color:var(--color-fg-muted)] hover:text-[color:var(--color-fg)] hover:bg-[color:var(--color-surface-2)] transition-colors"
+            class="rounded-md px-3 py-1.5 text-sm font-medium text-fg-muted hover:text-fg hover:bg-surface-2 transition-colors"
             :class="{
-              '!text-[color:var(--color-fg)] bg-[color:var(--color-surface-2)]':
+              'text-fg! bg-surface-2':
                 $route.path === r.path,
             }"
           >
@@ -90,9 +90,9 @@ const handleRefresh = async () => {
             v-for="r in filteredRoutes"
             :key="r.path"
             :to="r.path"
-            class="rounded-md px-3 py-2 text-sm font-medium text-[color:var(--color-fg-muted)] hover:text-[color:var(--color-fg)] hover:bg-[color:var(--color-surface-2)] transition-colors"
+            class="rounded-md px-3 py-2 text-sm font-medium text-fg-muted hover:text-fg hover:bg-surface-2 transition-colors"
             :class="{
-              '!text-[color:var(--color-fg)] bg-[color:var(--color-surface-2)]':
+              'text-fg! bg-surface-2':
                 $route.path === r.path,
             }"
             @click="isMobileMenuOpen = false"

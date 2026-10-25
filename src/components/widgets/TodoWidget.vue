@@ -62,19 +62,19 @@ onMounted(() => todoStore.initializeFromStorage());
 <template>
   <WidgetCard title="Tasks" :icon="ListTodo" widgetName="todo" displayName="Todo">
     <template #actions>
-      <span class="text-xs text-[color:var(--color-fg-muted)] tabular-nums">
+      <span class="text-xs text-fg-muted tabular-nums">
         {{ todoStore.todoStats.pending }} / {{ todoStore.todoStats.total }}
       </span>
     </template>
 
     <div v-if="todoStore.todoStats.total > 0" class="mb-4">
-      <div class="flex items-center justify-between text-xs text-[color:var(--color-fg-muted)] mb-1.5">
+      <div class="flex items-center justify-between text-xs text-fg-muted mb-1.5">
         <span>Progress</span>
         <span class="tabular-nums">{{ todoStore.todoStats.completionRate }}%</span>
       </div>
-      <div class="w-full bg-[color:var(--color-surface-2)] rounded-full h-1.5 overflow-hidden">
+      <div class="w-full bg-surface-2 rounded-full h-1.5 overflow-hidden">
         <div
-          class="h-full rounded-full bg-[color:var(--color-brand-600)] transition-all duration-300 ease-out"
+          class="h-full rounded-full bg-brand-600 transition-all duration-300 ease-out"
           :style="{ width: `${todoStore.todoStats.completionRate}%` }"
         ></div>
       </div>
@@ -98,7 +98,7 @@ onMounted(() => todoStore.initializeFromStorage());
           Add
         </UiButton>
       </div>
-      <p v-if="todoStore.error" class="text-xs text-[color:var(--color-danger)] mt-2">
+      <p v-if="todoStore.error" class="text-xs text-danger mt-2">
         {{ todoStore.error }}
       </p>
     </form>
@@ -119,15 +119,15 @@ onMounted(() => todoStore.initializeFromStorage());
       <div
         v-for="todo in sortedTodos"
         :key="todo.id"
-        class="group flex items-center gap-3 rounded-lg border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 transition-colors hover:bg-[color:var(--color-surface-2)]"
+        class="group flex items-center gap-3 rounded-lg border border-border bg-surface px-3 py-2 transition-colors hover:bg-surface-2"
         :class="{ 'opacity-60': todo.completed }"
       >
         <button
-          class="flex-shrink-0 w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors"
+          class="shrink-0 w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors"
           :class="
             todo.completed
-              ? 'bg-[color:var(--color-brand-600)] border-[color:var(--color-brand-600)] text-white'
-              : 'border-[color:var(--color-border-strong)] hover:border-[color:var(--color-brand-500)]'
+              ? 'bg-brand-600 border-brand-600 text-white'
+              : 'border-border-strong hover:border-brand-500'
           "
           :aria-label="todo.completed ? 'Mark as incomplete' : 'Mark as complete'"
           @click="todoStore.toggleTodo(todo.id)"
@@ -138,8 +138,8 @@ onMounted(() => todoStore.initializeFromStorage());
         <div class="flex-1 min-w-0">
           <div
             v-if="!editingId || editingId !== todo.id"
-            class="cursor-pointer text-sm text-[color:var(--color-fg)] truncate"
-            :class="{ 'line-through text-[color:var(--color-fg-subtle)]': todo.completed }"
+            class="cursor-pointer text-sm text-fg truncate"
+            :class="{ 'line-through text-fg-subtle': todo.completed }"
             @dblclick="startEditing(todo)"
           >
             {{ todo.title }}
@@ -161,14 +161,14 @@ onMounted(() => todoStore.initializeFromStorage());
           :aria-label="`Delete ${todo.title}`"
           @click="todoStore.deleteTodo(todo.id)"
         >
-          <Trash2 class="text-[color:var(--color-fg-muted)] hover:text-[color:var(--color-danger)]" />
+          <Trash2 class="text-fg-muted hover:text-danger" />
         </button>
       </div>
     </TransitionGroup>
 
     <div
       v-if="todoStore.todos.length > 0"
-      class="mt-5 flex gap-2 justify-between border-t border-[color:var(--color-border)] pt-4"
+      class="mt-5 flex gap-2 justify-between border-t border-border pt-4"
     >
       <UiButton
         v-if="todoStore.completedTodos.length > 0"
@@ -185,7 +185,7 @@ onMounted(() => todoStore.initializeFromStorage());
     </div>
 
     <Modal :open="showClearAllConfirm" title="Clear all tasks?" @close="showClearAllConfirm = false">
-      <p class="text-sm text-[color:var(--color-fg-muted)] mb-5">
+      <p class="text-sm text-fg-muted mb-5">
         This will permanently delete all tasks. This action can't be undone.
       </p>
       <div class="flex gap-2 justify-end">

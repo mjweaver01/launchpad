@@ -21,7 +21,7 @@ const showWidgetManager = ref(false);
   <main class="mx-auto max-w-7xl px-4 sm:px-6 py-6">
     <!-- Top bar -->
     <div class="flex items-center justify-between mb-5">
-      <div class="text-sm text-[color:var(--color-fg-muted)] tabular-nums">
+      <div class="text-sm text-fg-muted tabular-nums">
         {{ widgetStore.visibleWidgets.length }} of {{ widgetStore.widgets.length }} widgets
       </div>
       <UiButton
@@ -38,12 +38,12 @@ const showWidgetManager = ref(false);
     <Transition name="ui-collapse">
       <section
         v-if="showWidgetManager"
-        class="mb-6 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-5"
+        class="mb-6 rounded-2xl border border-border bg-surface p-5"
       >
         <div class="flex items-center justify-between mb-4">
           <div>
-            <h3 class="text-sm font-semibold text-[color:var(--color-fg)]">Widget Settings</h3>
-            <p class="text-xs text-[color:var(--color-fg-muted)] mt-0.5">
+            <h3 class="text-sm font-semibold text-fg">Widget Settings</h3>
+            <p class="text-xs text-fg-muted mt-0.5">
               Drag to reorder, duplicate with the copy icon, or hide widgets you do not need.
             </p>
           </div>
@@ -66,15 +66,15 @@ const showWidgetManager = ref(false);
             :draggable-active="showWidgetManager"
           >
             <div
-              class="flex items-center justify-between rounded-lg border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2"
+              class="flex items-center justify-between rounded-lg border border-border bg-surface px-3 py-2"
             >
               <div class="flex items-center gap-2 min-w-0">
-                <GripVertical class="h-4 w-4 text-[color:var(--color-fg-subtle)] flex-shrink-0" />
-                <span class="text-sm font-medium text-[color:var(--color-fg)] truncate">
+                <GripVertical class="h-4 w-4 text-fg-subtle shrink-0" />
+                <span class="text-sm font-medium text-fg truncate">
                   {{ widget.name }}
                 </span>
               </div>
-              <div class="flex items-center gap-0.5 flex-shrink-0">
+              <div class="flex items-center gap-0.5 shrink-0">
                 <button
                   class="ui-icon-btn"
                   :aria-label="`Duplicate ${widget.name}`"
@@ -102,15 +102,15 @@ const showWidgetManager = ref(false);
             :draggable-active="showWidgetManager"
           >
             <div
-              class="flex items-center justify-between rounded-lg border border-dashed border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-2 opacity-70"
+              class="flex items-center justify-between rounded-lg border border-dashed border-border bg-surface-2 px-3 py-2 opacity-70"
             >
               <div class="flex items-center gap-2 min-w-0">
-                <GripVertical class="h-4 w-4 text-[color:var(--color-fg-subtle)] flex-shrink-0" />
-                <span class="text-sm font-medium text-[color:var(--color-fg-muted)] truncate">
+                <GripVertical class="h-4 w-4 text-fg-subtle shrink-0" />
+                <span class="text-sm font-medium text-fg-muted truncate">
                   {{ widget.name }}
                 </span>
               </div>
-              <div class="flex items-center gap-0.5 flex-shrink-0">
+              <div class="flex items-center gap-0.5 shrink-0">
                 <button
                   class="ui-icon-btn"
                   :aria-label="`Duplicate ${widget.name}`"

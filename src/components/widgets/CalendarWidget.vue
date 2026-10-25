@@ -117,14 +117,14 @@ onMounted(() => {
     <!-- Sign-in -->
     <div v-if="!calendarStore.isAuthenticated" class="text-center py-6">
       <div
-        class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[color:var(--color-surface-2)] text-[color:var(--color-fg-muted)]"
+        class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-surface-2 text-fg-muted"
       >
         <Calendar class="h-6 w-6" />
       </div>
-      <h3 class="text-sm font-semibold text-[color:var(--color-fg)] mb-1">
+      <h3 class="text-sm font-semibold text-fg mb-1">
         Connect Google Calendar
       </h3>
-      <p class="text-sm text-[color:var(--color-fg-muted)] max-w-sm mx-auto leading-relaxed mb-5">
+      <p class="text-sm text-fg-muted max-w-sm mx-auto leading-relaxed mb-5">
         See today's, tomorrow's, and this week's events at a glance.
       </p>
       <UiButton
@@ -139,7 +139,7 @@ onMounted(() => {
 
     <div v-else-if="calendarStore.loading && !hasEvents" class="text-center py-8">
       <Spinner :size="28" />
-      <p class="text-sm text-[color:var(--color-fg-muted)] mt-3">Loading your events…</p>
+      <p class="text-sm text-fg-muted mt-3">Loading your events…</p>
     </div>
 
     <ErrorState
@@ -151,7 +151,7 @@ onMounted(() => {
     <div v-else class="space-y-5">
       <div
         v-if="calendarStore.authState.userInfo"
-        class="flex items-center gap-3 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-3"
+        class="flex items-center gap-3 rounded-xl border border-border bg-surface-2 p-3"
       >
         <img
           v-if="calendarStore.authState.userInfo.picture"
@@ -160,10 +160,10 @@ onMounted(() => {
           class="w-8 h-8 rounded-full"
         />
         <div class="min-w-0 flex-1">
-          <p class="text-sm font-medium text-[color:var(--color-fg)] truncate">
+          <p class="text-sm font-medium text-fg truncate">
             {{ calendarStore.authState.userInfo.name }}
           </p>
-          <p class="text-xs text-[color:var(--color-fg-muted)] truncate">
+          <p class="text-xs text-fg-muted truncate">
             {{ calendarStore.authState.userInfo.email }}
           </p>
         </div>
@@ -172,7 +172,7 @@ onMounted(() => {
       <!-- Today's events -->
       <section v-if="calendarStore.todaysEvents.length > 0">
         <h3
-          class="text-[0.7rem] uppercase tracking-wider font-semibold text-[color:var(--color-fg-muted)] mb-2"
+          class="text-[0.7rem] uppercase tracking-wider font-semibold text-fg-muted mb-2"
         >
           Today
         </h3>
@@ -180,25 +180,25 @@ onMounted(() => {
           <article
             v-for="event in calendarStore.todaysEvents"
             :key="event.id"
-            class="rounded-lg border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-3"
+            class="rounded-lg border border-border bg-surface p-3"
           >
             <div class="flex items-start gap-2 justify-between">
               <div class="flex-1 min-w-0">
-                <h4 class="text-sm font-medium text-[color:var(--color-fg)] truncate">
+                <h4 class="text-sm font-medium text-fg truncate">
                   {{ event.summary }}
                 </h4>
-                <p class="text-xs text-[color:var(--color-fg-muted)] tabular-nums mt-0.5">
+                <p class="text-xs text-fg-muted tabular-nums mt-0.5">
                   {{ formatEventTime(event) }}
                 </p>
                 <p
                   v-if="event.location"
-                  class="text-xs text-[color:var(--color-fg-subtle)] mt-1 flex items-center gap-1 truncate"
+                  class="text-xs text-fg-subtle mt-1 flex items-center gap-1 truncate"
                 >
-                  <MapPin class="h-3 w-3 flex-shrink-0" />
+                  <MapPin class="h-3 w-3 shrink-0" />
                   {{ event.location }}
                 </p>
               </div>
-              <div class="flex items-center gap-1.5 flex-shrink-0">
+              <div class="flex items-center gap-1.5 shrink-0">
                 <UiPill :variant="getStatusVariant(event)">{{ getEventStatus(event) }}</UiPill>
                 <a
                   v-if="event.htmlLink"
@@ -219,7 +219,7 @@ onMounted(() => {
 
       <section v-if="calendarStore.tomorrowsEvents.length > 0">
         <h3
-          class="text-[0.7rem] uppercase tracking-wider font-semibold text-[color:var(--color-fg-muted)] mb-2"
+          class="text-[0.7rem] uppercase tracking-wider font-semibold text-fg-muted mb-2"
         >
           Tomorrow
         </h3>
@@ -227,21 +227,21 @@ onMounted(() => {
           <article
             v-for="event in calendarStore.tomorrowsEvents.slice(0, 3)"
             :key="event.id"
-            class="rounded-lg border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-3"
+            class="rounded-lg border border-border bg-surface p-3"
           >
             <div class="flex items-start gap-2 justify-between">
               <div class="flex-1 min-w-0">
-                <h4 class="text-sm font-medium text-[color:var(--color-fg)] truncate">
+                <h4 class="text-sm font-medium text-fg truncate">
                   {{ event.summary }}
                 </h4>
-                <p class="text-xs text-[color:var(--color-fg-muted)] tabular-nums mt-0.5">
+                <p class="text-xs text-fg-muted tabular-nums mt-0.5">
                   {{ formatEventTime(event) }}
                 </p>
                 <p
                   v-if="event.location"
-                  class="text-xs text-[color:var(--color-fg-subtle)] mt-1 flex items-center gap-1 truncate"
+                  class="text-xs text-fg-subtle mt-1 flex items-center gap-1 truncate"
                 >
-                  <MapPin class="h-3 w-3 flex-shrink-0" />
+                  <MapPin class="h-3 w-3 shrink-0" />
                   {{ event.location }}
                 </p>
               </div>
@@ -250,7 +250,7 @@ onMounted(() => {
                 :href="event.htmlLink"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="ui-icon-btn flex-shrink-0"
+                class="ui-icon-btn shrink-0"
                 title="Open in Google Calendar"
                 aria-label="Open in Google Calendar"
               >
@@ -263,7 +263,7 @@ onMounted(() => {
 
       <section v-if="calendarStore.upcomingEvents.length > 0">
         <h3
-          class="text-[0.7rem] uppercase tracking-wider font-semibold text-[color:var(--color-fg-muted)] mb-2"
+          class="text-[0.7rem] uppercase tracking-wider font-semibold text-fg-muted mb-2"
         >
           This week
         </h3>
@@ -271,19 +271,19 @@ onMounted(() => {
           <article
             v-for="event in calendarStore.upcomingEvents.slice(0, 5)"
             :key="event.id"
-            class="rounded-lg border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-3"
+            class="rounded-lg border border-border bg-surface p-3"
           >
-            <h4 class="text-sm font-medium text-[color:var(--color-fg)] truncate">
+            <h4 class="text-sm font-medium text-fg truncate">
               {{ event.summary }}
             </h4>
-            <p class="text-xs text-[color:var(--color-fg-muted)] tabular-nums mt-0.5">
+            <p class="text-xs text-fg-muted tabular-nums mt-0.5">
               {{ formatEventDate(event) }} · {{ formatEventTime(event) }}
             </p>
             <p
               v-if="event.location"
-              class="text-xs text-[color:var(--color-fg-subtle)] mt-1 flex items-center gap-1 truncate"
+              class="text-xs text-fg-subtle mt-1 flex items-center gap-1 truncate"
             >
-              <MapPin class="h-3 w-3 flex-shrink-0" />
+              <MapPin class="h-3 w-3 shrink-0" />
               {{ event.location }}
             </p>
           </article>

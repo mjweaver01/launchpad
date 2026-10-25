@@ -13,11 +13,11 @@ defineEmits<{ (e: 'retry'): void }>();
 <template>
   <div class="text-center py-8">
     <div
-      class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[color:var(--color-danger-soft)] text-[color:var(--color-danger)]"
+      class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-danger-soft text-danger"
     >
       <AlertTriangle class="h-6 w-6" />
     </div>
-    <p class="text-sm text-[color:var(--color-fg-muted)] mb-4 max-w-sm mx-auto">{{ message }}</p>
+    <p class="text-sm text-fg-muted mb-4 max-w-sm mx-auto">{{ message }}</p>
     <UiButton variant="primary" size="sm" @click="$emit('retry')">
       {{ retryLabel ?? 'Try again' }}
     </UiButton>

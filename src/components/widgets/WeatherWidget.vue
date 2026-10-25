@@ -145,7 +145,7 @@ onMounted(() => {
 
     <div v-if="weatherStore.loading && !weatherData" class="text-center py-8">
       <Spinner :size="32" />
-      <p class="text-sm text-[color:var(--color-fg-muted)] mt-3">Getting your location…</p>
+      <p class="text-sm text-fg-muted mt-3">Getting your location…</p>
     </div>
 
     <ErrorState
@@ -171,31 +171,31 @@ onMounted(() => {
         </div>
         <component
           :is="getWeatherIcon(weatherData.icon)"
-          class="weather-icon text-[color:var(--color-brand-600)]"
+          class="weather-icon text-brand-600"
           stroke-width="1.25"
         />
       </div>
 
       <div class="weather-stats">
         <div
-          class="weather-stat rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]"
+          class="weather-stat rounded-xl border border-border bg-surface-2"
         >
           <div class="weather-stat-head">
-            <Droplets class="weather-stat-icon text-[color:var(--color-fg-muted)]" />
-            <span class="weather-stat-label text-[color:var(--color-fg-muted)]">Humidity</span>
+            <Droplets class="weather-stat-icon text-fg-muted" />
+            <span class="weather-stat-label text-fg-muted">Humidity</span>
           </div>
-          <span class="weather-stat-value font-semibold text-[color:var(--color-fg)] tabular-nums">
+          <span class="weather-stat-value font-semibold text-fg tabular-nums">
             {{ weatherData.humidity }}%
           </span>
         </div>
         <div
-          class="weather-stat rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]"
+          class="weather-stat rounded-xl border border-border bg-surface-2"
         >
           <div class="weather-stat-head">
-            <Wind class="weather-stat-icon text-[color:var(--color-fg-muted)]" />
-            <span class="weather-stat-label text-[color:var(--color-fg-muted)]">Wind</span>
+            <Wind class="weather-stat-icon text-fg-muted" />
+            <span class="weather-stat-label text-fg-muted">Wind</span>
           </div>
-          <span class="weather-stat-value font-semibold text-[color:var(--color-fg)] tabular-nums">
+          <span class="weather-stat-value font-semibold text-fg tabular-nums">
             {{ weatherData.windSpeed }}<span class="weather-stat-unit font-normal"> m/s</span>
           </span>
         </div>
@@ -209,22 +209,22 @@ onMounted(() => {
           <div
             v-for="(hour, index) in weatherData.hourlyForecast.slice(0, 12)"
             :key="index"
-            class="flex-shrink-0 rounded-lg border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-2 text-center w-[4.5rem]"
+            class="shrink-0 rounded-lg border border-border bg-surface p-2 text-center w-18"
           >
-            <div class="text-xs text-[color:var(--color-fg-muted)] mb-1 tabular-nums">
+            <div class="text-xs text-fg-muted mb-1 tabular-nums">
               {{ formatHourTime(hour.time) }}
             </div>
             <component
               :is="getWeatherIcon(hour.icon)"
-              class="h-6 w-6 mx-auto text-[color:var(--color-fg-muted)]"
+              class="h-6 w-6 mx-auto text-fg-muted"
               stroke-width="1.5"
             />
-            <div class="text-base font-semibold text-[color:var(--color-fg)] mt-1 tabular-nums">
+            <div class="text-base font-semibold text-fg mt-1 tabular-nums">
               {{ celsiusToFahrenheit(hour.temperature) }}°
             </div>
             <div
               v-if="hour.precipitationProbability > 0"
-              class="text-xs text-[color:var(--color-brand-600)] dark:text-[color:var(--color-brand-400)] mt-0.5 tabular-nums"
+              class="text-xs text-brand-600 dark:text-brand-400 mt-0.5 tabular-nums"
             >
               {{ hour.precipitationProbability }}%
             </div>
@@ -234,14 +234,14 @@ onMounted(() => {
 
       <div
         v-if="locationStore.formattedLocation"
-        class="mt-4 flex items-center gap-2 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-3"
+        class="mt-4 flex items-center gap-2 rounded-xl border border-border bg-surface-2 p-3"
       >
-        <MapPin class="h-4 w-4 text-[color:var(--color-fg-muted)] flex-shrink-0" />
+        <MapPin class="h-4 w-4 text-fg-muted shrink-0" />
         <div class="min-w-0">
-          <div class="text-base font-medium text-[color:var(--color-fg)] truncate">
+          <div class="text-base font-medium text-fg truncate">
             {{ locationStore.formattedLocation }}
           </div>
-          <div class="text-sm text-[color:var(--color-fg-subtle)] tabular-nums">
+          <div class="text-sm text-fg-subtle tabular-nums">
             {{ coordinates?.lat.toFixed(4) }}, {{ coordinates?.lon.toFixed(4) }}
           </div>
         </div>
@@ -251,7 +251,7 @@ onMounted(() => {
         <img
           :src="cachedMapImage"
           :alt="`Map of ${locationStore.formattedLocation || weatherData.location}`"
-          class="w-full h-auto object-cover border-y border-[color:var(--color-border)]"
+          class="w-full h-auto object-cover border-y border-border"
           @error="handleMapError"
         />
       </div>

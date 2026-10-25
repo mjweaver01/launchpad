@@ -80,11 +80,11 @@ onUnmounted(cleanupDragAndDrop);
     class="relative overflow-hidden transition-all duration-200 select-none"
     :class="{
       'cursor-grab active:cursor-grabbing': draggableActive,
-      'opacity-60 scale-[0.97] z-50 rotate-1 ring-2 ring-[color:var(--color-brand-500)] ring-offset-2 ring-offset-[color:var(--color-surface-2)]':
+      'opacity-60 scale-[0.97] z-50 rotate-1 ring-2 ring-brand-500 ring-offset-2 ring-offset-surface-2':
         widgetStore.isDragging && widgetStore.draggedWidget === widgetId,
-      'ring-2 ring-[color:var(--color-brand-400)] ring-inset':
+      'ring-2 ring-brand-400 ring-inset':
         widgetStore.dragOverIndex === index && widgetStore.draggedWidget !== widgetId,
-      'hover:shadow-[var(--shadow-card-hover)]': draggableActive && !widgetStore.isDragging,
+      'hover:shadow-(--shadow-card-hover)': draggableActive && !widgetStore.isDragging,
     }"
     :data-widget-id="widgetId"
     :data-widget-index="index"
@@ -105,10 +105,10 @@ onUnmounted(cleanupDragAndDrop);
         widgetStore.draggedWidget !== widgetId &&
         widgetStore.isDragging
       "
-      class="absolute inset-0 rounded-[var(--radius-card)] border-2 border-dashed border-[color:var(--color-brand-500)] bg-[color:var(--color-brand-100)]/40 dark:bg-[color:var(--color-brand-900)]/30 backdrop-blur-sm pointer-events-none flex items-center justify-center z-40"
+      class="absolute inset-0 rounded-card border-2 border-dashed border-brand-500 bg-brand-100/40 dark:bg-brand-900/30 backdrop-blur-sm pointer-events-none flex items-center justify-center z-40"
     >
       <span
-        class="bg-[color:var(--color-brand-600)] text-white px-3 py-1 rounded-full text-xs font-medium shadow-[var(--shadow-popover)]"
+        class="bg-brand-600 text-white px-3 py-1 rounded-full text-xs font-medium shadow-(--shadow-popover)"
       >
         Drop here
       </span>

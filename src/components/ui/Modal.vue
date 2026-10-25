@@ -23,7 +23,7 @@ defineEmits<{ (e: 'close'): void }>();
       >
         <h3
           v-if="title"
-          class="text-base font-semibold text-[color:var(--color-fg)] mb-2"
+          class="text-base font-semibold text-fg mb-2"
         >
           {{ title }}
         </h3>

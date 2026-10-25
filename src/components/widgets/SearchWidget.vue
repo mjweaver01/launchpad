@@ -79,13 +79,13 @@ const handleBlur = () => setTimeout(() => (showSuggestions.value = false), 200);
 
     <div class="relative mb-5">
       <Search
-        class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[color:var(--color-fg-subtle)] pointer-events-none"
+        class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-fg-subtle pointer-events-none"
       />
       <input
         v-model="searchQuery"
         type="text"
         placeholder="Ask anything…"
-        class="ui-input !pl-10 !pr-12 !py-2.5"
+        class="ui-input pl-10! pr-12! py-2.5!"
         :disabled="searchStore.loading"
         @keyup.enter="handleSearch"
         @focus="showSuggestions = true"
@@ -103,18 +103,18 @@ const handleBlur = () => setTimeout(() => (showSuggestions.value = false), 200);
       <Transition name="ui-popover">
         <div
           v-if="showSuggestions && searchStore.recentSearches.length > 0"
-          class="absolute top-full left-0 right-0 mt-1.5 z-10 ui-card !p-1.5 !shadow-[var(--shadow-popover)]"
+          class="absolute top-full left-0 right-0 mt-1.5 z-10 ui-card p-1.5! shadow-(--shadow-popover)!"
         >
-          <p class="text-[0.7rem] uppercase tracking-wider text-[color:var(--color-fg-subtle)] px-2 pt-1.5 pb-1">
+          <p class="text-[0.7rem] uppercase tracking-wider text-fg-subtle px-2 pt-1.5 pb-1">
             Recent
           </p>
           <button
             v-for="result in searchStore.recentSearches"
             :key="result.id"
-            class="w-full text-left px-2 py-1.5 text-sm rounded-md text-[color:var(--color-fg-muted)] hover:bg-[color:var(--color-surface-2)] hover:text-[color:var(--color-fg)] flex items-center gap-2 transition-colors"
+            class="w-full text-left px-2 py-1.5 text-sm rounded-md text-fg-muted hover:bg-surface-2 hover:text-fg flex items-center gap-2 transition-colors"
             @mousedown="selectSuggestion(result.query)"
           >
-            <History class="h-3.5 w-3.5 text-[color:var(--color-fg-subtle)] flex-shrink-0" />
+            <History class="h-3.5 w-3.5 text-fg-subtle shrink-0" />
             <span class="truncate">{{ result.query }}</span>
           </button>
         </div>
@@ -129,29 +129,29 @@ const handleBlur = () => setTimeout(() => (showSuggestions.value = false), 200);
 
     <div v-else-if="searchStore.loading" class="text-center py-10">
       <Spinner :size="28" />
-      <p class="text-sm text-[color:var(--color-fg-muted)] mt-3">Searching the web with AI…</p>
-      <p class="text-xs text-[color:var(--color-fg-subtle)] mt-1">This may take a few moments</p>
+      <p class="text-sm text-fg-muted mt-3">Searching the web with AI…</p>
+      <p class="text-xs text-fg-subtle mt-1">This may take a few moments</p>
     </div>
 
     <div v-else-if="currentResult && !showHistory">
       <div
-        class="rounded-xl bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] p-5"
+        class="rounded-xl bg-surface-2 border border-border p-5"
       >
         <div class="flex items-center gap-2 mb-3">
           <div
-            class="flex h-7 w-7 items-center justify-center rounded-lg bg-[color:var(--color-brand-600)] text-white"
+            class="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-600 text-white"
           >
             <Sparkles class="h-4 w-4" />
           </div>
-          <h3 class="text-sm font-semibold text-[color:var(--color-fg)]">AI Answer</h3>
+          <h3 class="text-sm font-semibold text-fg">AI Answer</h3>
         </div>
         <div
-          class="markdown-content text-sm text-[color:var(--color-fg-muted)] leading-relaxed"
+          class="markdown-content text-sm text-fg-muted leading-relaxed"
           v-html="formatAnswer(currentResult.answer)"
         />
       </div>
       <div
-        class="flex items-center justify-between text-xs text-[color:var(--color-fg-subtle)] pt-3 mt-3 border-t border-[color:var(--color-border)]"
+        class="flex items-center justify-between text-xs text-fg-subtle pt-3 mt-3 border-t border-border"
       >
         <span>{{ formatDate(currentResult.timestamp) }}</span>
         <UiButton variant="ghost" size="sm" :leading-icon="RotateCcw" @click="resetChat">
@@ -162,7 +162,7 @@ const handleBlur = () => setTimeout(() => (showSuggestions.value = false), 200);
 
     <div v-if="showHistory && searchStore.searchHistory.length > 0">
       <div class="flex items-center justify-between mb-3">
-        <h3 class="text-sm font-semibold text-[color:var(--color-fg)]">History</h3>
+        <h3 class="text-sm font-semibold text-fg">History</h3>
         <UiButton variant="danger" size="sm" :leading-icon="Trash2" @click="searchStore.clearHistory">
           Clear
         </UiButton>
@@ -171,15 +171,15 @@ const handleBlur = () => setTimeout(() => (showSuggestions.value = false), 200);
         <div
           v-for="result in searchStore.searchHistory.slice(0, 10)"
           :key="result.id"
-          class="group flex items-center gap-2 rounded-lg border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 transition-colors hover:bg-[color:var(--color-surface-2)]"
+          class="group flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 transition-colors hover:bg-surface-2"
         >
           <button
-            class="flex-1 text-left text-sm text-[color:var(--color-fg)] hover:text-[color:var(--color-brand-600)] transition-colors truncate"
+            class="flex-1 text-left text-sm text-fg hover:text-brand-600 transition-colors truncate"
             @click="selectFromHistory(result)"
           >
             {{ result.query }}
           </button>
-          <span class="text-xs text-[color:var(--color-fg-subtle)] flex-shrink-0">
+          <span class="text-xs text-fg-subtle shrink-0">
             {{ formatDate(result.timestamp) }}
           </span>
           <button

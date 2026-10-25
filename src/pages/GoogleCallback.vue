@@ -41,32 +41,32 @@ onMounted(handleCallback);
     <div class="ui-card w-full max-w-sm p-8 text-center">
       <div v-if="loading" class="space-y-4">
         <Spinner :size="32" />
-        <h2 class="text-base font-semibold text-[color:var(--color-fg)]">
+        <h2 class="text-base font-semibold text-fg">
           Connecting your calendar
         </h2>
-        <p class="text-sm text-[color:var(--color-fg-muted)]">
+        <p class="text-sm text-fg-muted">
           Please wait while we complete authentication.
         </p>
       </div>
 
       <div v-else-if="success" class="space-y-4">
         <div
-          class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[color:var(--color-success-soft)] text-[color:var(--color-success)]"
+          class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-success-soft text-success"
         >
           <Check class="h-6 w-6" stroke-width="2.5" />
         </div>
-        <h2 class="text-base font-semibold text-[color:var(--color-fg)]">Calendar connected</h2>
-        <p class="text-sm text-[color:var(--color-fg-muted)]">Redirecting to your dashboard…</p>
+        <h2 class="text-base font-semibold text-fg">Calendar connected</h2>
+        <p class="text-sm text-fg-muted">Redirecting to your dashboard…</p>
       </div>
 
       <div v-else-if="error" class="space-y-4">
         <div
-          class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[color:var(--color-danger-soft)] text-[color:var(--color-danger)]"
+          class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-danger-soft text-danger"
         >
           <X class="h-6 w-6" stroke-width="2.5" />
         </div>
-        <h2 class="text-base font-semibold text-[color:var(--color-fg)]">Connection failed</h2>
-        <p class="text-sm text-[color:var(--color-danger)]">{{ error }}</p>
+        <h2 class="text-base font-semibold text-fg">Connection failed</h2>
+        <p class="text-sm text-danger">{{ error }}</p>
         <UiButton variant="primary" @click="goHome">Back to dashboard</UiButton>
       </div>
     </div>

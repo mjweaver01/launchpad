@@ -57,7 +57,7 @@ onMounted(() => {
       <UiSelect
         v-model="newsStore.selectedCategory"
         :options="categoryOptions"
-        class="!w-[140px] !py-1.5 !text-xs"
+        class="w-[140px]! py-1.5! text-xs!"
         aria-label="News category"
         @change="handleCategoryChange"
       />
@@ -97,12 +97,12 @@ onMounted(() => {
     <div v-else-if="newsStore.currentNewsData">
       <article
         v-if="newsStore.currentNewsData.articles.length > 0"
-        class="group pb-5 mb-5 border-b border-[color:var(--color-border)]"
+        class="group pb-5 mb-5 border-b border-border"
       >
         <div class="grid md:grid-cols-3 gap-5">
           <div class="md:col-span-2">
             <h3
-              class="text-lg font-semibold text-[color:var(--color-fg)] mb-2 group-hover:text-[color:var(--color-brand-600)] dark:group-hover:text-[color:var(--color-brand-400)] transition-colors leading-snug"
+              class="text-lg font-semibold text-fg mb-2 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors leading-snug"
             >
               <a
                 :href="newsStore.currentNewsData.articles[0].url"
@@ -112,11 +112,11 @@ onMounted(() => {
                 {{ newsStore.currentNewsData.articles[0].title }}
               </a>
             </h3>
-            <p class="text-sm text-[color:var(--color-fg-muted)] mb-3 leading-relaxed line-clamp-3">
+            <p class="text-sm text-fg-muted mb-3 leading-relaxed line-clamp-3">
               {{ newsStore.currentNewsData.articles[0].description }}
             </p>
-            <div class="flex items-center gap-2 text-xs text-[color:var(--color-fg-subtle)]">
-              <span class="font-medium text-[color:var(--color-fg-muted)]">
+            <div class="flex items-center gap-2 text-xs text-fg-subtle">
+              <span class="font-medium text-fg-muted">
                 {{ newsStore.currentNewsData.articles[0].source.name }}
               </span>
               <span>·</span>
@@ -128,12 +128,12 @@ onMounted(() => {
               v-if="newsStore.currentNewsData.articles[0].urlToImage"
               :src="newsStore.currentNewsData.articles[0].urlToImage"
               :alt="newsStore.currentNewsData.articles[0].title"
-              class="w-full h-40 object-cover rounded-lg border border-[color:var(--color-border)]"
+              class="w-full h-40 object-cover rounded-lg border border-border"
               @error="handleImageError"
             />
             <div
               v-else
-              class="w-full h-40 bg-[color:var(--color-surface-2)] rounded-lg flex items-center justify-center text-[color:var(--color-fg-subtle)]"
+              class="w-full h-40 bg-surface-2 rounded-lg flex items-center justify-center text-fg-subtle"
             >
               <ImageIcon class="h-8 w-8" />
             </div>
@@ -145,7 +145,7 @@ onMounted(() => {
         <article
           v-for="(article, index) in newsStore.currentNewsData.articles.slice(1)"
           :key="index"
-          class="group rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-3 hover:bg-[color:var(--color-surface-3)] transition-colors"
+          class="group rounded-xl border border-border bg-surface-2 p-3 hover:bg-surface-3 transition-colors"
         >
           <img
             v-if="article.urlToImage"
@@ -156,22 +156,22 @@ onMounted(() => {
           />
           <div
             v-else
-            class="w-full h-28 bg-[color:var(--color-surface-3)] rounded-lg mb-3 flex items-center justify-center text-[color:var(--color-fg-subtle)]"
+            class="w-full h-28 bg-surface-3 rounded-lg mb-3 flex items-center justify-center text-fg-subtle"
           >
             <ImageIcon class="h-6 w-6" />
           </div>
           <h4
-            class="text-sm font-semibold text-[color:var(--color-fg)] mb-2 group-hover:text-[color:var(--color-brand-600)] transition-colors line-clamp-3 leading-snug"
+            class="text-sm font-semibold text-fg mb-2 group-hover:text-brand-600 transition-colors line-clamp-3 leading-snug"
           >
             <a :href="article.url" target="_blank" rel="noopener noreferrer">
               {{ article.title }}
             </a>
           </h4>
-          <p class="text-xs text-[color:var(--color-fg-muted)] mb-2 line-clamp-2 leading-relaxed">
+          <p class="text-xs text-fg-muted mb-2 line-clamp-2 leading-relaxed">
             {{ article.description }}
           </p>
-          <div class="flex items-center gap-2 text-[0.7rem] text-[color:var(--color-fg-subtle)]">
-            <span class="font-medium text-[color:var(--color-fg-muted)]">{{ article.source.name }}</span>
+          <div class="flex items-center gap-2 text-[0.7rem] text-fg-subtle">
+            <span class="font-medium text-fg-muted">{{ article.source.name }}</span>
             <span>·</span>
             <span>{{ formatDate(article.publishedAt) }}</span>
           </div>
@@ -187,9 +187,9 @@ onMounted(() => {
 
       <div
         v-else
-        class="flex flex-col sm:flex-row items-center justify-between gap-3 mt-5 pt-4 border-t border-[color:var(--color-border)]"
+        class="flex flex-col sm:flex-row items-center justify-between gap-3 mt-5 pt-4 border-t border-border"
       >
-        <p class="text-xs text-[color:var(--color-fg-muted)]">
+        <p class="text-xs text-fg-muted">
           {{ (newsStore.currentPage - 1) * newsStore.pageSize + 1 }}–{{
             (newsStore.currentPage - 1) * newsStore.pageSize +
             newsStore.currentNewsData.articles.length
@@ -209,8 +209,8 @@ onMounted(() => {
             class="min-w-8 h-8 px-2 rounded-md text-xs font-medium transition-colors"
             :class="
               page === newsStore.currentPage
-                ? 'bg-[color:var(--color-brand-600)] text-white'
-                : 'text-[color:var(--color-fg-muted)] hover:bg-[color:var(--color-surface-2)] hover:text-[color:var(--color-fg)]'
+                ? 'bg-brand-600 text-white'
+                : 'text-fg-muted hover:bg-surface-2 hover:text-fg'
             "
             @click="newsStore.goToPage(page)"
           >

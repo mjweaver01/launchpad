@@ -47,7 +47,7 @@ onUnmounted(() => {
 
 <template>
   <div
-    class="min-h-screen bg-[color:var(--color-surface-2)] text-[color:var(--color-fg)] transition-colors duration-200"
+    class="min-h-screen bg-surface-2 text-fg transition-colors duration-200"
   >
     <AppHeader v-if="$route.name !== 'Full Screen'" />
     <router-view />

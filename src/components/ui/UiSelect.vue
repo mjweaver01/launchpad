@@ -20,7 +20,7 @@ defineEmits<{
     :id="id"
     v-bind="$attrs"
     :value="modelValue"
-    class="ui-input pr-8 cursor-pointer appearance-none bg-no-repeat bg-[right_0.625rem_center] bg-[length:1rem]"
+    class="ui-input pr-8 cursor-pointer appearance-none bg-no-repeat bg-position-[right_0.625rem_center] bg-size-[1rem]"
     style="
       background-image: url(&quot;data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23737373' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>&quot;);
     "

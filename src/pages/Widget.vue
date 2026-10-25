@@ -51,7 +51,7 @@ const widgetInstanceProps = computed(() => {
     <component :is="currentWidget" v-if="currentWidget" v-bind="widgetInstanceProps" class="w-full" />
     <div
       v-else
-      class="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8"
+      class="rounded-2xl border border-border bg-surface p-8"
     >
       <EmptyState
         :icon="AlertTriangle"
