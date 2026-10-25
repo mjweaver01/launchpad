@@ -48,7 +48,7 @@ const showHeader = computed(() => !props.hideHeader && !isFullScreen.value);
           v-if="showExpand"
           :to="`/widget/${widgetName}`"
           class="ui-icon-btn"
-          :title="`View ${displayName} in full page`"
+          :data-tooltip="`View ${displayName} in full page`"
           :aria-label="`Expand ${displayName}`"
         >
           <Maximize2 />

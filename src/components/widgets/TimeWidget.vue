@@ -1,11 +1,23 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
-import { Clock, Watch, SquareSplitVertical, MapPin, Timer, TimerOff } from 'lucide-vue-next';
-import { useLocationStore, useWeatherStore, useWidgetSettingsStore } from '../../stores';
-import type { TimeClockMode } from '../../stores/widgetSettings';
+import { ref, onMounted, onUnmounted, computed, watch, nextTick } from 'vue';
+import { useRoute } from 'vue-router';
+import { Clock, Watch, SquareSplitVertical, MapPin, Settings2 } from 'lucide-vue-next';
+import {
+  useAppFontStore,
+  useLocationStore,
+  useWeatherStore,
+  useWidgetSettingsStore,
+} from '../../stores';
+import type { TimeClockMode, TimeWidgetSettings } from '../../stores/widgetSettings';
+import { fontSelectOptions, getFont } from '../../assets/fonts';
 import WidgetCard from './WidgetCard.vue';
 import IconButton from '../ui/IconButton.vue';
 import FlipDigit from './FlipDigit.vue';
+import Popover from '../ui/Popover.vue';
+import { usePopover } from '../../composables/usePopover';
+import UiSelect from '../ui/UiSelect.vue';
+import UiToggle from '../ui/UiToggle.vue';
+import UiButton from '../ui/UiButton.vue';
 
 const props = withDefaults(
   defineProps<{
@@ -22,10 +34,43 @@ const CLOCK_MODE_ORDER: ClockMode[] = ['digital', 'scoreboard', 'analog'];
 const locationStore = useLocationStore();
 const weatherStore = useWeatherStore();
 const widgetSettingsStore = useWidgetSettingsStore();
+const route = useRoute();
 const currentTime = ref(new Date());
-const clockMode = ref<ClockMode>(widgetSettingsStore.getTimeSettings(props.widgetId).clockMode);
-const showSeconds = ref(widgetSettingsStore.getTimeSettings(props.widgetId).showSeconds);
+const settings = ref<TimeWidgetSettings>(widgetSettingsStore.getTimeSettings(props.widgetId));
+const clockMode = computed(() => settings.value.clockMode);
+const showSeconds = computed(() => settings.value.showSeconds);
+const showPeriod = computed(() => settings.value.showPeriod);
+const appFontStore = useAppFontStore();
+// 'app' follows the app-wide font; otherwise the clock has its own.
+const clockFont = computed(() =>
+  getFont(settings.value.font === 'app' ? appFontStore.fontId : settings.value.font)
+);
+const isFullScreen = computed(() => route.name === 'Full Screen');
+const settingsPopover = usePopover();
 let intervalId: ReturnType<typeof setInterval> | null = null;
+
+const updateSettings = (patch: Partial<TimeWidgetSettings>) => {
+  settings.value = { ...settings.value, ...patch };
+  widgetSettingsStore.setTimeSettings(props.widgetId, patch);
+};
+
+// Time only: big rounded digits, no seconds, AM/PM, date or location.
+const applyTimeOnlyPreset = () =>
+  updateSettings({
+    clockMode: 'digital',
+    font: 'rounded',
+    showSeconds: false,
+    showPeriod: false,
+    showDate: false,
+    showLocation: false,
+  });
+
+const styleOptions = [
+  { label: 'Digital', value: 'digital' },
+  { label: 'Flip', value: 'scoreboard' },
+  { label: 'Analog', value: 'analog' },
+];
+const fontOptions = [{ label: 'App font', value: 'app' }, ...fontSelectOptions];
 
 const formattedTime = computed(() =>
   currentTime.value.toLocaleTimeString('en-US', {
@@ -40,15 +85,34 @@ const formattedTime = computed(() =>
 // separator is a full-width space in the monospace font (Chrome also emits a
 // narrow no-break space, U+202F), which left a gap as wide as a digit.
 const PERIOD_GAP = 14; // SVG units at font-size 100, about 0.14em
-const CHAR_WIDTH = 56; // advance per monospace glyph incl. letter-spacing
 const digitalParts = computed(() => {
   const match = formattedTime.value.match(/^(.*?)[\s\u202f]+([AP]M)$/i);
-  return match ? { time: match[1], period: match[2] } : { time: formattedTime.value, period: '' };
+  const parts = match
+    ? { time: match[1], period: match[2] }
+    : { time: formattedTime.value, period: '' };
+  return showPeriod.value ? parts : { time: parts.time, period: '' };
 });
-const digitalViewBoxWidth = computed(() => {
-  const { time, period } = digitalParts.value;
-  return (time.length + period.length) * CHAR_WIDTH + (period ? PERIOD_GAP : 0);
-});
+
+// The digital clock is SVG text sized to fill the card. Fonts differ in width
+// (and most aren't monospace), so measure the rendered text and fit the
+// viewBox to it, instead of estimating from the character count.
+const digitalText = ref<SVGTextElement | null>(null);
+const digitalViewBox = ref('0 -78 400 100');
+const measureDigital = () => {
+  const el = digitalText.value;
+  if (!el) return;
+  const box = el.getBBox();
+  if (!box.width || !box.height) return; // hidden or not laid out yet
+  const pad = box.height * 0.02;
+  digitalViewBox.value = `${box.x - pad} ${box.y} ${box.width + pad * 2} ${box.height}`;
+};
+watch(
+  () => [digitalParts.value.time, digitalParts.value.period, clockFont.value.id, clockMode.value],
+  () => nextTick(measureDigital),
+  { flush: 'post' }
+);
+// Webfonts load after first paint; re-measure once they arrive.
+const onFontsLoaded = () => measureDigital();
 
 const formattedDate = computed(() =>
   currentTime.value.toLocaleDateString('en-US', {
@@ -117,15 +181,7 @@ const nextModeLabel = computed(() => {
   }
 });
 
-const toggleSeconds = () => {
-  showSeconds.value = !showSeconds.value;
-  widgetSettingsStore.setTimeSettings(props.widgetId, { showSeconds: showSeconds.value });
-};
-
-const cycleClockMode = () => {
-  clockMode.value = nextClockMode.value;
-  widgetSettingsStore.setTimeSettings(props.widgetId, { clockMode: clockMode.value });
-};
+const cycleClockMode = () => updateSettings({ clockMode: nextClockMode.value });
 
 const loadLocationData = async () => {
   const coordinates = weatherStore.coordinatesCache?.data;
@@ -155,9 +211,10 @@ onMounted(() => {
   locationStore.initializeFromStorage();
   weatherStore.initializeFromStorage();
 
-  const settings = widgetSettingsStore.getTimeSettings(props.widgetId);
-  clockMode.value = settings.clockMode;
-  showSeconds.value = settings.showSeconds;
+  settings.value = widgetSettingsStore.getTimeSettings(props.widgetId);
+  document.fonts?.addEventListener('loadingdone', onFontsLoaded);
+  document.fonts?.ready.then(onFontsLoaded);
+  nextTick(measureDigital);
 
   intervalId = setInterval(() => {
     currentTime.value = new Date();
@@ -167,6 +224,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   if (intervalId) clearInterval(intervalId);
+  document.fonts?.removeEventListener('loadingdone', onFontsLoaded);
 });
 </script>
 
@@ -180,10 +238,10 @@ onUnmounted(() => {
   >
     <template #actions>
       <IconButton
-        v-if="clockMode === 'digital'"
-        :icon="showSeconds ? TimerOff : Timer"
-        :label="showSeconds ? 'Hide seconds' : 'Show seconds'"
-        @click="toggleSeconds"
+        :icon="Settings2"
+        label="Clock settings"
+        :aria-expanded="settingsPopover.isOpen.value"
+        @click="settingsPopover.toggle"
       />
       <IconButton :icon="nextModeIcon" :label="nextModeLabel" @click="cycleClockMode" />
     </template>
@@ -193,25 +251,34 @@ onUnmounted(() => {
       <div class="w-full">
         <svg
           class="block w-full"
-          :viewBox="`0 0 ${digitalViewBoxWidth} 100`"
+          :class="{ 'max-h-[70dvh]': isFullScreen }"
+          :viewBox="digitalViewBox"
           preserveAspectRatio="xMidYMid meet"
           :aria-label="`Current time ${formattedTime}`"
         >
+          <!-- x/y at the origin: the viewBox is fitted to this text's measured box -->
           <text
-            x="50%"
-            y="82"
-            text-anchor="middle"
-            class="font-mono fill-fg"
-            font-weight="700"
+            ref="digitalText"
+            x="0"
+            y="0"
+            class="fill-fg"
             font-size="100"
-            style="font-variant-numeric: tabular-nums; letter-spacing: -0.05em"
+            :font-weight="clockFont.clock.weight"
+            :style="{
+              fontFamily: clockFont.stack,
+              letterSpacing: clockFont.clock.letterSpacing,
+              fontVariantNumeric: 'tabular-nums',
+            }"
           >
             <tspan>{{ digitalParts.time }}</tspan>
             <tspan v-if="digitalParts.period" :dx="PERIOD_GAP">{{ digitalParts.period }}</tspan>
           </text>
         </svg>
       </div>
-      <div class="text-sm sm:text-base text-fg-muted mt-2 truncate max-w-full">
+      <div
+        v-if="settings.showDate"
+        class="text-sm sm:text-base text-fg-muted mt-2 truncate max-w-full"
+      >
         {{ formattedDate }}
       </div>
     </template>
@@ -224,10 +291,13 @@ onUnmounted(() => {
           <span class="scoreboard-colon" aria-hidden="true">:</span>
           <FlipDigit :value="scoreboardParts.m1" />
           <FlipDigit :value="scoreboardParts.m2" />
-          <span class="scoreboard-period">{{ scoreboardParts.period }}</span>
+          <span v-if="showPeriod" class="scoreboard-period">{{ scoreboardParts.period }}</span>
         </div>
       </div>
-      <div class="text-sm sm:text-base text-fg-muted mt-3 truncate max-w-full">
+      <div
+        v-if="settings.showDate"
+        class="text-sm sm:text-base text-fg-muted mt-3 truncate max-w-full"
+      >
         {{ formattedDate }}
       </div>
     </template>
@@ -235,13 +305,7 @@ onUnmounted(() => {
     <template v-else>
       <div class="relative aspect-square w-full max-w-[min(80%,16rem)]">
         <svg class="w-full h-full -rotate-90" viewBox="0 0 200 200">
-          <circle
-            cx="100"
-            cy="100"
-            r="98"
-            class="fill-surface stroke-border"
-            stroke-width="2"
-          />
+          <circle cx="100" cy="100" r="98" class="fill-surface stroke-border" stroke-width="2" />
           <g v-for="hour in 12" :key="hour" class="text-fg-muted">
             <line
               :x1="100 + 85 * Math.cos(((hour * 30 - 90) * Math.PI) / 180)"
@@ -282,16 +346,64 @@ onUnmounted(() => {
           <circle cx="100" cy="100" r="5" class="fill-fg" />
         </svg>
       </div>
-      <div class="text-sm text-fg-muted mt-3">{{ formattedDate }}</div>
+      <div v-if="settings.showDate" class="text-sm text-fg-muted mt-3">{{ formattedDate }}</div>
     </template>
 
     <div
-      v-if="locationStore.formattedLocation"
+      v-if="settings.showLocation && locationStore.formattedLocation"
       class="text-xs text-fg-muted mt-2 flex items-center justify-center gap-1 truncate max-w-full"
     >
       <MapPin class="h-3 w-3 shrink-0" />
       <span class="truncate">{{ locationStore.formattedLocation }}</span>
     </div>
+
+    <Popover
+      :open="settingsPopover.isOpen.value"
+      :anchor="settingsPopover.anchor.value"
+      title="Clock settings"
+      @close="settingsPopover.close"
+    >
+      <div class="space-y-4 text-left">
+        <UiSelect
+          id="clock-style"
+          label="Style"
+          :model-value="settings.clockMode"
+          :options="styleOptions"
+          @change="v => updateSettings({ clockMode: v as TimeClockMode })"
+        />
+        <UiSelect
+          v-if="clockMode === 'digital'"
+          id="clock-font"
+          label="Font"
+          :model-value="settings.font"
+          :options="fontOptions"
+          @change="v => updateSettings({ font: v as TimeWidgetSettings['font'] })"
+        />
+        <UiToggle
+          v-if="clockMode === 'digital'"
+          label="Seconds"
+          :model-value="settings.showSeconds"
+          @update:model-value="v => updateSettings({ showSeconds: v })"
+        />
+        <UiToggle
+          v-if="clockMode !== 'analog'"
+          label="AM/PM"
+          :model-value="settings.showPeriod"
+          @update:model-value="v => updateSettings({ showPeriod: v })"
+        />
+        <UiToggle
+          label="Date"
+          :model-value="settings.showDate"
+          @update:model-value="v => updateSettings({ showDate: v })"
+        />
+        <UiToggle
+          label="Location"
+          :model-value="settings.showLocation"
+          @update:model-value="v => updateSettings({ showLocation: v })"
+        />
+        <UiButton variant="secondary" size="sm" @click="applyTimeOnlyPreset"> Time only </UiButton>
+      </div>
+    </Popover>
   </WidgetCard>
 </template>
 

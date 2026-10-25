@@ -1,22 +1,28 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { Rocket, RefreshCw, Menu, X } from 'lucide-vue-next';
-import { routes } from '../router';
+import { ref, watch, nextTick } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { Rocket, RefreshCw, SunMoon, House, Fullscreen } from 'lucide-vue-next';
 import { useWeatherStore, useNewsStore, useCalendarStore } from '../stores';
+import { usePopover } from '../composables/usePopover';
 import IconButton from './ui/IconButton.vue';
+import Popover from './ui/Popover.vue';
+import ThemeSettings from './ThemeSettings.vue';
 
+const route = useRoute();
+const router = useRouter();
 const weatherStore = useWeatherStore();
 const newsStore = useNewsStore();
 const calendarStore = useCalendarStore();
+
+const themePopover = usePopover();
+const themeButton = ref<InstanceType<typeof IconButton> | null>(null);
+
+const navLinks = [
+  { to: '/', label: 'Home', icon: House },
+  { to: '/fullscreen', label: 'Full screen', icon: Fullscreen },
+];
+
 const isRefreshing = ref(false);
-const isMobileMenuOpen = ref(false);
-
-const filteredRoutes = computed(() =>
-  routes.filter(r => !r.path.includes('google') && !r.path.includes('/widget'))
-);
-
-const hasNavItems = computed(() => filteredRoutes.value.length > 0);
-
 const handleRefresh = async () => {
   if (isRefreshing.value) return;
   isRefreshing.value = true;
@@ -28,44 +34,52 @@ const handleRefresh = async () => {
     isRefreshing.value = false;
   }
 };
+
+// The old /settings page redirects to /?theme=1: open the theme popup, then
+// drop the query so a reload doesn't reopen it.
+watch(
+  () => route.query.theme,
+  async value => {
+    if (!value) return;
+    await nextTick();
+    themePopover.open(themeButton.value?.$el ?? null);
+    const { theme: _theme, ...rest } = route.query;
+    router.replace({ query: rest });
+  },
+  { immediate: true }
+);
 </script>
 
 <template>
-  <header
-    class="sticky top-0 z-50 backdrop-blur-md bg-surface/85 border-b border-border"
-  >
+  <header class="sticky top-0 z-50 backdrop-blur-md bg-surface/85 border-b border-border">
     <div class="mx-auto max-w-7xl px-4 sm:px-6">
       <div class="flex h-14 items-center justify-between gap-3">
-        <router-link
-          to="/"
-          class="flex items-center gap-2 text-fg no-underline"
-        >
-          <span
-            class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-white"
-          >
+        <router-link to="/" class="flex items-center gap-2 text-fg no-underline">
+          <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-white">
             <Rocket class="h-4 w-4" />
           </span>
           <span class="font-display text-base font-semibold tracking-tight">Launchpad</span>
         </router-link>
 
-        <!-- Desktop nav -->
-        <nav class="hidden md:flex items-center gap-1">
+        <nav class="flex items-center gap-1" aria-label="Main">
           <router-link
-            v-for="r in filteredRoutes"
-            :key="r.path"
-            :to="r.path"
-            class="rounded-md px-3 py-1.5 text-sm font-medium text-fg-muted hover:text-fg hover:bg-surface-2 transition-colors"
-            :class="{
-              'text-fg! bg-surface-2':
-                $route.path === r.path,
-            }"
+            v-for="link in navLinks"
+            :key="link.to"
+            :to="link.to"
+            class="ui-icon-btn"
+            :class="{ 'bg-surface-2 text-fg!': route.path === link.to }"
+            :aria-label="link.label"
+            :data-tooltip="link.label"
           >
-            {{ r.name }}
+            <component :is="link.icon" />
           </router-link>
-        </nav>
-
-        <!-- Right side -->
-        <div class="flex items-center gap-1">
+          <IconButton
+            ref="themeButton"
+            :icon="SunMoon"
+            label="Theme"
+            :aria-expanded="themePopover.isOpen.value"
+            @click="themePopover.toggle"
+          />
           <IconButton
             :icon="RefreshCw"
             :spin="isRefreshing"
@@ -73,49 +87,17 @@ const handleRefresh = async () => {
             label="Refresh all data"
             @click="handleRefresh"
           />
-          <IconButton
-            v-if="hasNavItems"
-            class="md:hidden"
-            :icon="isMobileMenuOpen ? X : Menu"
-            :label="isMobileMenuOpen ? 'Close menu' : 'Open menu'"
-            @click="isMobileMenuOpen = !isMobileMenuOpen"
-          />
-        </div>
-      </div>
-
-      <!-- Mobile menu -->
-      <Transition name="ui-mobile-menu">
-        <nav v-if="isMobileMenuOpen && hasNavItems" class="md:hidden flex flex-col gap-1 pb-4 pt-1">
-          <router-link
-            v-for="r in filteredRoutes"
-            :key="r.path"
-            :to="r.path"
-            class="rounded-md px-3 py-2 text-sm font-medium text-fg-muted hover:text-fg hover:bg-surface-2 transition-colors"
-            :class="{
-              'text-fg! bg-surface-2':
-                $route.path === r.path,
-            }"
-            @click="isMobileMenuOpen = false"
-          >
-            {{ r.name }}
-          </router-link>
         </nav>
-      </Transition>
+      </div>
     </div>
+
+    <Popover
+      :open="themePopover.isOpen.value"
+      :anchor="themePopover.anchor.value"
+      title="Theme"
+      @close="themePopover.close"
+    >
+      <ThemeSettings />
+    </Popover>
   </header>
 </template>
-
-<style scoped>
-.ui-mobile-menu-enter-active,
-.ui-mobile-menu-leave-active {
-  transition:
-    opacity 180ms ease,
-    transform 180ms ease;
-  overflow: hidden;
-}
-.ui-mobile-menu-enter-from,
-.ui-mobile-menu-leave-to {
-  opacity: 0;
-  transform: translateY(-4px);
-}
-</style>

@@ -39,7 +39,12 @@ const widgetInstanceId = computed(() => {
 
 const widgetInstanceProps = computed(() => {
   const widgetName = (route.params.name as string)?.toLowerCase();
-  if (widgetName === 'time' || widgetName === 'water' || widgetName === 'water-reminder') {
+  if (
+    widgetName === 'time' ||
+    widgetName === 'weather' ||
+    widgetName === 'water' ||
+    widgetName === 'water-reminder'
+  ) {
     return { widgetId: widgetInstanceId.value };
   }
   return {};
@@ -48,11 +53,13 @@ const widgetInstanceProps = computed(() => {
 
 <template>
   <main class="mx-auto max-w-4xl px-4 sm:px-6 py-6">
-    <component :is="currentWidget" v-if="currentWidget" v-bind="widgetInstanceProps" class="w-full" />
-    <div
-      v-else
-      class="rounded-2xl border border-border bg-surface p-8"
-    >
+    <component
+      :is="currentWidget"
+      v-if="currentWidget"
+      v-bind="widgetInstanceProps"
+      class="w-full"
+    />
+    <div v-else class="rounded-2xl border border-border bg-surface p-8">
       <EmptyState
         :icon="AlertTriangle"
         title="Widget not found"

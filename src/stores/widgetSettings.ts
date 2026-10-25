@@ -2,17 +2,36 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { CacheStorage } from './storage';
 import type { WaterReminderData } from './types';
+import type { FontId } from '../assets/fonts';
 
 export type TimeClockMode = 'digital' | 'scoreboard' | 'analog';
+
+/** Digital clock typeface: one of the shared fonts, or 'app' to follow the app font. */
+export type TimeClockFont = FontId | 'app';
 
 export interface TimeWidgetSettings {
   clockMode: TimeClockMode;
   /** Digital mode only: show the seconds field. */
   showSeconds: boolean;
+  /** Digital and scoreboard modes: show AM/PM. */
+  showPeriod: boolean;
+  showDate: boolean;
+  showLocation: boolean;
+  /** Digital mode only. */
+  font: TimeClockFont;
+}
+
+export type WeatherLayout = 'full' | 'summary' | 'compact';
+
+export interface WeatherWidgetSettings {
+  layout: WeatherLayout;
+  /** Compact layout: icon and temperature size, percent of the default. */
+  compactScale: number;
 }
 
 export interface WidgetSettingsEntry {
   time?: TimeWidgetSettings;
+  weather?: WeatherWidgetSettings;
   waterReminder?: WaterReminderData;
 }
 
@@ -21,7 +40,16 @@ const LEGACY_TIME_KEY = 'timeWidget-clockMode';
 const LEGACY_TIME_ANALOG_KEY = 'timeWidget-analogClock';
 const LEGACY_WATER_KEY = 'water-reminder-data';
 
-const defaultTimeSettings = (): TimeWidgetSettings => ({ clockMode: 'digital', showSeconds: true });
+const defaultTimeSettings = (): TimeWidgetSettings => ({
+  clockMode: 'digital',
+  showSeconds: true,
+  showPeriod: true,
+  showDate: true,
+  showLocation: true,
+  font: 'mono',
+});
+
+const defaultWeatherSettings = (): WeatherWidgetSettings => ({ layout: 'full', compactScale: 100 });
 
 export const useWidgetSettingsStore = defineStore('widgetSettings', () => {
   const byWidgetId = ref<Record<string, WidgetSettingsEntry>>({});
@@ -68,6 +96,17 @@ export const useWidgetSettingsStore = defineStore('widgetSettings', () => {
   const setTimeSettings = (widgetId: string, settings: Partial<TimeWidgetSettings>) => {
     const entry = getEntry(widgetId);
     entry.time = { ...defaultTimeSettings(), ...entry.time, ...settings };
+    persist();
+  };
+
+  const getWeatherSettings = (widgetId: string): WeatherWidgetSettings => ({
+    ...defaultWeatherSettings(),
+    ...getEntry(widgetId).weather,
+  });
+
+  const setWeatherSettings = (widgetId: string, settings: Partial<WeatherWidgetSettings>) => {
+    const entry = getEntry(widgetId);
+    entry.weather = { ...defaultWeatherSettings(), ...entry.weather, ...settings };
     persist();
   };
 
@@ -152,6 +191,8 @@ export const useWidgetSettingsStore = defineStore('widgetSettings', () => {
   return {
     getTimeSettings,
     setTimeSettings,
+    getWeatherSettings,
+    setWeatherSettings,
     getWaterReminderData,
     setWaterReminderData,
     copySettings,

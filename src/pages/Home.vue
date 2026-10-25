@@ -144,7 +144,7 @@ const showWidgetManager = ref(false);
         :draggable-active="showWidgetManager"
       >
         <TimeWidget v-if="widget.component === 'TimeWidget'" :widget-id="widget.id" />
-        <WeatherWidget v-else-if="widget.component === 'WeatherWidget'" />
+        <WeatherWidget v-else-if="widget.component === 'WeatherWidget'" :widget-id="widget.id" />
         <NewsWidget v-else-if="widget.component === 'NewsWidget'" />
         <CalendarWidget v-else-if="widget.component === 'CalendarWidget'" />
         <TodoWidget v-else-if="widget.component === 'TodoWidget'" />

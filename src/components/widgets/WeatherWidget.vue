@@ -16,14 +16,41 @@ import {
   Cloud,
 } from 'lucide-vue-next';
 import type { Component } from 'vue';
-import { useWeatherStore, useLocationStore } from '../../stores';
+import { Settings2 } from 'lucide-vue-next';
+import { useWeatherStore, useLocationStore, useWidgetSettingsStore } from '../../stores';
+import type { WeatherLayout } from '../../stores/widgetSettings';
 import WidgetCard from './WidgetCard.vue';
 import IconButton from '../ui/IconButton.vue';
+import Popover from '../ui/Popover.vue';
+import { usePopover } from '../../composables/usePopover';
+import UiSelect from '../ui/UiSelect.vue';
 import Spinner from '../ui/Spinner.vue';
 import ErrorState from '../ui/ErrorState.vue';
 
+const props = withDefaults(defineProps<{ widgetId?: string }>(), { widgetId: 'weather' });
+
 const weatherStore = useWeatherStore();
 const locationStore = useLocationStore();
+const widgetSettingsStore = useWidgetSettingsStore();
+const layout = ref<WeatherLayout>(widgetSettingsStore.getWeatherSettings(props.widgetId).layout);
+const compactScale = ref(widgetSettingsStore.getWeatherSettings(props.widgetId).compactScale);
+
+const onCompactScale = (event: Event) => {
+  compactScale.value = Number((event.target as HTMLInputElement).value);
+  widgetSettingsStore.setWeatherSettings(props.widgetId, { compactScale: compactScale.value });
+};
+const settingsPopover = usePopover();
+
+const layoutOptions = [
+  { label: 'Full: details, hourly, map', value: 'full' },
+  { label: 'Summary: conditions and next hours', value: 'summary' },
+  { label: 'Compact: icon and temperature', value: 'compact' },
+];
+
+const setLayout = (value: WeatherLayout) => {
+  layout.value = value;
+  widgetSettingsStore.setWeatherSettings(props.widgetId, { layout: value });
+};
 const cachedMapImage = ref<string | null>(null);
 
 const coordinates = computed(() => weatherStore.coordinatesCache?.data || null);
@@ -52,6 +79,18 @@ const ICON_MAP: Record<string, Component> = {
   hail: Snowflake,
 };
 const getWeatherIcon = (icon: string): Component => ICON_MAP[icon] ?? CloudSun;
+
+// Color treatment for the compact layout icon: a filled orange sun
+// with yellow rays, pale moon, grey clouds, blue rain and so on.
+const getIconTone = (icon: string): string => {
+  if (icon === 'clear-day') return 'wx-sun';
+  if (icon === 'clear-night') return 'wx-moon';
+  if (icon.startsWith('thunder')) return 'wx-storm';
+  if (icon.includes('rain') || icon.startsWith('showers')) return 'wx-rain';
+  if (icon.includes('snow') || icon === 'sleet' || icon === 'hail') return 'wx-snow';
+  if (icon === 'partly-cloudy-day') return 'wx-sun-cloud';
+  return 'wx-cloud';
+};
 
 const formatHourTime = (timeString: string) => {
   const date = new Date(timeString);
@@ -126,14 +165,29 @@ const loadWeather = async (force = false) => {
 const retryLocation = () => loadWeather(true);
 
 onMounted(() => {
+  const weatherSettings = widgetSettingsStore.getWeatherSettings(props.widgetId);
+  layout.value = weatherSettings.layout;
+  compactScale.value = weatherSettings.compactScale;
   weatherStore.initializeFromStorage();
   if (!weatherStore.weatherCache?.data) loadWeather();
 });
 </script>
 
 <template>
-  <WidgetCard title="Weather" :icon="CloudSun" widgetName="weather" displayName="Weather">
+  <WidgetCard
+    title="Weather"
+    :icon="CloudSun"
+    widgetName="weather"
+    displayName="Weather"
+    :body-class="layout === 'compact' ? 'flex! flex-col items-center justify-center' : ''"
+  >
     <template #actions>
+      <IconButton
+        :icon="Settings2"
+        label="Weather settings"
+        :aria-expanded="settingsPopover.isOpen.value"
+        @click="settingsPopover.toggle"
+      />
       <IconButton
         :icon="RefreshCw"
         :spin="weatherStore.loading"
@@ -154,6 +208,60 @@ onMounted(() => {
       retry-label="Try again"
       @retry="retryLocation"
     />
+
+    <div
+      v-else-if="weatherData && layout === 'compact'"
+      class="weather-compact"
+      :style="{ '--wx-scale': compactScale / 100 }"
+      :aria-label="`${celsiusToFahrenheit(weatherData.temperature)} degrees, ${weatherData.description}`"
+    >
+      <component
+        :is="getWeatherIcon(weatherData.icon)"
+        class="weather-compact-icon"
+        :class="getIconTone(weatherData.icon)"
+        stroke-width="1.75"
+      />
+      <div class="weather-compact-temp">{{ celsiusToFahrenheit(weatherData.temperature) }}°</div>
+    </div>
+
+    <div v-else-if="weatherData && layout === 'summary'" class="weather-content">
+      <div class="weather-description">{{ weatherData.description }}</div>
+      <div class="weather-hero">
+        <div class="weather-hero-text">
+          <span class="weather-temp">{{ celsiusToFahrenheit(weatherData.temperature) }}°</span>
+          <div class="weather-feels">
+            Feels like {{ celsiusToFahrenheit(weatherData.feelsLike) }}°
+          </div>
+        </div>
+        <component
+          :is="getWeatherIcon(weatherData.icon)"
+          class="weather-icon"
+          :class="getIconTone(weatherData.icon)"
+          stroke-width="1.5"
+        />
+      </div>
+      <div
+        v-if="weatherData.hourlyForecast && weatherData.hourlyForecast.length > 0"
+        class="weather-summary-hours"
+      >
+        <div
+          v-for="(hour, index) in weatherData.hourlyForecast.slice(0, 5)"
+          :key="index"
+          class="weather-summary-hour"
+        >
+          <div class="text-xs text-fg-muted tabular-nums">{{ formatHourTime(hour.time) }}</div>
+          <component
+            :is="getWeatherIcon(hour.icon)"
+            class="h-6 w-6 mx-auto my-1"
+            :class="getIconTone(hour.icon)"
+            stroke-width="1.75"
+          />
+          <div class="text-sm font-semibold text-fg tabular-nums">
+            {{ celsiusToFahrenheit(hour.temperature) }}°
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div v-else-if="weatherData" class="weather-content">
       <div class="weather-description">
@@ -177,9 +285,7 @@ onMounted(() => {
       </div>
 
       <div class="weather-stats">
-        <div
-          class="weather-stat rounded-xl border border-border bg-surface-2"
-        >
+        <div class="weather-stat rounded-xl border border-border bg-surface-2">
           <div class="weather-stat-head">
             <Droplets class="weather-stat-icon text-fg-muted" />
             <span class="weather-stat-label text-fg-muted">Humidity</span>
@@ -188,9 +294,7 @@ onMounted(() => {
             {{ weatherData.humidity }}%
           </span>
         </div>
-        <div
-          class="weather-stat rounded-xl border border-border bg-surface-2"
-        >
+        <div class="weather-stat rounded-xl border border-border bg-surface-2">
           <div class="weather-stat-head">
             <Wind class="weather-stat-icon text-fg-muted" />
             <span class="weather-stat-label text-fg-muted">Wind</span>
@@ -256,10 +360,114 @@ onMounted(() => {
         />
       </div>
     </div>
+
+    <Popover
+      :open="settingsPopover.isOpen.value"
+      :anchor="settingsPopover.anchor.value"
+      title="Weather settings"
+      @close="settingsPopover.close"
+    >
+      <div class="space-y-4">
+        <UiSelect
+          id="weather-layout"
+          label="Layout"
+          :model-value="layout"
+          :options="layoutOptions"
+          @change="v => setLayout(v as WeatherLayout)"
+        />
+        <div v-if="layout === 'compact'">
+          <label class="ui-label flex justify-between" for="weather-compact-scale">
+            <span>Icon and temperature size</span>
+            <span class="tabular-nums text-fg-muted">{{ compactScale }}%</span>
+          </label>
+          <input
+            id="weather-compact-scale"
+            type="range"
+            class="ui-range"
+            min="50"
+            max="150"
+            step="5"
+            :value="compactScale"
+            @input="onCompactScale"
+          />
+        </div>
+      </div>
+    </Popover>
   </WidgetCard>
 </template>
 
 <style scoped>
+/* Compact: icon and temperature tile. Sized from the card width (cqi) and capped by
+   viewport height so it also fits a landscape phone in full screen. */
+.weather-compact {
+  container-type: inline-size;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: min(4cqi, 3dvh);
+  padding: 0.5rem 0;
+}
+
+.weather-compact-icon {
+  width: calc(min(55cqi, 42dvh) * var(--wx-scale, 1));
+  height: calc(min(55cqi, 42dvh) * var(--wx-scale, 1));
+}
+
+.weather-compact-temp {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: calc(min(26cqi, 20dvh) * var(--wx-scale, 1));
+  line-height: 1;
+  color: var(--color-fg);
+  font-variant-numeric: tabular-nums;
+  /* Optically center: the degree sign adds width on the right only. */
+  padding-left: 0.25em;
+}
+
+/* Icon color tones. Lucide icons draw with stroke=currentColor and fill=none;
+   setting fill fills closed shapes (sun disc, cloud body) but not the rays. */
+.wx-sun {
+  color: #facc15;
+  fill: #f59e0b;
+}
+.wx-sun-cloud {
+  color: #fbbf24;
+  fill: color-mix(in oklch, var(--color-fg-muted) 35%, transparent);
+}
+.wx-moon {
+  color: var(--color-fg);
+  fill: color-mix(in oklch, var(--color-fg) 85%, transparent);
+}
+.wx-cloud {
+  color: var(--color-fg-muted);
+  fill: color-mix(in oklch, var(--color-fg-muted) 35%, transparent);
+}
+.wx-rain {
+  color: #60a5fa;
+}
+.wx-snow {
+  color: #7dd3fc;
+}
+.wx-storm {
+  color: #facc15;
+}
+
+.weather-summary-hours {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.375rem;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.weather-summary-hour {
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border);
+  padding: 0.5rem 0.25rem;
+}
+
 /* Make the weather body a query container so the hero/stats scale with
    the actual card width rather than viewport-based breakpoints. */
 .weather-content {

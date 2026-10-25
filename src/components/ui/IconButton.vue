@@ -22,8 +22,8 @@ withDefaults(
     class="ui-icon-btn"
     :type="type"
     :disabled="disabled"
-    :title="label"
     :aria-label="label"
+    :data-tooltip="label"
   >
     <component :is="icon" :class="{ 'animate-spin': spin }" />
   </button>

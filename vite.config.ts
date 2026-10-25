@@ -11,6 +11,8 @@ export default defineConfig({
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'favicon.svg'],
       workbox: {
         cleanupOutdatedCaches: true,
+        // Include the self-hosted clock fonts so they work offline.
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
       },
       manifest: {
         name: 'Launchpad',

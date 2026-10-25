@@ -3,7 +3,6 @@ import Home from './pages/Home.vue';
 import GoogleCallback from './pages/GoogleCallback.vue';
 import Widget from './pages/Widget.vue';
 import FullScreen from './pages/FullScreen.vue';
-import Settings from './pages/Settings.vue';
 import { readRememberedFullScreen } from './stores/fullScreen';
 
 export const routes: Array<RouteRecordRaw> = [
@@ -18,9 +17,9 @@ export const routes: Array<RouteRecordRaw> = [
     component: FullScreen,
   },
   {
+    // Settings moved into header popups; keep old links and bookmarks working.
     path: '/settings',
-    name: 'Settings',
-    component: Settings,
+    redirect: { path: '/', query: { theme: '1' } },
   },
   {
     path: '/widget/:name',

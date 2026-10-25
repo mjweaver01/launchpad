@@ -33,6 +33,9 @@ function normalizeHour(hour: number): number {
 
 export type ThemeLevel = 'normal' | 'dark' | 'redshift';
 
+const OVERRIDE_KEY = 'themeManualOverride';
+const OVERRIDE_EXPIRES_KEY = 'themeManualOverrideExpiresAt';
+
 export const useAutoThemeStore = defineStore('autoTheme', () => {
   const darkModeStore = useDarkModeStore();
   const redHueStore = useRedHueStore();
@@ -42,6 +45,8 @@ export const useAutoThemeStore = defineStore('autoTheme', () => {
   const isAutoThemeEnabled = ref(false);
   const currentThemeLevel = ref<ThemeLevel>('normal');
   const manualOverride = ref<ThemeLevel | null>(null);
+  /** When the manual override ends (ms timestamp): the next scheduled change. */
+  const overrideExpiresAt = ref<number | null>(null);
   const redshiftStartHour = ref(22); // 10 PM default
   const redshiftEndHour = ref(6); // 6 AM default
 
@@ -74,30 +79,28 @@ export const useAutoThemeStore = defineStore('autoTheme', () => {
   });
 
   // Actions
-  const getCurrentHour = (): number => {
-    const now = new Date();
-    return now.getHours() + now.getMinutes() / 60;
-  };
+  const hourOf = (date: Date): number =>
+    date.getHours() + date.getMinutes() / 60 + date.getSeconds() / 3600;
 
-  const determineThemeLevel = (): ThemeLevel => {
-    const currentHour = getCurrentHour();
+  /** Scheduled theme level at a given hour of the day (0-24, fractional). */
+  const levelAtHour = (hour: number): ThemeLevel => {
     const schedule = themeSchedule.value;
 
     // Handle redshift time (can cross midnight)
     if (redshiftStartHour.value > redshiftEndHour.value) {
       // Crosses midnight (e.g., 22:00 to 06:00)
-      if (currentHour >= redshiftStartHour.value || currentHour < redshiftEndHour.value) {
+      if (hour >= redshiftStartHour.value || hour < redshiftEndHour.value) {
         return 'redshift';
       }
     } else {
       // Same day (e.g., 02:00 to 06:00)
-      if (currentHour >= redshiftStartHour.value && currentHour < redshiftEndHour.value) {
+      if (hour >= redshiftStartHour.value && hour < redshiftEndHour.value) {
         return 'redshift';
       }
     }
 
     // Check for dark mode time
-    if (currentHour >= schedule.dark.start || currentHour < schedule.normal.start) {
+    if (hour >= schedule.dark.start || hour < schedule.normal.start) {
       return 'dark';
     }
 
@@ -105,9 +108,37 @@ export const useAutoThemeStore = defineStore('autoTheme', () => {
     return 'normal';
   };
 
-  const applyThemeLevel = (level: ThemeLevel) => {
-    console.log(`Applying theme level: ${level}`);
+  const determineThemeLevel = (): ThemeLevel => levelAtHour(hourOf(new Date()));
 
+  /**
+   * Timestamp of the next moment the scheduled level differs from the one in
+   * effect at `from`. Used to expire a manual override at the next scheduled
+   * change, so a late-night tap doesn't stick into the next day.
+   */
+  const nextScheduleChange = (from: Date): number => {
+    const startLevel = levelAtHour(hourOf(from));
+    const { sunrise, sunset } = sunTimes.value;
+    const boundaries = [sunrise, sunset, redshiftStartHour.value, redshiftEndHour.value];
+
+    const candidates = boundaries
+      .map(hour => {
+        const at = new Date(from);
+        at.setHours(0, Math.round(hour * 60), 0, 0);
+        if (at <= from) at.setDate(at.getDate() + 1);
+        return at;
+      })
+      .sort((a, b) => a.getTime() - b.getTime());
+
+    for (const at of candidates) {
+      // Check a minute past the boundary to avoid rounding at the edge.
+      if (levelAtHour(hourOf(new Date(at.getTime() + 60_000))) !== startLevel) {
+        return at.getTime();
+      }
+    }
+    return from.getTime() + 24 * 60 * 60 * 1000;
+  };
+
+  const applyThemeLevel = (level: ThemeLevel) => {
     switch (level) {
       case 'normal':
         if (darkModeStore.isDarkMode) {
@@ -140,12 +171,44 @@ export const useAutoThemeStore = defineStore('autoTheme', () => {
     currentThemeLevel.value = level;
   };
 
-  const updateTheme = () => {
+  const persistOverride = () => {
+    if (manualOverride.value && overrideExpiresAt.value !== null) {
+      localStorage.setItem(OVERRIDE_KEY, manualOverride.value);
+      localStorage.setItem(OVERRIDE_EXPIRES_KEY, String(overrideExpiresAt.value));
+    } else {
+      localStorage.removeItem(OVERRIDE_KEY);
+      localStorage.removeItem(OVERRIDE_EXPIRES_KEY);
+    }
+  };
+
+  const clearOverride = () => {
+    manualOverride.value = null;
+    overrideExpiresAt.value = null;
+    persistOverride();
+  };
+
+  /**
+   * Apply the scheduled level (or an unexpired manual override).
+   * `force` applies it even when the level hasn't changed. That matters at
+   * startup: dark mode and red shift are restored from storage as they were
+   * last session, while currentThemeLevel starts at 'normal', so without
+   * forcing, last night's red shift would stay on all day.
+   */
+  const updateTheme = (force = false) => {
     if (!isAutoThemeEnabled.value) return;
 
-    const newLevel = determineThemeLevel();
-    if (newLevel !== currentThemeLevel.value && !manualOverride.value) {
-      applyThemeLevel(newLevel);
+    if (
+      manualOverride.value &&
+      overrideExpiresAt.value !== null &&
+      Date.now() >= overrideExpiresAt.value
+    ) {
+      clearOverride();
+      force = true;
+    }
+
+    const level = manualOverride.value ?? determineThemeLevel();
+    if (force || level !== currentThemeLevel.value) {
+      applyThemeLevel(level);
     }
   };
 
@@ -153,29 +216,25 @@ export const useAutoThemeStore = defineStore('autoTheme', () => {
     isAutoThemeEnabled.value = true;
     localStorage.setItem('autoThemeEnabled', 'true');
 
-    // Apply theme immediately
-    updateTheme();
+    // Apply theme immediately, even if the level looks unchanged
+    updateTheme(true);
 
     // Set up periodic updates (every minute)
     if (updateInterval) {
       clearInterval(updateInterval);
     }
-    updateInterval = setInterval(updateTheme, 60000);
-
-    console.log('Auto-theme enabled');
+    updateInterval = setInterval(() => updateTheme(), 60000);
   };
 
   const disableAutoTheme = () => {
     isAutoThemeEnabled.value = false;
-    manualOverride.value = null;
+    clearOverride();
     localStorage.setItem('autoThemeEnabled', 'false');
 
     if (updateInterval) {
       clearInterval(updateInterval);
       updateInterval = null;
     }
-
-    console.log('Auto-theme disabled');
   };
 
   const toggleAutoTheme = () => {
@@ -186,14 +245,16 @@ export const useAutoThemeStore = defineStore('autoTheme', () => {
     }
   };
 
+  /** Set a manual override that lasts until the next scheduled change. */
   const setManualOverride = (level: ThemeLevel | null) => {
-    manualOverride.value = level;
     if (level) {
+      manualOverride.value = level;
+      overrideExpiresAt.value = nextScheduleChange(new Date());
+      persistOverride();
       applyThemeLevel(level);
-      localStorage.setItem('themeManualOverride', level);
     } else {
-      localStorage.removeItem('themeManualOverride');
-      updateTheme(); // Apply automatic theme
+      clearOverride();
+      updateTheme(true);
     }
   };
 
@@ -203,35 +264,43 @@ export const useAutoThemeStore = defineStore('autoTheme', () => {
     localStorage.setItem('redshiftStartHour', startHour.toString());
     localStorage.setItem('redshiftEndHour', endHour.toString());
 
+    // The schedule moved, so an active override ends at the new next change.
+    if (manualOverride.value) {
+      overrideExpiresAt.value = nextScheduleChange(new Date());
+      persistOverride();
+    }
+
     if (isAutoThemeEnabled.value) {
       updateTheme();
     }
   };
 
+  const readHour = (key: string, fallback: number): number => {
+    const value = parseFloat(localStorage.getItem(key) ?? '');
+    return Number.isFinite(value) && value >= 0 && value < 24 ? value : fallback;
+  };
+
   const initializeAutoTheme = () => {
     // Load settings from localStorage
-    const autoEnabled = localStorage.getItem('autoThemeEnabled');
-    const savedOverride = localStorage.getItem('themeManualOverride');
-    const savedStartHour = localStorage.getItem('redshiftStartHour');
-    const savedEndHour = localStorage.getItem('redshiftEndHour');
+    isAutoThemeEnabled.value = localStorage.getItem('autoThemeEnabled') === 'true';
 
-    if (autoEnabled === 'true') {
-      isAutoThemeEnabled.value = true;
-    }
+    // parseFloat, not parseInt: the sliders step in half hours (21.5 = 9:30 PM)
+    redshiftStartHour.value = readHour('redshiftStartHour', 22);
+    redshiftEndHour.value = readHour('redshiftEndHour', 6);
 
+    const savedOverride = localStorage.getItem(OVERRIDE_KEY);
     if (savedOverride && ['normal', 'dark', 'redshift'].includes(savedOverride)) {
       manualOverride.value = savedOverride as ThemeLevel;
+      const savedExpiry = Number(localStorage.getItem(OVERRIDE_EXPIRES_KEY));
+      // Overrides saved before expiry existed get one now, ending at the next change.
+      overrideExpiresAt.value =
+        Number.isFinite(savedExpiry) && savedExpiry > 0
+          ? savedExpiry
+          : nextScheduleChange(new Date());
+      persistOverride();
     }
 
-    if (savedStartHour) {
-      redshiftStartHour.value = parseInt(savedStartHour, 10);
-    }
-
-    if (savedEndHour) {
-      redshiftEndHour.value = parseInt(savedEndHour, 10);
-    }
-
-    // If auto-theme is enabled, start the system
+    // If auto-theme is enabled, start the system (expired overrides clear here)
     if (isAutoThemeEnabled.value) {
       enableAutoTheme();
     }
@@ -260,6 +329,7 @@ export const useAutoThemeStore = defineStore('autoTheme', () => {
     currentThemeLevel,
     effectiveThemeLevel,
     manualOverride,
+    overrideExpiresAt,
     redshiftStartHour,
     redshiftEndHour,
 
