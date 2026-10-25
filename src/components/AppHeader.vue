@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { useRoute } from 'vue-router';
 import { Rocket, RefreshCw, Menu, X } from 'lucide-vue-next';
 import { routes } from '../router';
 import { useWeatherStore, useNewsStore, useCalendarStore } from '../stores';
 import IconButton from './ui/IconButton.vue';
 
-const route = useRoute();
 const weatherStore = useWeatherStore();
 const newsStore = useNewsStore();
 const calendarStore = useCalendarStore();
@@ -14,13 +12,10 @@ const isRefreshing = ref(false);
 const isMobileMenuOpen = ref(false);
 
 const filteredRoutes = computed(() =>
-  routes.filter(
-    r => !r.path.includes('google') && r.path !== '/' && !r.path.includes('/widget')
-  )
+  routes.filter(r => !r.path.includes('google') && !r.path.includes('/widget'))
 );
 
-const showHomeLink = computed(() => route.path.includes('/widget'));
-const hasNavItems = computed(() => filteredRoutes.value.length > 0 || showHomeLink.value);
+const hasNavItems = computed(() => filteredRoutes.value.length > 0);
 
 const handleRefresh = async () => {
   if (isRefreshing.value) return;
@@ -67,13 +62,6 @@ const handleRefresh = async () => {
           >
             {{ r.name }}
           </router-link>
-          <router-link
-            v-if="showHomeLink"
-            to="/"
-            class="rounded-md px-3 py-1.5 text-sm font-medium text-[color:var(--color-fg-muted)] hover:text-[color:var(--color-fg)] hover:bg-[color:var(--color-surface-2)] transition-colors"
-          >
-            Home
-          </router-link>
         </nav>
 
         <!-- Right side -->
@@ -97,10 +85,7 @@ const handleRefresh = async () => {
 
       <!-- Mobile menu -->
       <Transition name="ui-mobile-menu">
-        <nav
-          v-if="isMobileMenuOpen && hasNavItems"
-          class="md:hidden flex flex-col gap-1 pb-4 pt-1"
-        >
+        <nav v-if="isMobileMenuOpen && hasNavItems" class="md:hidden flex flex-col gap-1 pb-4 pt-1">
           <router-link
             v-for="r in filteredRoutes"
             :key="r.path"
@@ -113,14 +98,6 @@ const handleRefresh = async () => {
             @click="isMobileMenuOpen = false"
           >
             {{ r.name }}
-          </router-link>
-          <router-link
-            v-if="showHomeLink"
-            to="/"
-            class="rounded-md px-3 py-2 text-sm font-medium text-[color:var(--color-fg-muted)] hover:text-[color:var(--color-fg)] hover:bg-[color:var(--color-surface-2)] transition-colors"
-            @click="isMobileMenuOpen = false"
-          >
-            Home
           </router-link>
         </nav>
       </Transition>

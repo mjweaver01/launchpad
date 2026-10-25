@@ -7,6 +7,8 @@ export type TimeClockMode = 'digital' | 'scoreboard' | 'analog';
 
 export interface TimeWidgetSettings {
   clockMode: TimeClockMode;
+  /** Digital mode only: show the seconds field. */
+  showSeconds: boolean;
 }
 
 export interface WidgetSettingsEntry {
@@ -19,7 +21,7 @@ const LEGACY_TIME_KEY = 'timeWidget-clockMode';
 const LEGACY_TIME_ANALOG_KEY = 'timeWidget-analogClock';
 const LEGACY_WATER_KEY = 'water-reminder-data';
 
-const defaultTimeSettings = (): TimeWidgetSettings => ({ clockMode: 'digital' });
+const defaultTimeSettings = (): TimeWidgetSettings => ({ clockMode: 'digital', showSeconds: true });
 
 export const useWidgetSettingsStore = defineStore('widgetSettings', () => {
   const byWidgetId = ref<Record<string, WidgetSettingsEntry>>({});
@@ -51,7 +53,7 @@ export const useWidgetSettingsStore = defineStore('widgetSettings', () => {
 
   const getTimeSettings = (widgetId: string): TimeWidgetSettings => {
     const existing = getEntry(widgetId).time;
-    if (existing) return existing;
+    if (existing) return { ...defaultTimeSettings(), ...existing };
 
     const migrated = migrateLegacyTimeSettings(widgetId);
     if (migrated) {
@@ -116,12 +118,12 @@ export const useWidgetSettingsStore = defineStore('widgetSettings', () => {
     try {
       const savedMode = localStorage.getItem(LEGACY_TIME_KEY);
       if (savedMode === 'digital' || savedMode === 'scoreboard' || savedMode === 'analog') {
-        return { clockMode: savedMode };
+        return { ...defaultTimeSettings(), clockMode: savedMode };
       }
 
       const legacy = localStorage.getItem(LEGACY_TIME_ANALOG_KEY);
       if (legacy && JSON.parse(legacy)) {
-        return { clockMode: 'analog' };
+        return { ...defaultTimeSettings(), clockMode: 'analog' };
       }
     } catch (error) {
       console.warn('Failed to migrate legacy time widget settings:', error);

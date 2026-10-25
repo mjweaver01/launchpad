@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { X, Layers, SunDim, Lock, LockOpen } from 'lucide-vue-next';
+import { X, Layers, Sun, Lock, LockOpen } from 'lucide-vue-next';
 import { useWidgetStore, useFullScreenStore } from '../stores';
 import { useWakeLock } from '../composables/useWakeLock';
 import DraggableWidget from '../components/widgets/DraggableWidget.vue';
@@ -69,8 +69,10 @@ const handleKeydown = (event: KeyboardEvent) => {
   if (event.key === 'Escape') exitFullScreen();
 };
 
-const onDimInput = (event: Event) => {
-  fullScreenStore.setDim(Number((event.target as HTMLInputElement).value));
+// The slider shows brightness (right = brighter); the store keeps the dim
+// amount, which is the overlay opacity.
+const onBrightnessInput = (event: Event) => {
+  fullScreenStore.setDim(1 - Number((event.target as HTMLInputElement).value));
   revealControls();
 };
 
@@ -118,17 +120,17 @@ onUnmounted(() => {
           <span class="hidden sm:inline">{{ wakeLock.isActive.value ? 'Awake' : 'Sleep' }}</span>
         </button>
 
-        <label class="flex items-center gap-2 flex-1 sm:flex-none min-w-0" title="Dim screen">
-          <SunDim class="h-4 w-4 flex-shrink-0" />
+        <label class="flex items-center gap-2 flex-1 sm:flex-none min-w-0" title="Brightness">
+          <Sun class="h-4 w-4 flex-shrink-0" />
           <input
             type="range"
-            min="0"
-            max="0.9"
+            min="0.1"
+            max="1"
             step="0.05"
-            :value="fullScreenStore.dim"
+            :value="1 - fullScreenStore.dim"
             class="ui-range fs-dim-range"
-            aria-label="Dim screen"
-            @input="onDimInput"
+            aria-label="Brightness"
+            @input="onBrightnessInput"
           />
         </label>
 

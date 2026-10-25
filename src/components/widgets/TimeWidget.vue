@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
-import { Clock, Watch, LayoutGrid, MapPin } from 'lucide-vue-next';
+import { Clock, Watch, SquareSplitVertical, MapPin, Timer, TimerOff } from 'lucide-vue-next';
 import { useLocationStore, useWeatherStore, useWidgetSettingsStore } from '../../stores';
 import type { TimeClockMode } from '../../stores/widgetSettings';
 import WidgetCard from './WidgetCard.vue';
@@ -24,6 +24,7 @@ const weatherStore = useWeatherStore();
 const widgetSettingsStore = useWidgetSettingsStore();
 const currentTime = ref(new Date());
 const clockMode = ref<ClockMode>(widgetSettingsStore.getTimeSettings(props.widgetId).clockMode);
+const showSeconds = ref(widgetSettingsStore.getTimeSettings(props.widgetId).showSeconds);
 let intervalId: ReturnType<typeof setInterval> | null = null;
 
 const formattedTime = computed(() =>
@@ -31,7 +32,7 @@ const formattedTime = computed(() =>
     hour12: true,
     hour: 'numeric',
     minute: '2-digit',
-    second: '2-digit',
+    ...(showSeconds.value ? { second: '2-digit' as const } : {}),
   })
 );
 
@@ -85,7 +86,7 @@ const nextModeIcon = computed(() => {
     case 'digital':
       return Clock;
     case 'scoreboard':
-      return LayoutGrid;
+      return SquareSplitVertical;
     case 'analog':
       return Watch;
   }
@@ -101,6 +102,11 @@ const nextModeLabel = computed(() => {
       return 'Switch to analog';
   }
 });
+
+const toggleSeconds = () => {
+  showSeconds.value = !showSeconds.value;
+  widgetSettingsStore.setTimeSettings(props.widgetId, { showSeconds: showSeconds.value });
+};
 
 const cycleClockMode = () => {
   clockMode.value = nextClockMode.value;
@@ -135,7 +141,9 @@ onMounted(() => {
   locationStore.initializeFromStorage();
   weatherStore.initializeFromStorage();
 
-  clockMode.value = widgetSettingsStore.getTimeSettings(props.widgetId).clockMode;
+  const settings = widgetSettingsStore.getTimeSettings(props.widgetId);
+  clockMode.value = settings.clockMode;
+  showSeconds.value = settings.showSeconds;
 
   intervalId = setInterval(() => {
     currentTime.value = new Date();
@@ -157,6 +165,12 @@ onUnmounted(() => {
     body-class="!flex flex-col items-center justify-center text-center"
   >
     <template #actions>
+      <IconButton
+        v-if="clockMode === 'digital'"
+        :icon="showSeconds ? TimerOff : Timer"
+        :label="showSeconds ? 'Hide seconds' : 'Show seconds'"
+        @click="toggleSeconds"
+      />
       <IconButton :icon="nextModeIcon" :label="nextModeLabel" @click="cycleClockMode" />
     </template>
 
