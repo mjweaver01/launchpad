@@ -36,6 +36,20 @@ const formattedTime = computed(() =>
   })
 );
 
+// Split "11:48 PM" so the AM/PM sits a small fixed gap from the digits. The
+// separator is a full-width space in the monospace font (Chrome also emits a
+// narrow no-break space, U+202F), which left a gap as wide as a digit.
+const PERIOD_GAP = 14; // SVG units at font-size 100, about 0.14em
+const CHAR_WIDTH = 56; // advance per monospace glyph incl. letter-spacing
+const digitalParts = computed(() => {
+  const match = formattedTime.value.match(/^(.*?)[\s\u202f]+([AP]M)$/i);
+  return match ? { time: match[1], period: match[2] } : { time: formattedTime.value, period: '' };
+});
+const digitalViewBoxWidth = computed(() => {
+  const { time, period } = digitalParts.value;
+  return (time.length + period.length) * CHAR_WIDTH + (period ? PERIOD_GAP : 0);
+});
+
 const formattedDate = computed(() =>
   currentTime.value.toLocaleDateString('en-US', {
     weekday: 'long',
@@ -179,9 +193,9 @@ onUnmounted(() => {
       <div class="w-full">
         <svg
           class="block w-full"
-          :viewBox="`0 0 ${formattedTime.length * 56} 100`"
+          :viewBox="`0 0 ${digitalViewBoxWidth} 100`"
           preserveAspectRatio="xMidYMid meet"
-          aria-label="Current time"
+          :aria-label="`Current time ${formattedTime}`"
         >
           <text
             x="50%"
@@ -192,7 +206,8 @@ onUnmounted(() => {
             font-size="100"
             style="font-variant-numeric: tabular-nums; letter-spacing: -0.05em"
           >
-            {{ formattedTime }}
+            <tspan>{{ digitalParts.time }}</tspan>
+            <tspan v-if="digitalParts.period" :dx="PERIOD_GAP">{{ digitalParts.period }}</tspan>
           </text>
         </svg>
       </div>
