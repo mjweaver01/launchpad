@@ -51,9 +51,13 @@ export default defineConfig({
     },
   },
   server: {
+    // 1234 and 5173 are taken by other local projects. netlify dev serves on
+    // 7410 (see netlify.toml) and proxies to this Vite server on 7411.
+    port: 7411,
+    strictPort: true,
     proxy: {
       '/.netlify/functions': {
-        target: 'http://localhost:1234',
+        target: 'http://localhost:7410',
         changeOrigin: true,
       },
     },

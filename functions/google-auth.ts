@@ -34,7 +34,7 @@ export const handler: Handler = async event => {
     const oauth2Client = new google.auth.OAuth2(
       GOOGLE_CLIENT_ID,
       GOOGLE_CLIENT_SECRET,
-      `${new URL(event.headers.origin || 'http://localhost:5173').origin}/auth/google/callback`
+      `${new URL(event.headers.origin || 'http://localhost:7410').origin}/auth/google/callback`
     );
 
     // Exchange authorization code for tokens

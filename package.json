@@ -6,12 +6,12 @@
     "node": ">=24.22.1"
   },
   "scripts": {
-    "dev": "netlify dev --port 1234",
+    "dev": "netlify dev --port 7410",
     "vite": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "vue-tsc --noEmit",
-    "netlify": "lsof -ti:1234 | xargs kill -9 2>/dev/null; NODE_OPTIONS=--inspect netlify dev --port 1234",
+    "netlify": "lsof -ti:7410 | xargs kill -9 2>/dev/null; NODE_OPTIONS=--inspect netlify dev --port 7410",
     "n": "npm run netlify",
     "d": "npm run netlify",
     "format": "prettier --write \"src/**/*.{js,ts,vue,jsx,tsx}\""

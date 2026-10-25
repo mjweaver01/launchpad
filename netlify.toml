@@ -3,6 +3,13 @@
   functions = "functions"
   publish = "dist"
 
+[dev]
+  # Local ports: 1234 and 5173 are used by other projects on this machine.
+  framework = "#custom"
+  command = "npm run vite"
+  port = 7410
+  targetPort = 7411
+
 [[headers]]
   for = "/index.html"
   [headers.values]
